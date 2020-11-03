@@ -1,5 +1,6 @@
 /* Open Sans from Google Fonts */
 @import 'https://fonts.googleapis.com/css?family=Quicksand:400,500,700';
+@import 'https://fonts.googleapis.com/css?family=Prompt:400,500,700';
 /* Theme LESS assets */
 /* Colors */
 /* Fonts */
@@ -16,17 +17,21 @@
   border-color: #CC0066;
 }
 .quicksand {
-  font-family: 'Quicksand', sans-serif;
+  font-family: 'Quicksand', 'Prompt', sans-serif;
 }
 .hero {
   background-color: #F19A2D;
   background-image: url("/base/images/bg-banner.jpg");
+  background-position: inherit;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 .hero-search .image-credit {
   color: #ffffff;
 }
 body {
   background: #ffffff;
+  font-family: 'Quicksand', 'Prompt', sans-serif;
 }
 .site-footer {
   background: #495A74;
@@ -63,7 +68,7 @@ input[type="color"]:focus {
 }
 .page-heading,
 .media-heading {
-  font-family: 'Quicksand', sans-serif;
+  font-family: 'Quicksand', 'Prompt', sans-serif;
 }
 .media-grid {
   background-color: #f6f7f9;
@@ -110,13 +115,13 @@ input[type="color"]:focus {
   background-color: #889ab4;
 }
 .btn {
-  font-family: 'Quicksand', sans-serif;
+  font-family: 'Quicksand', 'Prompt', sans-serif;
 }
 .btn-primary {
   background-color: #CC0066;
 }
 .nav-main {
-  font-family: 'Quicksand', sans-serif;
+  font-family: 'Quicksand', 'Prompt', sans-serif;
   background-color: #CC0066;
 }
 .nav-main .nav-collapse .nav > li a {
@@ -177,11 +182,11 @@ input[type="color"]:focus {
 }
 /* All modules */
 .module-heading {
-  font-family: 'Quicksand', sans-serif;
+  font-family: 'Quicksand', 'Prompt', sans-serif;
   background-color: #d6dce6;
 }
 .module-content h1 {
-  font-family: 'Quicksand', sans-serif;
+  font-family: 'Quicksand', 'Prompt', sans-serif;
 }
 /* Search */
 .module-hero-search .search-input input {
@@ -198,7 +203,7 @@ input[type="color"]:focus {
   color: #F19A2D;
 }
 .news-header {
-  font-family: 'Quicksand', sans-serif;
+  font-family: 'Quicksand', 'Prompt', sans-serif;
   background-color: #d6dce6;
 }
 .news-header .btn:hover {
@@ -214,7 +219,7 @@ input[type="color"]:focus {
   color: #354255;
 }
 .news-item-title {
-  font-family: 'Quicksand', sans-serif;
+  font-family: 'Quicksand', 'Prompt', sans-serif;
 }
 .add-dataset-modal {
   position: fixed;
@@ -266,7 +271,7 @@ input[type="color"]:focus {
   margin-top: 15px;
 }
 .search-form h2 {
-  font-family: 'Quicksand', sans-serif;
+  font-family: 'Quicksand', 'Prompt', sans-serif;
 }
 .search-giant.search-input button i:hover {
   color: #CC0066;
@@ -300,4 +305,7 @@ input[type="color"]:focus {
 .resource-tracking-summary {
   margin-top: -20px !important;
   border-top: none !important;
+}
+.masthead .nav li a {
+  background-color: #003647;
 }
