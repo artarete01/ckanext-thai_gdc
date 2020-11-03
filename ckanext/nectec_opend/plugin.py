@@ -6,6 +6,7 @@ import re
 from itertools import count
 from six import string_types
 from ckan.model import (MAX_TAG_LENGTH, MIN_TAG_LENGTH)
+from ckan.lib.helpers import json
 
 import logging
 
@@ -15,6 +16,7 @@ class Nectec_OpendPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.IPackageController, inherit=True)
     plugins.implements(plugins.IValidators)
+
 
     # IConfigurer
 
