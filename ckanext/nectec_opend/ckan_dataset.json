@@ -1,0 +1,662 @@
+{
+    "scheming_version": 1,
+    "dataset_type": "dataset",
+    "about": "A reimplementation of the default CKAN dataset schema",
+    "about_url": "http://github.com/ckan/ckanext-scheming",
+    "dataset_fields": [
+      {
+        "field_name": "data_type",
+        "label": {
+          "en": "Data Type",
+          "th": "ประเภทข้อมูล"
+        },
+        "preset": "select",
+        "choices": [
+          {
+            "value": "ข้อมูลทะเบียน",
+            "label": "ข้อมูลทะเบียน"
+          },
+          {
+            "value": "ข้อมูลระดับย่อย",
+            "label": "ข้อมูลระดับย่อย"
+          },
+          {
+            "value": "ข้อมูลภูมิสารสนเทศเชิงพื้นที่",
+            "label": "ข้อมูลภูมิสารสนเทศเชิงพื้นที่"
+          },
+          {
+            "value": "ข้อมูลประเภทอื่นๆ",
+            "label": "ข้อมูลประเภทอื่นๆ"
+          }
+        ],
+        "required": true
+      },
+      {
+        "field_name": "title",
+        "label": "Title",
+        "preset": "title",
+        "form_placeholder": "eg. A descriptive title",
+        "required": true
+      },
+      {
+        "field_name": "name",
+        "label": "URL",
+        "preset": "dataset_slug",
+        "form_placeholder": "eg. my-dataset"
+      },
+      {
+        "field_name": "data_owner",
+        "label": {
+          "en": "Data Owner",
+          "th": "องค์กร"
+        },
+        "form_placeholder": "องค์กร",
+        "required": true
+      },
+      {
+        "field_name": "contact_person",
+        "label": {
+          "en": "Contact Person",
+          "th": "ชื่อผู้ติดต่อ"
+        },
+        "form_placeholder": "Joe Bloggs"
+      },
+      {
+        "field_name": "contact_email",
+        "label": {
+          "en": "Contact Email",
+          "th": "อีเมล์ผู้ติดต่อ"
+        },
+        "form_placeholder": "joe@example.com",
+        "display_snippet": "email.html",
+        "required": true
+      },
+      {
+        "field_name": "tag_string",
+        "label": {
+          "en": "Tags",
+          "th": "คำสำคัญ"
+        },
+        "preset": "tag_string_autocomplete",
+        "form_placeholder": "eg. economy, mental health, government",
+        "required": true
+      },
+      {
+        "field_name": "notes",
+        "label": "Description",
+        "form_snippet": "markdown.html",
+        "form_placeholder": "eg. Some useful notes about the data"
+      },
+      {
+        "field_name": "objective",
+        "label": {
+          "en": "Objective",
+          "th": "วัตถุประสงค์"
+        },
+        "preset": "multiple_checkbox",
+        "choices": [
+          {
+            "value": "ยุทธศาสตร์ชาติ",
+            "label": "ยุทธศาสตร์ชาติ"
+          },
+          {
+            "value": "แผนพัฒนาเศรษฐกิจและสังคมแห่งชาติ",
+            "label": "แผนพัฒนาเศรษฐกิจและสังคมแห่งชาติ"
+          },
+          {
+            "value": "แผนความมั่นคงแห่งชาติ",
+            "label": "แผนความมั่นคงแห่งชาติ"
+          },
+          {
+            "value": "แผนแม่บทภายใต้ยุทธศาสตร์ชาติ",
+            "label": "แผนแม่บทภายใต้ยุทธศาสตร์ชาติ"
+          },
+          {
+            "value": "แผนปฏิรูปประเทศ",
+            "label": "แผนปฏิรูปประเทศ"
+          },
+          {
+            "value": "แผนระดับที่ 3 (มติครม. 4 ธ.ค. 2560)",
+            "label": "แผนระดับที่ 3 (มติครม. 4 ธ.ค. 2560)"
+          },
+          {
+            "value": "นโยบายรัฐบาล/ข้อสั่งการนายกรัฐมนตรี",
+            "label": "นโยบายรัฐบาล/ข้อสั่งการนายกรัฐมนตรี"
+          },
+          {
+            "value": "มติคณะรัฐมนตรี",
+            "label": "มติคณะรัฐมนตรี"
+          },
+          {
+            "value": "เพื่อการให้บริการประชาชน",
+            "label": "เพื่อการให้บริการประชาชน"
+          },
+          {
+            "value": "กฎหมายที่เกี่ยวข้อง",
+            "label": "กฎหมายที่เกี่ยวข้อง"
+          },
+          {
+            "value": "พันธกิจหน่วยงาน",
+            "label": "พันธกิจหน่วยงาน"
+          },
+          {
+            "value": "ดัชนี/ตัวชี้วัดระดับนานาชาติ",
+            "label": "ดัชนี/ตัวชี้วัดระดับนานาชาติ"
+          },
+          {
+            "value": "ไม่ทราบ",
+            "label": "ไม่ทราบ"
+          },
+          {
+            "value": "อื่นๆ",
+            "label": "อื่นๆ"
+          }
+        ],
+        "required": true
+      },
+      {
+        "field_name": "update_frequency_unit",
+        "label": {
+          "en": "Update Frequency Unit",
+          "th": "หน่วยความถี่ของการปรับปรุงข้อมูล"
+        },
+        "preset": "select",
+        "choices": [
+          {
+            "value": "ปี",
+            "label": "ปี"
+          },
+          {
+            "value": "ครึ่งปี",
+            "label": "ครึ่งปี"
+          },
+          {
+            "value": "ไตรมาส",
+            "label": "ไตรมาส"
+          },
+          {
+            "value": "เดือน",
+            "label": "เดือน"
+          },
+          {
+            "value": "สัปดาห์",
+            "label": "สัปดาห์"
+          },
+          {
+            "value": "วัน",
+            "label": "วัน"
+          },
+          {
+            "value": "วันทำการ",
+            "label": "วันทำการ"
+          },
+          {
+            "value": "ชั่วโมง",
+            "label": "ชั่วโมง"
+          },
+          {
+            "value": "นาที",
+            "label": "นาที"
+          },
+          {
+            "value": "ตามเวลาจริง",
+            "label": "ตามเวลาจริง"
+          },
+          {
+            "value": "ไม่มีการปรับปรุงหลังจากการจัดเก็บข้อมูล",
+            "label": "ไม่มีการปรับปรุงหลังจากการจัดเก็บข้อมูล"
+          },
+          {
+            "value": "อื่นๆ",
+            "label": "อื่นๆ"
+          },
+          {
+            "value": "ไม่ทราบ",
+            "label": "ไม่ทราบ"
+          }
+        ]
+      },
+      {
+        "field_name": "update_frequency_interval",
+        "label": {
+          "en": "Update Frequency Interval",
+          "th": "ค่าความถี่ของการปรับปรุงข้อมูล"
+        }
+      },
+      {
+        "field_name": "geo_coverage",
+        "label": {
+          "en": "Geo Coverage",
+          "th": "ขอบเขตเชิงภูมิศาสตร์หรือเชิงพื้นที่"
+        },
+        "preset": "select",
+        "choices": [
+          {
+            "value": "โลก",
+            "label": "โลก"
+          },
+          {
+            "value": "ทวีป/กลุ่มประเทศในทวีป",
+            "label": "ทวีป/กลุ่มประเทศในทวีป"
+          },
+          {
+            "value": "กลุ่มประเทศทางเศรษฐกิจ",
+            "label": "กลุ่มประเทศทางเศรษฐกิจ"
+          },
+          {
+            "value": "ประเทศ",
+            "label": "ประเทศ"
+          },
+          {
+            "value": "ภาค",
+            "label": "ภาค"
+          },
+          {
+            "value": "จังหวัด",
+            "label": "จังหวัด"
+          },
+          {
+            "value": "อำเภอ",
+            "label": "อำเภอ"
+          },
+          {
+            "value": "ตำบล",
+            "label": "ตำบล"
+          },
+          {
+            "value": "หมู่บ้าน",
+            "label": "หมู่บ้าน"
+          },
+          {
+            "value": "เทศบาล/อบต.",
+            "label": "เทศบาล/อบต."
+          },
+          {
+            "value": "พิกัด",
+            "label": "พิกัด"
+          },
+          {
+            "value": "อื่นๆ",
+            "label": "อื่นๆ"
+          },
+          {
+            "value": "ไม่ทราบ",
+            "label": "ไม่ทราบ"
+          }
+        ]
+      },
+      {
+        "field_name": "data_source",
+        "label": {
+          "en": "Data Source",
+          "th": "แหล่งที่มา"
+        },
+        "required": true
+      },
+      {
+        "field_name": "data_format",
+        "label": {
+          "en": "Data Format",
+          "th": "รูปแบบการเก็บข้อมูล"
+        },
+        "preset": "select",
+        "choices": [
+          {
+            "value": "Database",
+            "label": "Database"
+          },
+          {
+            "value": "CSV",
+            "label": "CSV"
+          },
+          {
+            "value": "XML",
+            "label": "XML"
+          },
+          {
+            "value": "Image",
+            "label": "Image"
+          },
+          {
+            "value": "Video",
+            "label": "Video"
+          },
+          {
+            "value": "Audio",
+            "label": "Audio"
+          },
+          {
+            "value": "Text",
+            "label": "Text"
+          },
+          {
+            "value": "JSON",
+            "label": "JSON"
+          },
+          {
+            "value": "HTML",
+            "label": "HTML"
+          },
+          {
+            "value": "XLS",
+            "label": "XLS"
+          },
+          {
+            "value": "PDF",
+            "label": "PDF"
+          },
+          {
+            "value": "อื่นๆ",
+            "label": "อื่นๆ"
+          }
+        ]
+      },
+      {
+        "field_name": "data_category",
+        "label": {
+          "en": "Data Category",
+          "th": "หมวดหมู่ข้อมูลตามธรรมาภิบาลข้อมูลภาครัฐ"
+        },
+        "preset": "select",
+        "choices": [
+          {
+            "value": "ข้อมูลสาธารณะ",
+            "label": "ข้อมูลสาธารณะ"
+          },
+          {
+            "value": "ข้อมูลส่วนบุคคล",
+            "label": "ข้อมูลส่วนบุคคล"
+          },
+          {
+            "value": "ข้อมูลความมั่นคง",
+            "label": "ข้อมูลความมั่นคง"
+          },
+          {
+            "value": "ข้อมูลความลับทางราชการ",
+            "label": "ข้อมูลความลับทางราชการ"
+          }
+        ],
+        "required": true
+      },
+      {
+        "field_name": "license_id",
+        "label": "License",
+        "preset": "select",
+        "choices": [
+          {
+            "value": "DGA Open Government License",
+            "label": "DGA Open Government License"
+          },
+          {
+            "value": "Creative Commons Attributions",
+            "label": "Creative Commons Attributions"
+          },
+          {
+            "value": "Creative Commons Attribution Share-Alike",
+            "label": "Creative Commons Attribution Share-Alike"
+          },
+          {
+            "value": "Creative Commons Non-Commercial (Any)",
+            "label": "Creative Commons Non-Commercial (Any)"
+          },
+          {
+            "value": "Open Data Common",
+            "label": "Open Data Common"
+          },
+          {
+            "value": "GNU Free Documentation License",
+            "label": "GNU Free Documentation License"
+          },
+          {
+            "value": "License not specified",
+            "label": "License not specified"
+          },
+          {
+            "value": "อื่นๆ",
+            "label": "อื่นๆ"
+          }
+        ]
+      },
+      {
+        "field_name": "owner_org",
+        "label": "Organization",
+        "preset": "dataset_organization",
+        "form_snippet": "owner_org.html"
+      },
+      {
+        "field_name": "high_value_dataset",
+        "label": {
+          "en": "High Value Dataset",
+          "th": "ชุดข้อมูลที่มีคุณค่าสูง"
+        },
+        "preset": "select",
+        "choices": [
+          {
+            "value": "false",
+            "label": "ไม่ใช่"
+          },
+          {
+            "value": "true",
+            "label": "ใช่"
+          }
+        ],
+        "required": true
+      },
+      {
+        "field_name": "url",
+        "label": "URL",
+        "form_placeholder": "http://example.com/dataset.json",
+        "display_property": "foaf:homepage",
+        "display_snippet": "link.html"
+      },
+      {
+        "field_name": "accessible_condition",
+        "label": {
+          "en": "Accessible Condition",
+          "th": "เงื่อนไขในการเข้าถึงข้อมูล"
+        },
+        "form_snippet": "markdown.html",
+        "form_placeholder": "eg. Some useful condition about the data"
+      },
+      {
+        "field_name": "data_language",
+        "label": {
+          "en": "Data Language",
+          "th": "ภาษาที่ใช้"
+        },
+        "preset": "multiple_checkbox",
+        "choices": [
+          {
+            "value": "ไทย",
+            "label": "ไทย"
+          },
+          {
+            "value": "อังกฤษ",
+            "label": "อังกฤษ"
+          },
+          {
+            "value": "จีน",
+            "label": "จีน"
+          },
+          {
+            "value": "มลายู",
+            "label": "มลายู"
+          },
+          {
+            "value": "พม่า",
+            "label": "พม่า"
+          },
+          {
+            "value": "ลาว",
+            "label": "ลาว"
+          },
+          {
+            "value": "เขมร",
+            "label": "เขมร"
+          },
+          {
+            "value": "ญี่ปุ่น",
+            "label": "ญี่ปุ่น"
+          },
+          {
+            "value": "เกาหลี",
+            "label": "เกาหลี"
+          },
+          {
+            "value": "ฝรั่งเศส",
+            "label": "ฝรั่งเศส"
+          },
+          {
+            "value": "เยอรมัน",
+            "label": "เยอรมัน"
+          },
+          {
+            "value": "อารบิก",
+            "label": "อารบิก"
+          },
+          {
+            "value": "ไม่ทราบ",
+            "label": "ไม่ทราบ"
+          },
+          {
+            "value": "อื่นๆ",
+            "label": "อื่นๆ"
+          }
+        ]
+      },
+      {
+        "field_name": "reference_data",
+        "label": {
+          "en": "Reference Data",
+          "th": "ข้อมูลอ้างอิง"
+        },
+        "preset": "select",
+        "choices": [
+          {
+            "value": "false",
+            "label": "ไม่ใช่"
+          },
+          {
+            "value": "true",
+            "label": "ใช่"
+          }
+        ],
+        "required": true
+      },
+      {
+        "field_name": "data_collect",
+        "label": {
+          "en": "Data Collect",
+          "th": "หน่วยย่อยที่สุดของการจัดเก็บข้อมูล"
+        },
+        "preset": "select",
+        "choices": [
+          {
+            "value": "บุคคล",
+            "label": "บุคคล"
+          },
+          {
+            "value": "ครัวเรือน/ครอบครัว",
+            "label": "ครัวเรือน/ครอบครัว"
+          },
+          {
+            "value": "บ้าน/ที่อยู่อาศัย",
+            "label": "บ้าน/ที่อยู่อาศัย"
+          },
+          {
+            "value": "บริษัท/ห้างร้าน/สถานประกอบการ",
+            "label": "บริษัท/ห้างร้าน/สถานประกอบการ"
+          },
+          {
+            "value": "อาคาร/สิ่งปลูกสร้าง",
+            "label": "อาคาร/สิ่งปลูกสร้าง"
+          },
+          {
+            "value": "พื้นที่การเกษตร",
+            "label": "พื้นที่การเกษตร"
+          },
+          {
+            "value": "สัตว์และพันธุ์พืช",
+            "label": "สัตว์และพันธุ์พืช"
+          },
+          {
+            "value": "ขอบเขตเชิงภูมิศาสตร์หรือเชิงพื้นที่",
+            "label": "ขอบเขตเชิงภูมิศาสตร์หรือเชิงพื้นที่"
+          },
+          {
+            "value": "แหล่งน้ำ",
+            "label": "แหล่งน้ำ"
+          },
+          {
+            "value": "เส้นทางการเดินทาง",
+            "label": "เส้นทางการเดินทาง"
+          },
+          {
+            "value": "ไม่ทราบ",
+            "label": "ไม่ทราบ"
+          },
+          {
+            "value": "อื่นๆ",
+            "label": "อื่นๆ"
+          }
+        ]
+      },
+      {
+        "field_name": "data_support",
+        "label": {
+          "en": "Data Support",
+          "th": "ผู้สนับสนุนหรือผู้ร่วมดำเนินการ"
+        },
+        "preset": "select",
+        "choices": [
+          {
+            "value": "หน่วยงานของรัฐ",
+            "label": "หน่วยงานของรัฐ"
+          },
+          {
+            "value": "หน่วยงานเอกชน",
+            "label": "หน่วยงานเอกชน"
+          },
+          {
+            "value": "หน่วยงาน/องค์กรระหว่างประเทศ",
+            "label": "หน่วยงาน/องค์กรระหว่างประเทศ"
+          },
+          {
+            "value": "มูลนิธิ/สมาคม",
+            "label": "มูลนิธิ/สมาคม"
+          },
+          {
+            "value": "สถาบันการศึกษา",
+            "label": "สถาบันการศึกษา"
+          },
+          {
+            "value": "อื่นๆ",
+            "label": "อื่นๆ"
+          }
+        ]
+      }
+    ],
+    "resource_fields": [
+      {
+        "field_name": "url",
+        "label": "URL",
+        "preset": "resource_url_upload"
+      },
+      {
+        "field_name": "name",
+        "label": "Name",
+        "form_placeholder": "eg. January 2011 Gold Prices"
+      },
+      {
+        "field_name": "description",
+        "label": "Description",
+        "form_snippet": "markdown.html",
+        "form_placeholder": "Some useful notes about the data"
+      },
+      {
+        "field_name": "format",
+        "label": "Format",
+        "preset": "resource_format_autocomplete"
+      }
+    ]
+  }  
