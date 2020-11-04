@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python
+# encoding: utf-8
 
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
@@ -33,15 +34,14 @@ class Nectec_OpendPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             search_params['q'] = q
         return search_params
     
-    def after_create(self, context, data_dict):
-        if 'state' in data_dict and data_dict['state'] == 'draft':
-            data_dict['state'] = 'active'
-            toolkit.get_action('package_update')(context, data_dict)
+    def create(self, package):
+        self.modify_package_before(package)
     
-    def after_update(self, context, data_dict):
-        if 'state' in data_dict and data_dict['state'] == 'draft':
-            data_dict['state'] = 'active'
-            toolkit.get_action('package_update')(context, data_dict)
+    def update(self, package):
+        self.modify_package_before(package)
+    
+    def modify_package_before(self, package):
+        package.state = 'active'
     
     def get_validators(self):
         return {
