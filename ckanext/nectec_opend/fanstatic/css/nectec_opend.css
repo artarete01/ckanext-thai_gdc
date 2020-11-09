@@ -22,7 +22,7 @@
 .hero {
   background-color: #F19A2D;
   background-image: url("/base/images/bg-banner.jpg");
-  background-position: inherit;
+  background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
 }
@@ -308,4 +308,35 @@ input[type="color"]:focus {
 }
 .masthead .nav li a {
   background-color: #003647;
+}
+.divIconFooter {
+  float: left;
+  margin-right: 5px;
+}
+.iconFooter {
+  margin-right: 15px;
+  width: 15px;
+  -webkit-transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  transition: all 0.5s ease;
+}
+.ml35px {
+  margin-left: 35px !important;
+}
+.totalVisitor {
+  color: #ffffff;
+  font-family: sukhumvitBold;
+  font-size: calc(20px + var(--font-size-custom));
+  -webkit-transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  transition: all 0.5s ease;
+}
+.navbar-toggle {
+  background-color: #003647;
+}
+.toolbar .breadcrumb a {
+  text-shadow: none;
+  color: #505050;
 }

@@ -1,0 +1,26 @@
+{% import 'macros/form.html' as form %}
+
+{%- set options=[] -%}
+{%- for c in h.scheming_field_choices(field) -%}
+  {%- if not form_restrict_choices_to or c.value in form_restrict_choices_to -%}
+    {%- do options.append({
+      'value': c.value|string,
+      'text': h.scheming_language_text(c.label) }) -%}
+  {%- endif -%}
+{%- endfor -%}
+
+{% if c.userobj.sysadmin %}
+{% call form.select(
+    field.field_name,
+    id='field-' + field.field_name,
+    label=h.scheming_language_text(field.label),
+    options=options,
+    selected=data.get(field.field_name, field.get('default', 'notspecified')),
+    error=errors[field.field_name],
+    classes=['control-medium'],
+    is_required=h.scheming_field_required(field),
+    attrs = {'class' : "form-control", 'onchange' : "sSelect_data_type();"}
+    )
+%}
+{% endcall %}
+{% endif %}

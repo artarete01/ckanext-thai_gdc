@@ -1,0 +1,94 @@
+<footer class="site-footer">
+    <div class="container">
+      {% block footer_content %}
+      <div class="blockFooter">
+          {% block footer_nav %}
+           <div class="bgFooterTop">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-7 col-sm-7 col-xs-12">
+                            <div class="row">
+                                <div class="col-md-12 col-sm-12 col-xs-12">
+                                    <div class="divIconFooter">
+                                        <i class="fa fa-map-marker iconFooter" aria-hidden="true"></i>
+                                    </div>
+                                    <div>
+                                        สำนักงาน....
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <div class="ml35px">
+                                        Office of ...
+                                    </div>
+                                    <div class="ml35px">
+                                        เลขที่ ....
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12 col-sm-12 col-xs-12 mt-1">
+                                    <div class="divIconFooter">
+                                        <i class="fa fa-phone iconFooter" aria-hidden="true"></i>
+                                    </div>
+                                    <div>โทร : ...</div>
+                                    <div class="clearfix"></div>
+                                    <div class="ml35px">
+                                        โทรสาร : ...
+                                    </div>
+                                </div>
+                                <div class="col-md-12 col-sm-12 col-xs-12 mt-1">
+                                    <div class="divIconFooter">
+                                        <i class="fa fa-envelope iconFooter" aria-hidden="true"></i>
+                                    </div>
+                                    <div>
+                                        e-mail : ...
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-5 col-sm-5 col-xs-12">
+                            <div class="row">
+                                {% block footer_attribution %}
+                                    <div class="col-md-12 col-sm-12 col-xs-12 text-right">
+                                        จำนวนผู้เข้าชม <span class="totalVisitor">{{ h.nectec_opend_get_stat_all_view() }}</span>
+                                    </div>
+
+                                    <div class="col-md-12 col-sm-12 col-xs-12 text-right mt-1">
+                                        <a href="/pages/q-a">
+                                            Q & A
+                                        </a>
+                                        <span>|</span>
+
+                                        <a href="#" target="_blank">
+                                            นโยบายเว็บไซต์
+                                        </a>
+                                        <span>|</span>
+
+                                        <a href="#" target="_blank">
+                                            นโยบายข้อมูลส่วนบุคคล
+                                        </a>
+                                        <span>|</span><br/>
+                                        <a href="#" target="_blank" class="dsBlockFooter">
+                                            นโยบายการรักษาความมั่นคงปลอดภัยเว็บไซต์
+                                        </a>
+                                    </div>
+                                {% endblock %}
+                                {% block footer_lang %}
+                                    {% snippet "snippets/language_selector.html" %}
+                                {% endblock %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          {% endblock %}
+      </div>
+      {% endblock %}
+    </div>
+  
+    {% block footer_debug %}
+      {% if g.debug %}
+        {% include 'snippets/debug.html' %}
+      {% endif %}
+    {% endblock %}
+  </footer>
+  
