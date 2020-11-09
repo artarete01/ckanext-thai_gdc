@@ -10,7 +10,6 @@
           "en": "Data Type",
           "th": "ประเภทข้อมูล"
         },
-        "preset": "select",
         "choices": [
           {
             "value": "ข้อมูลทะเบียน",
@@ -25,15 +24,31 @@
             "label": "ข้อมูลภูมิสารสนเทศเชิงพื้นที่"
           },
           {
+            "value": "สถิติทั่วไป",
+            "label": "สถิติทั่วไป"
+          },
+          {
+            "value": "สถิติทางการ",
+            "label": "สถิติทางการ"
+          },
+          {
             "value": "ข้อมูลประเภทอื่นๆ",
             "label": "ข้อมูลประเภทอื่นๆ"
           }
         ],
+        "form_snippet": "data_type.html",
         "required": true
       },
       {
+        "field_name": "data_type_other",
+        "form_snippet": "data_type_other.html"
+      },
+      {
         "field_name": "title",
-        "label": "Title",
+        "label": {
+          "en": "Dataset Name",
+          "th": "ชื่อชุดข้อมูล"
+        },
         "preset": "title",
         "form_placeholder": "eg. A descriptive title",
         "required": true
@@ -45,16 +60,12 @@
         "form_placeholder": "eg. my-dataset"
       },
       {
-        "field_name": "data_owner",
-        "label": {
-          "en": "Data Owner",
-          "th": "องค์กร"
-        },
-        "form_placeholder": "องค์กร",
-        "required": true
+        "field_name": "owner_org",
+        "label": "Organization",
+        "preset": "dataset_organization"
       },
       {
-        "field_name": "contact_person",
+        "field_name": "maintainer",
         "label": {
           "en": "Contact Person",
           "th": "ชื่อผู้ติดต่อ"
@@ -62,7 +73,7 @@
         "form_placeholder": "Joe Bloggs"
       },
       {
-        "field_name": "contact_email",
+        "field_name": "maintainer_email",
         "label": {
           "en": "Contact Email",
           "th": "อีเมล์ผู้ติดต่อ"
@@ -152,7 +163,12 @@
             "label": "อื่นๆ"
           }
         ],
+        "form_snippet": "objective.html",
         "required": true
+      },
+      {
+        "field_name": "objective_other",
+        "form_snippet": "objective_other.html"
       },
       {
         "field_name": "update_frequency_unit",
@@ -207,12 +223,12 @@
             "label": "ไม่มีการปรับปรุงหลังจากการจัดเก็บข้อมูล"
           },
           {
-            "value": "อื่นๆ",
-            "label": "อื่นๆ"
-          },
-          {
             "value": "ไม่ทราบ",
             "label": "ไม่ทราบ"
+          },
+          {
+            "value": "อื่นๆ",
+            "label": "อื่นๆ"
           }
         ]
       },
@@ -276,12 +292,12 @@
             "label": "พิกัด"
           },
           {
-            "value": "อื่นๆ",
-            "label": "อื่นๆ"
-          },
-          {
             "value": "ไม่ทราบ",
             "label": "ไม่ทราบ"
+          },
+          {
+            "value": "อื่นๆ",
+            "label": "อื่นๆ"
           }
         ]
       },
@@ -418,31 +434,6 @@
         ]
       },
       {
-        "field_name": "owner_org",
-        "label": "Organization",
-        "preset": "dataset_organization",
-        "form_snippet": "owner_org.html"
-      },
-      {
-        "field_name": "high_value_dataset",
-        "label": {
-          "en": "High Value Dataset",
-          "th": "ชุดข้อมูลที่มีคุณค่าสูง"
-        },
-        "preset": "select",
-        "choices": [
-          {
-            "value": "false",
-            "label": "ไม่ใช่"
-          },
-          {
-            "value": "true",
-            "label": "ใช่"
-          }
-        ],
-        "required": true
-      },
-      {
         "field_name": "url",
         "label": "URL",
         "form_placeholder": "http://example.com/dataset.json",
@@ -523,25 +514,6 @@
             "label": "อื่นๆ"
           }
         ]
-      },
-      {
-        "field_name": "reference_data",
-        "label": {
-          "en": "Reference Data",
-          "th": "ข้อมูลอ้างอิง"
-        },
-        "preset": "select",
-        "choices": [
-          {
-            "value": "false",
-            "label": "ไม่ใช่"
-          },
-          {
-            "value": "true",
-            "label": "ใช่"
-          }
-        ],
-        "required": true
       },
       {
         "field_name": "data_collect",
@@ -634,6 +606,228 @@
             "label": "อื่นๆ"
           }
         ]
+      },
+      {
+        "field_name": "first_year_of_data",
+        "label": {
+            "en": "First year of data (Statistical data)",
+            "th": "ปีข้อมูลที่เริ่มต้นจัดทำ (สำหรับชุดข้อมูลสถิติ)"
+          },
+        "preset": "date"
+      },
+      {
+        "field_name": "last_year_of_data",
+        "label": {
+            "en": "Last year of data (Statistical data)",
+            "th": "ปีข้อมูลล่าสุดที่เผยแพร่ (สำหรับชุดข้อมูลสถิติ)"
+          },
+        "preset": "date"
+      },
+      {
+        "field_name": "release_calendar",
+        "label": {
+            "en": "Release calendar (Statistical data)",
+            "th": "วันที่กำหนดเผยแพร่ข้อมูลล่าสุด (สำหรับชุดข้อมูลสถิติ)"
+          },
+        "preset": "date"
+      },
+      {
+        "field_name": "disaggregate",
+        "label": {
+            "en": "Disaggregate (Statistical data)",
+            "th": "การจัดจำแนก (สำหรับชุดข้อมูลสถิติ)"
+          },
+        "preset": "multiple_checkbox",
+        "choices": [
+          {
+            "value": "ไม่มี",
+            "label": "ไม่มี"
+          },
+          {
+            "value": "เพศ",
+            "label": "เพศ"
+          },
+          {
+            "value": "อายุ/กลุ่มอายุ",
+            "label": "อายุ/กลุ่มอายุ"
+          },
+          {
+            "value": "สถานภาพสมรส",
+            "label": "สถานภาพสมรส"
+          },
+          {
+            "value": "ศาสนา",
+            "label": "ศาสนา"
+          },
+          {
+            "value": "ระดับการศึกษา",
+            "label": "ระดับการศึกษา"
+          },
+          {
+            "value": "อาชีพ",
+            "label": "อาชีพ"
+          },
+          {
+            "value": "สถานภาพการทางาน",
+            "label": "สถานภาพการทางาน"
+          },
+          {
+            "value": "อุตสาหกรรม/ประเภทกิจการ",
+            "label": "อุตสาหกรรม/ประเภทกิจการ"
+          },
+          {
+            "value": "รายได้",
+            "label": "รายได้"
+          },
+          {
+            "value": "ขอบเขตเชิงภูมิศาสตร์หรือเชิงพื้นที่",
+            "label": "ขอบเขตเชิงภูมิศาสตร์หรือเชิงพื้นที่"
+          },
+          {
+            "value": "ผลิตภัณฑ์",
+            "label": "ผลิตภัณฑ์"
+          },
+          {
+            "value": "ไม่ทราบ",
+            "label": "ไม่ทราบ"
+          },
+          {
+            "value": "อื่นๆ",
+            "label": "อื่นๆ"
+          }
+        ]
+      },
+      {
+        "field_name": "unit_of_measure",
+        "label": {
+            "en": "Unit of measure (Statistical data)",
+            "th": "หน่วยของการวัด (สำหรับชุดข้อมูลสถิติ)"
+          }
+      },
+      {
+        "field_name": "unit_multiplier",
+        "label": {
+            "en": "Unit multiplier (Statistical data)",
+            "th": "ตัวคูณหน่วยวัด (สำหรับชุดข้อมูลสถิติ)"
+          },
+        "preset": "select",
+        "choices": [
+          {
+            "value": "หน่วย",
+            "label": "หน่วย"
+          },
+          {
+            "value": "สิบ",
+            "label": "สิบ"
+          },
+          {
+            "value": "ร้อย",
+            "label": "ร้อย"
+          },
+          {
+            "value": "พัน",
+            "label": "พัน"
+          },
+          {
+            "value": "หมื่น",
+            "label": "หมื่น"
+          },
+          {
+            "value": "แสน",
+            "label": "แสน"
+          },
+          {
+            "value": "ล้าน",
+            "label": "ล้าน"
+          },
+          {
+            "value": "สิบล้าน",
+            "label": "สิบล้าน"
+          },
+          {
+            "value": "ร้อยล้าน",
+            "label": "ร้อยล้าน"
+          },
+          {
+            "value": "พันล้าน",
+            "label": "พันล้าน"
+          },
+          {
+            "value": "หมื่นล้าน",
+            "label": "หมื่นล้าน"
+          },
+          {
+            "value": "แสนล้าน",
+            "label": "แสนล้าน"
+          },
+          {
+            "value": "ล้านล้าน",
+            "label": "ล้านล้าน"
+          },
+          {
+            "value": "ไม่ทราบ",
+            "label": "ไม่ทราบ"
+          },
+          {
+            "value": "อื่นๆ",
+            "label": "อื่นๆ"
+          }
+        ]
+      },
+      {
+        "field_name": "calculation",
+        "label": {
+            "en": "Calculation (Statistical data)",
+            "th": "วิธีการคำนวณ (สำหรับชุดข้อมูลสถิติ)"
+          },
+        "form_snippet": "markdown.html",
+        "form_placeholder": ""
+      },
+      {
+        "field_name": "standard",
+        "label": {
+            "en": "Standard (Statistical data)",
+            "th": "มาตรฐานการจัดทำข้อมูล (สำหรับชุดข้อมูลสถิติ)"
+          }
+      },
+  
+      {
+        "field_name": "high_value_dataset",
+        "label": {
+          "en": "High Value Dataset",
+          "th": "ชุดข้อมูลที่มีคุณค่าสูง"
+        },
+        "preset": "select",
+        "choices": [
+          {
+            "value": "false",
+            "label": "ไม่ใช่"
+          },
+          {
+            "value": "true",
+            "label": "ใช่"
+          }
+        ],
+        "form_snippet": "select_admin_only.html"
+      },
+      {
+        "field_name": "reference_data",
+        "label": {
+          "en": "Reference Data",
+          "th": "ข้อมูลอ้างอิง"
+        },
+        "preset": "select",
+        "choices": [
+          {
+            "value": "false",
+            "label": "ไม่ใช่"
+          },
+          {
+            "value": "true",
+            "label": "ใช่"
+          }
+        ],
+        "form_snippet": "select_admin_only.html"
       }
     ],
     "resource_fields": [

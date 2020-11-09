@@ -8,6 +8,7 @@ from itertools import count
 from six import string_types
 from ckan.model import (MAX_TAG_LENGTH, MIN_TAG_LENGTH)
 from ckan.lib.helpers import json
+from ckanext.nectec_opend import helpers as noh
 
 import logging
 
@@ -15,6 +16,7 @@ log = logging.getLogger(__name__)
 
 class Nectec_OpendPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
     plugins.implements(plugins.IConfigurer)
+    plugins.implements(plugins.ITemplateHelpers)
     plugins.implements(plugins.IPackageController, inherit=True)
     plugins.implements(plugins.IValidators)
 
@@ -49,6 +51,14 @@ class Nectec_OpendPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
             'tag_length_validator': tag_length_validator,
             'tag_string_convert': tag_string_convert,
             }
+    
+    def get_helpers(self):
+        return {
+            'nectec_opend_day_thai': noh.day_thai,
+            'nectec_opend_get_stat_all_view': noh.get_stat_all_view,
+            'nectec_opend_facet_chart': noh.facet_chart,
+            'nectec_opend_get_recent_view_for_package': noh.get_recent_view_for_package
+        }
         
     
 def tag_name_validator(value, context):
