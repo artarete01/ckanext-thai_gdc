@@ -9,38 +9,29 @@
                         <div class="col-md-7 col-sm-7 col-xs-12">
                             <div class="row">
                                 <div class="col-md-12 col-sm-12 col-xs-12">
-                                    <div class="divIconFooter">
-                                        <i class="fa fa-map-marker iconFooter" aria-hidden="true"></i>
-                                    </div>
-                                    <div>
-                                        สำนักงาน....
-                                    </div>
-                                    <div class="clearfix"></div>
-                                    <div class="ml35px">
-                                        Office of ...
-                                    </div>
-                                    <div class="ml35px">
-                                        เลขที่ ....
-                                    </div>
+                                    <table>
+                                        <tr>
+                                            <td style="vertical-align:top"><i class="fa fa-map-marker iconFooter" aria-hidden="true"></i></td>
+                                            <td style="vertical-align:top">{{ h.render_markdown(g.site_org_address) }}</td>
+                                        </tr>
+                                    </table>
                                 </div>
 
                                 <div class="col-md-12 col-sm-12 col-xs-12 mt-1">
-                                    <div class="divIconFooter">
-                                        <i class="fa fa-phone iconFooter" aria-hidden="true"></i>
-                                    </div>
-                                    <div>โทร : ...</div>
-                                    <div class="clearfix"></div>
-                                    <div class="ml35px">
-                                        โทรสาร : ...
-                                    </div>
+                                    <table>
+                                        <tr>
+                                            <td style="vertical-align:top"><i class="fa fa-phone iconFooter" aria-hidden="true"></i></td>
+                                            <td style="vertical-align:top">{{ h.render_markdown(g.site_org_contact) }}</td>
+                                        </tr>
+                                    </table>
                                 </div>
                                 <div class="col-md-12 col-sm-12 col-xs-12 mt-1">
-                                    <div class="divIconFooter">
-                                        <i class="fa fa-envelope iconFooter" aria-hidden="true"></i>
-                                    </div>
-                                    <div>
-                                        e-mail : ...
-                                    </div>
+                                    <table>
+                                        <tr>
+                                            <td style="vertical-align:top"><i class="fa fa-envelope iconFooter" aria-hidden="true"></i></td>
+                                            <td style="vertical-align:top">{{ h.render_markdown(g.site_org_email) }}</td>
+                                        </tr>
+                                    </table>
                                 </div>
                             </div>
                         </div>
@@ -53,23 +44,7 @@
                                     </div>
 
                                     <div class="col-md-12 col-sm-12 col-xs-12 text-right mt-1">
-                                        <a href="/pages/q-a">
-                                            Q & A
-                                        </a>
-                                        <span>|</span>
-
-                                        <a href="#" target="_blank">
-                                            นโยบายเว็บไซต์
-                                        </a>
-                                        <span>|</span>
-
-                                        <a href="#" target="_blank">
-                                            นโยบายข้อมูลส่วนบุคคล
-                                        </a>
-                                        <span>|</span><br/>
-                                        <a href="#" target="_blank" class="dsBlockFooter">
-                                            นโยบายการรักษาความมั่นคงปลอดภัยเว็บไซต์
-                                        </a>
+                                        {{ h.render_markdown(g.site_policy_link) }}
                                     </div>
                                 {% endblock %}
                                 {% block footer_lang %}

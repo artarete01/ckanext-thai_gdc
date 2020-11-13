@@ -1,0 +1,25 @@
+# Thai translations for ckanext-nectec_opend.
+# Copyright (C) 2020 ORGANIZATION
+# This file is distributed under the same license as the ckanext-nectec_opend
+# project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2020.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: ckanext-nectec_opend 0.0.1\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2020-05-25 14:17+0700\n"
+"PO-Revision-Date: 2020-07-14 11:17+0700\n"
+"Language: th\n"
+"Language-Team: th <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.3.4\n"
+"Last-Translator: \n"
+"X-Generator: Poedit 2.2.4\n"
+
+msgid "Search data"
+msgstr "ค้นหาชุดข้อมูล"
+

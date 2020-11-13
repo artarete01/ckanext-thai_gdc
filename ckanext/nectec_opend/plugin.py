@@ -3,6 +3,8 @@
 
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
+from ckan.lib.plugins import DefaultTranslation
+from ckan import logic
 import re
 from itertools import count
 from six import string_types
@@ -14,12 +16,13 @@ import logging
 
 log = logging.getLogger(__name__)
 
-class Nectec_OpendPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
+class Nectec_OpendPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.DefaultDatasetForm):
     plugins.implements(plugins.IConfigurer)
+    plugins.implements(plugins.ITranslation)
     plugins.implements(plugins.ITemplateHelpers)
     plugins.implements(plugins.IPackageController, inherit=True)
     plugins.implements(plugins.IValidators)
-
+    plugins.implements(plugins.IRoutes, inherit=True)
 
     # IConfigurer
 
@@ -27,6 +30,34 @@ class Nectec_OpendPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
         toolkit.add_template_directory(config_, 'templates')
         toolkit.add_public_directory(config_, 'public')
         toolkit.add_resource('fanstatic', 'nectec_opend')
+    
+    def before_map(self, map):
+        opend_controller = 'ckanext.nectec_opend.controllers.opend:OpendController'
+
+        map.connect('nectec_opend_page_index', '/pages',
+                    action='page_index', ckan_icon='file', controller=opend_controller)
+
+        return map
+
+    def update_config_schema(self, schema):
+
+        ignore_missing = toolkit.get_validator('ignore_missing')
+
+        schema.update({
+            'ckan.site_org_address': [ignore_missing, unicode],
+            'ckan.site_org_contact': [ignore_missing, unicode],
+            'ckan.site_org_email': [ignore_missing, unicode],
+            'ckan.site_policy_link': [ignore_missing, unicode],
+        })
+
+        return schema
+    
+    def before_view(self, pkg_dict):
+        pkg_dict = logic.get_action("package_show")({}, {
+            'include_tracking': True,
+            'id': pkg_dict['id']
+        })
+        return pkg_dict
     
     def before_search(self, search_params):
         if 'q' in search_params:
@@ -54,6 +85,9 @@ class Nectec_OpendPlugin(plugins.SingletonPlugin, toolkit.DefaultDatasetForm):
     
     def get_helpers(self):
         return {
+            'nectec_opend_get_organizations': noh.get_organizations,
+            'nectec_opend_get_groups': noh.get_groups,
+            'nectec_opend_get_resource_download': noh.get_resource_download,
             'nectec_opend_day_thai': noh.day_thai,
             'nectec_opend_get_stat_all_view': noh.get_stat_all_view,
             'nectec_opend_facet_chart': noh.facet_chart,

@@ -4,6 +4,56 @@
 /* Theme LESS assets */
 /* Colors */
 /* Fonts */
+@font-face {
+  font-family: 'sukhumvitBold';
+  src: url('../fonts/sukhumvitset/sukhumvitset-bold-webfont.woff2') format('woff2'),
+  url('../fonts/sukhumvitset/sukhumvitset-bold-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+
+}
+
+@font-face {
+  font-family: 'sukhumvitLight';
+  src: url('../fonts/sukhumvitset/sukhumvitset-light-webfont.woff2') format('woff2'),
+  url('../fonts/sukhumvitset/sukhumvitset-light-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+
+}
+
+@font-face {
+  font-family: 'sukhumvitMedium';
+  src: url('../fonts/sukhumvitset/sukhumvitset-medium-webfont.woff2') format('woff2'),
+  url('../fonts/sukhumvitset/sukhumvitset-medium-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+
+}
+
+@font-face {
+  font-family: 'sukhumvitSemiBold';
+  src: url('../fonts/sukhumvitset/sukhumvitset-semibold-webfont.woff2') format('woff2'),
+  url('../fonts/sukhumvitset/sukhumvitset-semibold-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'sukhumvitText';
+  src: url('../fonts/sukhumvitset/sukhumvitset-text-webfont.woff2') format('woff2'),
+  url('../fonts/sukhumvitset/sukhumvitset-text-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'sukhumvitThin';
+  src: url('../fonts/sukhumvitset/sukhumvitset-thin-webfont.woff2') format('woff2'),
+  url('../fonts/sukhumvitset/sukhumvitset-thin-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
 /* Responsive */
 /* News */
 /* Hero */
@@ -31,7 +81,7 @@
 }
 body {
   background: #ffffff;
-  font-family: 'Quicksand', 'Prompt', sans-serif;
+  font-family: "sukhumvitText";
 }
 .site-footer {
   background: #495A74;
@@ -68,7 +118,7 @@ input[type="color"]:focus {
 }
 .page-heading,
 .media-heading {
-  font-family: 'Quicksand', 'Prompt', sans-serif;
+  font-family: "sukhumvitBold";
 }
 .media-grid {
   background-color: #f6f7f9;
@@ -115,13 +165,13 @@ input[type="color"]:focus {
   background-color: #889ab4;
 }
 .btn {
-  font-family: 'Quicksand', 'Prompt', sans-serif;
+  font-family: "sukhumvitText";
 }
 .btn-primary {
   background-color: #CC0066;
 }
 .nav-main {
-  font-family: 'Quicksand', 'Prompt', sans-serif;
+  font-family: "sukhumvitText";
   background-color: #CC0066;
 }
 .nav-main .nav-collapse .nav > li a {
@@ -182,11 +232,11 @@ input[type="color"]:focus {
 }
 /* All modules */
 .module-heading {
-  font-family: 'Quicksand', 'Prompt', sans-serif;
+  font-family: "sukhumvitBold";
   background-color: #d6dce6;
 }
 .module-content h1 {
-  font-family: 'Quicksand', 'Prompt', sans-serif;
+  font-family: "sukhumvitText";
 }
 /* Search */
 .module-hero-search .search-input input {
@@ -203,7 +253,7 @@ input[type="color"]:focus {
   color: #F19A2D;
 }
 .news-header {
-  font-family: 'Quicksand', 'Prompt', sans-serif;
+  font-family: "sukhumvitText";
   background-color: #d6dce6;
 }
 .news-header .btn:hover {
@@ -219,7 +269,7 @@ input[type="color"]:focus {
   color: #354255;
 }
 .news-item-title {
-  font-family: 'Quicksand', 'Prompt', sans-serif;
+  font-family: "sukhumvitText";
 }
 .add-dataset-modal {
   position: fixed;
@@ -270,9 +320,6 @@ input[type="color"]:focus {
 .resource-list {
   margin-top: 15px;
 }
-.search-form h2 {
-  font-family: 'Quicksand', 'Prompt', sans-serif;
-}
 .search-giant.search-input button i:hover {
   color: #CC0066;
 }
@@ -309,6 +356,15 @@ input[type="color"]:focus {
 .masthead .nav li a {
   background-color: #003647;
 }
+.header {
+  font-family: sukhumvitBold;
+}
+h1, h2, h3 {
+  font-family: sukhumvitBold;
+}
+.masthead .section {
+  font-family: sukhumvitBold;
+}
 .divIconFooter {
   float: left;
   margin-right: 5px;
@@ -326,8 +382,8 @@ input[type="color"]:focus {
 }
 .totalVisitor {
   color: #ffffff;
-  font-family: sukhumvitBold;
-  font-size: calc(20px + var(--font-size-custom));
+  font-family: "sukhumvitBold";
+  font-size: 20px;
   -webkit-transition: all 0.5s ease;
   -moz-transition: all 0.5s ease;
   -o-transition: all 0.5s ease;
@@ -339,4 +395,13 @@ input[type="color"]:focus {
 .toolbar .breadcrumb a {
   text-shadow: none;
   color: #505050;
+}
+.textRecentViews {
+  color: #EF7100;
+  margin-left: 5px;
+  font-family: sukhumvitText;
+  font-size: 12px;
+}
+.package_count {
+  font-family: sukhumvitText;
 }

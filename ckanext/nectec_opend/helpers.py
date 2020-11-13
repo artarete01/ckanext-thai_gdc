@@ -13,15 +13,35 @@ from ckan.lib.search import make_connection
 import logging
 from ckanapi import LocalCKAN, NotFound, NotAuthorized
 
-from ckanext.dundee.dundee_model.dundee_model import DundeeModel
+from ckanext.nectec_opend.model.opend import OpendModel
 
 get_action = logic.get_action
-dundee_model = DundeeModel()
+opend_model = OpendModel()
 
 log = logging.getLogger(__name__)
 
+def get_organizations(all_fields=False, include_dataset_count=False, sort="name asc"):
+    context = {'user': c.user}
+    data_dict = {
+        'all_fields': all_fields,
+        'include_dataset_count': include_dataset_count,
+        'sort': sort}
+    return logic.get_action('organization_list')(context, data_dict)
+
+def get_groups(all_fields=False, include_dataset_count=False, sort="name asc"):
+    context = {'user': c.user}
+    data_dict = {
+        'all_fields': all_fields,
+        'include_dataset_count': include_dataset_count,
+        'sort': sort}
+    return logic.get_action('group_list')(context, data_dict)
+
+def get_resource_download(resource_id):
+    return opend_model.get_resource_download(resource_id)
+
 def get_stat_all_view():
-    return 1
+    num = opend_model.get_all_view()
+    return num
 
 def day_thai(t):
     month = [
@@ -59,7 +79,6 @@ def facet_chart(type, limit):
         i += 1
 
     return data
-
 
 def get_recent_view_for_package(package_id):
     rs = model.TrackingSummary.get_for_package(package_id)

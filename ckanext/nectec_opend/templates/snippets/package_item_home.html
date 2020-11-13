@@ -42,12 +42,6 @@
                   {% elif package.get('state', '').startswith('deleted') %}
                     <span class="label label-danger">{{ _('Deleted') }}</span>
                   {% endif %}
-                  <span class="textRecentViews">
-                    <i class="fa fa-line-chart" aria-hidden="true"></i>
-                    {{package.tracking_summary.recent}} recent views
-                </span>
-                  
-                  {#{ h.popular('recent views', package.tracking_summary.recent, min=20) if package.tracking_summary }#}
                 {% endblock %}
               </h3>
             {% endblock %}
