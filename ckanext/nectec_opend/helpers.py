@@ -83,3 +83,7 @@ def facet_chart(type, limit):
 def get_recent_view_for_package(package_id):
     rs = model.TrackingSummary.get_for_package(package_id)
     return rs['recent']
+
+def get_featured_pages(per_page):
+    pages = opend_model.get_featured_pages(per_page)
+    return pages

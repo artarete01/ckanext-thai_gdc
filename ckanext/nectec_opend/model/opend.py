@@ -59,3 +59,22 @@ class OpendModel:
         resultproxy = model.Session.execute(sql)
         row = resultproxy.fetchone()
         return 0 if row is None else row['sum']
+    
+    def get_featured_pages(self, limit):
+        if limit > 0:
+            sql = '''
+                select row_number() over (order by publish_date, modified desc) as rownum, cp.* from ckanext_pages cp where extras like '%"featured": true%' and page_type = 'page' and private = false order by publish_date, modified desc limit {} 
+            '''.format(limit)
+        else:
+            sql = '''
+                select row_number() over (order by publish_date, modified desc) as rownum, cp.* from ckanext_pages cp where extras like '%"featured": true%' and page_type = 'page' and private = false order by publish_date, modified desc 
+            '''
+
+        resultproxy = model.Session.execute(sql)
+
+        data = []
+        for rowproxy in resultproxy:
+            my_dict = {column: value for column, value in rowproxy.items()}
+            data.append(my_dict)
+
+        return data

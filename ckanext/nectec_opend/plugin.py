@@ -11,6 +11,7 @@ from six import string_types
 from ckan.model import (MAX_TAG_LENGTH, MIN_TAG_LENGTH)
 from ckan.lib.helpers import json
 from ckanext.nectec_opend import helpers as noh
+from ckanext.pages.interfaces import IPagesSchema
 
 import logging
 
@@ -23,6 +24,7 @@ class Nectec_OpendPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.De
     plugins.implements(plugins.IPackageController, inherit=True)
     plugins.implements(plugins.IValidators)
     plugins.implements(plugins.IRoutes, inherit=True)
+    plugins.implements(IPagesSchema)
 
     # IConfigurer
 
@@ -33,9 +35,6 @@ class Nectec_OpendPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.De
     
     def before_map(self, map):
         opend_controller = 'ckanext.nectec_opend.controllers.opend:OpendController'
-
-        map.connect('nectec_opend_page_index', '/pages',
-                    action='page_index', ckan_icon='file', controller=opend_controller)
 
         return map
 
@@ -48,6 +47,17 @@ class Nectec_OpendPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.De
             'ckan.site_org_contact': [ignore_missing, unicode],
             'ckan.site_org_email': [ignore_missing, unicode],
             'ckan.site_policy_link': [ignore_missing, unicode],
+        })
+
+        return schema
+
+    #IPagesSchema 
+    def update_pages_schema(self, schema):
+        ignore_missing = toolkit.get_validator('ignore_missing')
+        boolean_validator = toolkit.get_validator('boolean_validator')
+
+        schema.update({
+            'featured': [ignore_missing, boolean_validator],
         })
 
         return schema
@@ -91,7 +101,8 @@ class Nectec_OpendPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.De
             'nectec_opend_day_thai': noh.day_thai,
             'nectec_opend_get_stat_all_view': noh.get_stat_all_view,
             'nectec_opend_facet_chart': noh.facet_chart,
-            'nectec_opend_get_recent_view_for_package': noh.get_recent_view_for_package
+            'nectec_opend_get_recent_view_for_package': noh.get_recent_view_for_package,
+            'nectec_opend_get_featured_pages': noh.get_featured_pages
         }
         
     
