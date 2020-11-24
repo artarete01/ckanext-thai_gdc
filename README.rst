@@ -15,7 +15,10 @@ CKAN Extension เพื่อให้หน่วยงานภาครั�
 Requirements
 ------------
 
-สามารถติดตั้งร่วมกับ CKAN 2.8 ขึ้นไป โดยจำเป็นต้องติดตั้ง [ckanext-scheming](https://github.com/ckan/ckanext-scheming) และ [ckanext-pages](https://github.com/ckan/ckanext-pages)
+สามารถติดตั้งร่วมกับ CKAN 2.8 ขึ้นไป โดยจำเป็นต้องติดตั้ง Extension เหล่านี้ก่อน 
+
+- https://github.com/ckan/ckanext-scheming
+- https://github.com/ckan/ckanext-pages
 
 
 ------------
@@ -51,4 +54,4 @@ Config Settings
 
 module-path:file to schemas being used
 
-    scheming.dataset_schemas = ckanext.nectec_opend:ckan_dataset.json
+scheming.dataset_schemas = ckanext.nectec_opend:ckan_dataset.json
