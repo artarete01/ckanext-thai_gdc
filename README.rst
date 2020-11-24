@@ -54,4 +54,4 @@ Config Settings
 
 module-path:file to schemas being used
 
-scheming.dataset_schemas = ckanext.nectec_opend:ckan_dataset.json
+     scheming.dataset_schemas = ckanext.nectec_opend:ckan_dataset.json
