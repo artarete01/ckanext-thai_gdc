@@ -87,3 +87,7 @@ def get_recent_view_for_package(package_id):
 def get_featured_pages(per_page):
     pages = opend_model.get_featured_pages(per_page)
     return pages
+
+def get_page(name):
+    page = opend_model.get_page(name)
+    return page

@@ -42,10 +42,12 @@
                   {% elif package.get('state', '').startswith('deleted') %}
                     <span class="label label-danger">{{ _('Deleted') }}</span>
                   {% endif %}
+                  {% if package.tracking_summary %}
                   <span class="textRecentViews">
                     <i class="fa fa-line-chart" aria-hidden="true"></i>
                     {{package.tracking_summary.recent}} recent views
-                </span>
+                  </span>
+                  {% endif %}
                   
                   {#{ h.popular('recent views', package.tracking_summary.recent, min=20) if package.tracking_summary }#}
                 {% endblock %}
@@ -79,6 +81,12 @@
               {% endblock %}
             {% endif %}
           {% endblock %}
+          <div style="margin-top: 8px;">
+            <i class="fa fa-building" aria-hidden="true"></i>
+            {{ package.organization.title }}
+            <i class="fa fa-calendar" aria-hidden="true"></i>
+            {{ h.nectec_opend_day_thai(h.date_str_to_datetime(package.metadata_modified)) }}
+        </div>
         {% endblock %}
       </li>
     {% endblock %}

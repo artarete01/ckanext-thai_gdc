@@ -1,13 +1,13 @@
 {% import 'macros/form.html' as form %}
 <script type="text/javascript">
-	function sSelect_data_type(){
-		index = document.getElementById('field-data_type').value;
-		if(index == 'ข้อมูลประเภทอื่นๆ'){
-			document.getElementById('field-data_type_other').style.display='';
-            document.getElementById('field-data_type_other').focus();
+	function sSelect_unit_of_multiplier(){
+		index = document.getElementById('field-unit_of_multiplier').value;
+		if(index == 'อื่นๆ'){
+			document.getElementById('field-unit_of_multiplier_other').style.display='';
+            document.getElementById('field-unit_of_multiplier_other').focus();
 		} else {
-            document.getElementById('field-data_type_other').value='';
-            document.getElementById('field-data_type_other').style.display='none';
+            document.getElementById('field-unit_of_multiplier_other').value='';
+            document.getElementById('field-unit_of_multiplier_other').style.display='none';
         }
 	}
 </script>
@@ -15,8 +15,8 @@
 {%- set options=[] -%}
 {%- set form_restrict_choices_to=field.get('form_restrict_choices_to') -%}
 {%- if not h.scheming_field_required(field) or
-  field.get('form_include_blank_choice', false) -%}
-{%- do options.append({'value': '', 'text': ''}) -%}
+    field.get('form_include_blank_choice', false) -%}
+  {%- do options.append({'value': '', 'text': ''}) -%}
 {%- endif -%}
 {%- for c in h.scheming_field_choices(field) -%}
   {%- if not form_restrict_choices_to or c.value in form_restrict_choices_to -%}
@@ -35,7 +35,7 @@
     error=errors[field.field_name],
     classes=['control-medium'],
     is_required=h.scheming_field_required(field),
-    attrs = {'class' : "form-control", 'onchange' : "sSelect_data_type();"}
+    attrs = {'class' : "form-control", 'onchange' : "sSelect_unit_of_multiplier();"}
     )
 %}
 {% endcall %}

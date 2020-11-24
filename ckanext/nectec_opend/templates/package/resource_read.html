@@ -1,0 +1,37 @@
+{% ckan_extends %}
+
+{% macro license_string(pkg) %}
+  {% if 'license_url' in pkg %}
+    <a href="{{ pkg.license_url }}" rel="dc:rights">{{ pkg.license_title }}</a>
+  {% else %}
+    <span property="dc:rights">{{ pkg.license_title }}</span>
+  {% endif %}
+{% endmacro %}
+
+{% block secondary_content %}
+  {% block resources_list %}
+    {% snippet "package/snippets/resources.html", pkg=pkg, active=res.id %}
+  {% endblock %}
+
+  <section class="module module-narrow module-shallow license">
+    {% block license_title %}
+      <h2 class="module-heading"><i class="fa fa-lock"></i> {{ _('License') }}</h2>
+    {% endblock %}
+    {% block license_content %}
+      <p class="module-content">
+        {% block license_content_inner %}
+          {{ license_string(pkg) }}
+          {% if pkg.isopen %}
+            <a href="http://opendefinition.org/okd/" title="{{ _('This dataset satisfies the Open Definition.') }}">
+                <img class="open-data" src="{{ h.url_for_static('/base/images/od_80x15_blue.png') }}" alt="[Open Data]" />
+            </a>
+          {% endif %}
+        {% endblock %}
+      </p>
+    {% endblock %}
+  </section>
+
+{% endblock %}
+
+
+

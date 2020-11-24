@@ -1,0 +1,5 @@
+{% if data['update_frequency_unit'] == "อื่นๆ" %}
+<input type="text" name="{{field.field_name}}" id="field-{{field.field_name}}" value="{{data[field.field_name]}}" placeholder="โปรดระบุ" style="margin-bottom: 30px;" class="form-control">
+{% else %}
+<input type="text" name="{{field.field_name}}" id="field-{{field.field_name}}" value="{{data[field.field_name]}}" placeholder="โปรดระบุ" style="display:none;margin-bottom: 30px;" class="form-control">
+{% endif %}

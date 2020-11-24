@@ -41,8 +41,10 @@ class Nectec_OpendPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.De
     def update_config_schema(self, schema):
 
         ignore_missing = toolkit.get_validator('ignore_missing')
+        remove_whitespace = toolkit.get_validator('remove_whitespace')
 
         schema.update({
+            'ckan.promoted_banner': [ignore_missing, unicode, remove_whitespace],
             'ckan.site_org_address': [ignore_missing, unicode],
             'ckan.site_org_contact': [ignore_missing, unicode],
             'ckan.site_org_email': [ignore_missing, unicode],
@@ -101,6 +103,7 @@ class Nectec_OpendPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.De
             'nectec_opend_day_thai': noh.day_thai,
             'nectec_opend_get_stat_all_view': noh.get_stat_all_view,
             'nectec_opend_facet_chart': noh.facet_chart,
+            'nectec_opend_get_page': noh.get_page,
             'nectec_opend_get_recent_view_for_package': noh.get_recent_view_for_package,
             'nectec_opend_get_featured_pages': noh.get_featured_pages
         }

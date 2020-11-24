@@ -34,20 +34,6 @@ class OpendModel:
 
         return data
     
-    def get_page_by_name(self, name):
-        sql = '''
-            select cp.* from ckanext_pages cp where name = '{}' 
-        '''.format(name)
-        
-        resultproxy = model.Session.execute(sql)
-
-        data = []
-        for rowproxy in resultproxy:
-            my_dict = {column: value for column, value in rowproxy.items()}
-            data.append(my_dict)
-
-        return data
-    
     def get_resource_download(self, resource_id):
         sql = '''
                 select ts.url,sum(count) as sum, replace(replace(substring(ts.url from '\/dataset\/.*\/resource\/'),'/dataset/',''),'/resource/','') as package_id, 
@@ -70,6 +56,20 @@ class OpendModel:
                 select row_number() over (order by publish_date, modified desc) as rownum, cp.* from ckanext_pages cp where extras like '%"featured": true%' and page_type = 'page' and private = false order by publish_date, modified desc 
             '''
 
+        resultproxy = model.Session.execute(sql)
+
+        data = []
+        for rowproxy in resultproxy:
+            my_dict = {column: value for column, value in rowproxy.items()}
+            data.append(my_dict)
+
+        return data
+    
+    def get_page(self, name):
+        sql = '''
+            select cp.* from ckanext_pages cp where name = '{}' 
+        '''.format(name)
+        
         resultproxy = model.Session.execute(sql)
 
         data = []

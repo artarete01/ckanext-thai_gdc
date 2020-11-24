@@ -1,13 +1,13 @@
 {% import 'macros/form.html' as form %}
 <script type="text/javascript">
-	function sSelect_data_type(){
-		index = document.getElementById('field-data_type').value;
-		if(index == 'ข้อมูลประเภทอื่นๆ'){
-			document.getElementById('field-data_type_other').style.display='';
-            document.getElementById('field-data_type_other').focus();
+	function sSelect_data_format(){
+		index = document.getElementById('field-data_format').value;
+		if(index == 'อื่นๆ'){
+			document.getElementById('field-data_format_other').style.display='';
+            document.getElementById('field-data_format_other').focus();
 		} else {
-            document.getElementById('field-data_type_other').value='';
-            document.getElementById('field-data_type_other').style.display='none';
+            document.getElementById('field-data_format_other').value='';
+            document.getElementById('field-data_format_other').style.display='none';
         }
 	}
 </script>
@@ -35,7 +35,7 @@
     error=errors[field.field_name],
     classes=['control-medium'],
     is_required=h.scheming_field_required(field),
-    attrs = {'class' : "form-control", 'onchange' : "sSelect_data_type();"}
+    attrs = {'class' : "form-control", 'onchange' : "sSelect_data_format();"}
     )
 %}
 {% endcall %}

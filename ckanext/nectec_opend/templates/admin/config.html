@@ -22,6 +22,20 @@
       {% set is_url = data[field_url] and data[field_url].startswith('http') %}
       {{ form.image_upload(data, errors, is_upload_enabled=h.uploads_enabled(), is_url=is_url, is_upload=is_upload, upload_label = _('Site logo'), url_label=_('Site logo'),  field_url=field_url, field_upload='logo_upload', field_clear='clear_logo_upload' )}}
 
+      <div class="form-group control-full">
+        <label class="control-label">Promoted banner</label>
+        <div class="controls">
+            <button class="form-control" style="width: 250px;"> <a href="/pages_edit/promoted-banner" target="_blank"> <i class="fa fa-wrench"></i> แก้ไข "promoted-banner"</a></button>
+        </div>
+      </div>
+      
+      <div class="form-group control-full">
+        <label class="control-label">Search background</label>
+        <div class="controls">
+            <button class="form-control" style="width: 250px;"> <a href="/pages_edit/search-background" target="_blank"> <i class="fa fa-wrench"></i> แก้ไข "search-background"</a></button>
+        </div>
+      </div>
+
       {{ form.markdown('ckan.site_about', id='field-ckan-site-about', label=_('About'), value=data['ckan.site_about'], error=error, placeholder=_('About page text')) }}
 
       {{ form.markdown('ckan.site_intro_text', id='field-ckan-site-intro-text', label=_('Intro Text'), value=data['ckan.site_intro_text'], error=error, placeholder=_('Text on home page')) }}
@@ -30,13 +44,13 @@
 
       {{ form.select('ckan.homepage_style', id='field-homepage-style', label=_('Homepage'), options=homepages, selected=data['ckan.homepage_style'], error=error) }}
 
-      {{ form.markdown('ckan.site_org_address', id='field-ckan-site-org-address', label='ที่อยู่หน่วยงาน', value=data['ckan.site_org_address'], error=error, classes=['control-medium']) }}
+      {{ form.markdown('ckan.site_org_address', id='field-ckan-site-org-address', label='ที่อยู่หน่วยงาน (footer)', value=data['ckan.site_org_address'], error=error, classes=['control-medium']) }}
 
-      {{ form.markdown('ckan.site_org_contact', id='field-ckan-site-org-contact', label='เบอร์โทรหน่วยงาน', value=data['ckan.site_org_contact'], error=error, classes=['control-medium']) }}
+      {{ form.markdown('ckan.site_org_contact', id='field-ckan-site-org-contact', label='เบอร์โทรหน่วยงาน (footer)', value=data['ckan.site_org_contact'], error=error, classes=['control-medium']) }}
 
-      {{ form.markdown('ckan.site_org_email', id='field-ckan-site-org-email', label='อีเมลหน่วยงาน', value=data['ckan.site_org_email'], error=error, classes=['control-medium']) }}
+      {{ form.markdown('ckan.site_org_email', id='field-ckan-site-org-email', label='อีเมลหน่วยงาน (footer)', value=data['ckan.site_org_email'], error=error, classes=['control-medium']) }}
 
-      {{ form.markdown('ckan.site_policy_link', id='field-ckan-site-policy-link', label='รวมลิ้งค์นโยบายเว็บไซต์', value=data['ckan.site_policy_link'], error=error) }}
+      {{ form.markdown('ckan.site_policy_link', id='field-ckan-site-policy-link', label='รวมลิ้งค์นโยบายเว็บไซต์ (footer)', value=data['ckan.site_policy_link'], error=error, classes=['control-medium']) }}
 
       {% endblock %}
       <div class="form-actions">

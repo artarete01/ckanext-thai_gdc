@@ -16,12 +16,17 @@
 
   {% block home_image %}
     <section class="featured media-overlay hidden-xs">
-      <h2 class="media-heading">{% block home_image_caption %}{{ _("This is a featured section") }}{% endblock %}</h2>
+      <!--<h2 class="media-heading">{% block home_image_caption %}{{ _("This is a featured section") }}{% endblock %}</h2>-->
       {% block home_image_content %}
-        <a class="media-image" href="#">
-          <!--<img class="img-responsive" src="{{ h.url_for_static_or_external(g.promoted_banner) }}" alt="Placeholder" width="420" height="220" />-->
-          <img class="img-responsive" src="{{ h.url_for_static('/base/images/placeholder-420x220.png') }}" alt="Placeholder" width="420" height="220" />
-        </a>
+        {% set site_protocol_and_host = h.get_site_protocol_and_host() %}
+        {% set promoted_banner_page = h.nectec_opend_get_page('promoted-banner') %}
+        {% if promoted_banner_page and site_protocol_and_host[0]+'://'+site_protocol_and_host[1] in promoted_banner_page[0].content %}
+          {% set list1 = promoted_banner_page[0].content.split(site_protocol_and_host[0]+'://'+site_protocol_and_host[1]) %}
+          {% set list2 = list1[1].split('"') %}
+          <img class="img-responsive" style="min-width: 100%;" src="{{ h.url_for_static(list2[0]) }}" width="420" height="220" />
+        {% else %}
+          <img class="img-responsive" style="min-width: 100%;" src="{{ h.url_for_static_or_external(g.promoted_banner) }}" alt="Placeholder" width="420" height="220" />
+        {% endif %}
       {% endblock %}
     </section>
   {% endblock %}
