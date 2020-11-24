@@ -52,6 +52,6 @@ To install ckanext-nectec_opend:
 Config Settings
 ---------------
 
-module-path:file to schemas being used
+module-path:file for dataset schema
 
      scheming.dataset_schemas = ckanext.nectec_opend:ckan_dataset.json
