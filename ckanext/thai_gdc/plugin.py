@@ -17,7 +17,7 @@ import logging
 
 log = logging.getLogger(__name__)
 
-class thai_gdcPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.DefaultDatasetForm):
+class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.DefaultDatasetForm):
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.ITranslation)
     plugins.implements(plugins.ITemplateHelpers)
