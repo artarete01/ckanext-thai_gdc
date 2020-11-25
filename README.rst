@@ -1,5 +1,5 @@
 =============
-ckanext-nectec_opend
+ckanext-thai_gdc
 =============
 
 CKAN Extension เพื่อให้หน่วยงานภาครัฐของไทยนำไปติดตั้งเพื่อสร้าง "ระบบบัญชีข้อมูลหน่วยงาน (Agency Data Catalog)" ตามโครงการศึกษาและพัฒนาต้นแบบระบบบัญชีข้อมูลกลางภาครัฐ (Government Data Catalog) และระบบนามานุกรม (Directory Service) โดยความร่วมมือของสำนักงานสถิติแห่งชาติ (สสช.) สำนักงานพัฒนารัฐบาลดิจิทัล (องค์การมหาชน) (สพร.) สถาบันส่งเสริมการวิเคราะห์และบริหารข้อมูลขนาดใหญ่ภาครัฐ (สวข.) สถาบันเทคโนโลยีพระจอมเกล้าเจ้าคุณทหารลาดกระบัง และศูนย์เทคโนโลยีอิเล็กทรอนิกส์และคอมพิวเตอร์แห่งชาติ 
@@ -31,17 +31,17 @@ Installation
    For example installing any non-Python dependencies or adding any required
    config settings.
 
-To install ckanext-nectec_opend:
+To install ckanext-thai_gdc:
 
 1. Activate your CKAN virtual environment, for example::
 
      . /usr/lib/ckan/default/bin/activate
 
-2. Install the ckanext-nectec_opend Python package into your virtual environment::
+2. Install the ckanext-thai_gdc Python package into your virtual environment::
 
-     pip install ckanext-nectec_opend
+     pip install ckanext-thai_gdc
 
-3. Add ``nectec_opend`` to the ``ckan.plugins`` setting in your CKAN
+3. Add ``thai_gdc`` to the ``ckan.plugins`` setting in your CKAN
    config file (by default the config file is located at
    ``/etc/ckan/default/production.ini``).
 
@@ -56,4 +56,4 @@ Config Settings
 
 module-path:file for dataset schema
 
-     scheming.dataset_schemas = ckanext.nectec_opend:ckan_dataset.json
+     scheming.dataset_schemas = ckanext.thai_gdc:ckan_dataset.json

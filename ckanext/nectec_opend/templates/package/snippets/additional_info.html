@@ -15,7 +15,7 @@
           <tr>
             <th scope="row" class="dataset-label">{{ _("Last Updated") }}</th>
             <td class="dataset-details">
-                {{ h.nectec_opend_day_thai(h.date_str_to_datetime(pkg_dict.metadata_modified)) }}
+                {{ h.thai_gdc_day_thai(h.date_str_to_datetime(pkg_dict.metadata_modified)) }}
             </td>
           </tr>
         {% endif %}
@@ -24,7 +24,7 @@
             <th scope="row" class="dataset-label">{{ _("Created") }}</th>
 
             <td class="dataset-details">
-                {{ h.nectec_opend_day_thai(h.date_str_to_datetime(pkg_dict.metadata_created)) }}
+                {{ h.thai_gdc_day_thai(h.date_str_to_datetime(pkg_dict.metadata_created)) }}
             </td>
           </tr>
         {% endif %}

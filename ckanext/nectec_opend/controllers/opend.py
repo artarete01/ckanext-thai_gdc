@@ -7,7 +7,7 @@ _ = p.toolkit._
 
 
 class OpendController(p.toolkit.BaseController):
-    controller = 'ckanext.nectec_opend.controllers.opend:OpendController'
+    controller = 'ckanext.thai_gdc.controllers.opend:OpendController'
 
     def index(self):
         return 

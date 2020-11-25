@@ -10,14 +10,14 @@ from itertools import count
 from six import string_types
 from ckan.model import (MAX_TAG_LENGTH, MIN_TAG_LENGTH)
 from ckan.lib.helpers import json
-from ckanext.nectec_opend import helpers as noh
+from ckanext.thai_gdc import helpers as noh
 from ckanext.pages.interfaces import IPagesSchema
 
 import logging
 
 log = logging.getLogger(__name__)
 
-class Nectec_OpendPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.DefaultDatasetForm):
+class thai_gdcPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.DefaultDatasetForm):
     plugins.implements(plugins.IConfigurer)
     plugins.implements(plugins.ITranslation)
     plugins.implements(plugins.ITemplateHelpers)
@@ -31,10 +31,10 @@ class Nectec_OpendPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.De
     def update_config(self, config_):
         toolkit.add_template_directory(config_, 'templates')
         toolkit.add_public_directory(config_, 'public')
-        toolkit.add_resource('fanstatic', 'nectec_opend')
+        toolkit.add_resource('fanstatic', 'thai_gdc')
     
     def before_map(self, map):
-        opend_controller = 'ckanext.nectec_opend.controllers.opend:OpendController'
+        opend_controller = 'ckanext.thai_gdc.controllers.opend:OpendController'
 
         return map
 
@@ -97,15 +97,15 @@ class Nectec_OpendPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.De
     
     def get_helpers(self):
         return {
-            'nectec_opend_get_organizations': noh.get_organizations,
-            'nectec_opend_get_groups': noh.get_groups,
-            'nectec_opend_get_resource_download': noh.get_resource_download,
-            'nectec_opend_day_thai': noh.day_thai,
-            'nectec_opend_get_stat_all_view': noh.get_stat_all_view,
-            'nectec_opend_facet_chart': noh.facet_chart,
-            'nectec_opend_get_page': noh.get_page,
-            'nectec_opend_get_recent_view_for_package': noh.get_recent_view_for_package,
-            'nectec_opend_get_featured_pages': noh.get_featured_pages
+            'thai_gdc_get_organizations': noh.get_organizations,
+            'thai_gdc_get_groups': noh.get_groups,
+            'thai_gdc_get_resource_download': noh.get_resource_download,
+            'thai_gdc_day_thai': noh.day_thai,
+            'thai_gdc_get_stat_all_view': noh.get_stat_all_view,
+            'thai_gdc_facet_chart': noh.facet_chart,
+            'thai_gdc_get_page': noh.get_page,
+            'thai_gdc_get_recent_view_for_package': noh.get_recent_view_for_package,
+            'thai_gdc_get_featured_pages': noh.get_featured_pages
         }
         
     

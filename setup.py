@@ -10,7 +10,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-    name='''ckanext-nectec_opend''',
+    name='''ckanext-thai_gdc''',
 
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
@@ -21,7 +21,7 @@ setup(
     long_description=long_description,
 
     # The project's main homepage.
-    url='https://github.com//ckanext-nectec_opend',
+    url='https://github.com//ckanext-thai_gdc',
 
     # Author details
     author='''''',
@@ -80,7 +80,7 @@ setup(
     # pip to create the appropriate form of executable for the target platform.
     entry_points='''
         [ckan.plugins]
-        nectec_opend=ckanext.nectec_opend.plugin:Nectec_OpendPlugin
+        thai_gdc=ckanext.thai_gdc.plugin:thai_gdcPlugin
 
         [babel.extractors]
         ckan = ckan.lib.extract:extract_ckan

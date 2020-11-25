@@ -1,12 +1,12 @@
-# Thai translations for ckanext-nectec_opend.
+# Thai translations for ckanext-thai_gdc.
 # Copyright (C) 2020 ORGANIZATION
-# This file is distributed under the same license as the ckanext-nectec_opend
+# This file is distributed under the same license as the ckanext-thai_gdc
 # project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2020.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: ckanext-nectec_opend 0.0.1\n"
+"Project-Id-Version: ckanext-thai_gdc 0.0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2020-05-25 14:17+0700\n"
 "PO-Revision-Date: 2020-07-14 11:17+0700\n"

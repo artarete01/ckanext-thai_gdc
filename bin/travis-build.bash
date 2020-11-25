@@ -32,7 +32,7 @@ cd ckan
 paster db init -c test-core.ini
 cd -
 
-echo "Installing ckanext-nectec_opend and its requirements..."
+echo "Installing ckanext-thai_gdc and its requirements..."
 python setup.py develop
 pip install -r dev-requirements.txt
 

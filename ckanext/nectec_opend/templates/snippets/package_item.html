@@ -85,7 +85,7 @@
             <i class="fa fa-building" aria-hidden="true"></i>
             {{ package.organization.title }}
             <i class="fa fa-calendar" aria-hidden="true"></i>
-            {{ h.nectec_opend_day_thai(h.date_str_to_datetime(package.metadata_modified)) }}
+            {{ h.thai_gdc_day_thai(h.date_str_to_datetime(package.metadata_modified)) }}
         </div>
         {% endblock %}
       </li>

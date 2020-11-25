@@ -1,5 +1,5 @@
 """Tests for plugin.py."""
-import ckanext.nectec_opend.plugin as plugin
+import ckanext.thai_gdc.plugin as plugin
 
 def test_plugin():
     pass

@@ -13,7 +13,7 @@ from ckan.lib.search import make_connection
 import logging
 from ckanapi import LocalCKAN, NotFound, NotAuthorized
 
-from ckanext.nectec_opend.model.opend import OpendModel
+from ckanext.thai_gdc.model.opend import OpendModel
 
 get_action = logic.get_action
 opend_model = OpendModel()
