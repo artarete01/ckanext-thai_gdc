@@ -37,7 +37,7 @@ To install ckanext-thai_gdc:
 
      . /usr/lib/ckan/default/bin/activate
 
-2. Install the ckanext-thai_gdc Python package, from your CKAN virtualenv, run the following from your CKAN base folder::
+2. Install the ckanext-thai_gdc Python package, from your CKAN virtualenv, run the following from your CKAN base folder (/usr/lib/ckan/default)::
 
      pip install -e 'git+https://gitlab.nectec.or.th/opend/ckanext-thai_gdc.git#egg=ckanext-thai_gdc'
 
