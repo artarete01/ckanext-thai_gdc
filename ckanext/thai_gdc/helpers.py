@@ -95,3 +95,12 @@ def get_page(name):
         db.init_db(model)
     page = opend_model.get_page(name)
     return page
+
+def get_all_groups():
+    groups = toolkit.get_action('group_list_authz')(
+        data_dict={'include_dataset_count': False, 'all_fields': True})
+    pkg_group_ids = set(group['id'] for group
+                        in c.pkg_dict.get('groups', []))
+    return [[group['id'], group['display_name']]
+            for group in groups if
+            group['id'] not in pkg_group_ids]

@@ -106,7 +106,8 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             'thai_gdc_facet_chart': noh.facet_chart,
             'thai_gdc_get_page': noh.get_page,
             'thai_gdc_get_recent_view_for_package': noh.get_recent_view_for_package,
-            'thai_gdc_get_featured_pages': noh.get_featured_pages
+            'thai_gdc_get_featured_pages': noh.get_featured_pages,
+            'thai_gdc_get_all_groups': noh.get_all_groups
         }
         
     
