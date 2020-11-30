@@ -15,6 +15,8 @@ from ckanapi import LocalCKAN, NotFound, NotAuthorized
 
 from ckanext.thai_gdc.model.opend import OpendModel
 
+from ckanext.pages import db
+
 get_action = logic.get_action
 opend_model = OpendModel()
 
@@ -89,5 +91,7 @@ def get_featured_pages(per_page):
     return pages
 
 def get_page(name):
+    if db.pages_table is None:
+        db.init_db(model)
     page = opend_model.get_page(name)
     return page
