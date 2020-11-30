@@ -72,7 +72,7 @@ class OpendModel:
         try:
             resultproxy = model.Session.execute(sql)
         except:
-            return []
+            return None
 
         data = []
         for rowproxy in resultproxy:
