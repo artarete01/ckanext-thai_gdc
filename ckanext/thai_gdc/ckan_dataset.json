@@ -29,6 +29,8 @@
           }
         ],
         "form_snippet": "data_type.html",
+        "display_snippet": "select.html",
+        "validators": "scheming_required scheming_choices",
         "required": true
       },
       {
@@ -231,6 +233,8 @@
           }
         ],
         "form_snippet": "license_id.html",
+        "display_snippet": "select.html",
+        "validators": "scheming_required scheming_choices",
         "required": true
       },
       {
@@ -269,7 +273,9 @@
             "label": "ใช่"
           }
         ],
-        "form_snippet": "select_admin_only.html"
+        "form_snippet": "select_admin_only.html",
+        "display_snippet": "select.html",
+        "validators": "scheming_required scheming_choices"
       },
       {
         "field_name": "reference_data",
@@ -287,7 +293,9 @@
             "label": "ใช่"
           }
         ],
-        "form_snippet": "select_admin_only.html"
+        "form_snippet": "select_admin_only.html",
+        "display_snippet": "select.html",
+        "validators": "scheming_required scheming_choices"
       },
       {
         "field_name": "official_statistics",
@@ -305,7 +313,9 @@
             "label": "ใช่"
           }
         ],
-        "form_snippet": "select_admin_only.html"
+        "form_snippet": "select_admin_only.html",
+        "display_snippet": "select.html",
+        "validators": "scheming_required scheming_choices"
       }
     ],
     "resource_fields": [
@@ -387,6 +397,8 @@
           }
         ],
         "form_snippet": "update_frequency_unit.html",
+        "display_snippet": "select.html",
+        "validators": "scheming_required scheming_choices",
         "required": true
       },
       {
@@ -461,6 +473,8 @@
           }
         ],
         "form_snippet": "geo_coverage.html",
+        "display_snippet": "select.html",
+        "validators": "scheming_required scheming_choices",
         "required": true
       },
       {
@@ -536,6 +550,8 @@
           }
         ],
         "form_snippet": "data_format.html",
+        "display_snippet": "select.html",
+        "validators": "scheming_required scheming_choices",
         "required": true
       },
       {
@@ -574,7 +590,9 @@
             "label": "อื่นๆ"
           }
         ],
-        "form_snippet": "data_support.html"
+        "form_snippet": "data_support.html",
+        "display_snippet": "select.html",
+        "validators": "scheming_required scheming_choices"
       },
       {
         "field_name": "data_support_other",
@@ -636,7 +654,9 @@
             "label": "อื่นๆ"
           }
         ],
-        "form_snippet": "data_collect.html"
+        "form_snippet": "data_collect.html",
+        "display_snippet": "select.html",
+        "validators": "scheming_required scheming_choices"
       },
       {
         "field_name": "data_collect_other",
@@ -706,7 +726,9 @@
             "label": "อื่นๆ"
           }
         ],
-        "form_snippet": "data_language.html"
+        "form_snippet": "data_language.html",
+        "display_snippet": "select.html",
+        "validators": "scheming_required scheming_choices"
       },
       {
         "field_name": "data_language_other",
@@ -884,7 +906,9 @@
             "label": "อื่นๆ"
           }
         ],
-        "form_snippet": "unit_of_multiplier.html"
+        "form_snippet": "unit_of_multiplier.html",
+        "display_snippet": "select.html",
+        "validators": "scheming_required scheming_choices"
       },
       {
         "field_name": "unit_of_multiplier_other",
