@@ -69,8 +69,10 @@ class OpendModel:
         sql = '''
             select cp.* from ckanext_pages cp where name = '{}' 
         '''.format(name)
-        
-        resultproxy = model.Session.execute(sql)
+        try:
+            resultproxy = model.Session.execute(sql)
+        except:
+            return []
 
         data = []
         for rowproxy in resultproxy:

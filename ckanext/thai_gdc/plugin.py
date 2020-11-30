@@ -82,11 +82,12 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
     def create(self, package):
         self.modify_package_before(package)
     
-    def update(self, package):
+    def edit(self, package):
         self.modify_package_before(package)
     
     def modify_package_before(self, package):
         package.state = 'active'
+        
     
     def get_validators(self):
         return {

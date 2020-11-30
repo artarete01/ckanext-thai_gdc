@@ -157,6 +157,9 @@
           }
         ],
         "form_snippet": "objective.html",
+        "display_snippet": "multiple_choice.html",
+        "validators": "scheming_multiple_choice",
+        "output_validators": "scheming_multiple_choice_output",
         "required": true
       },
       {
@@ -797,7 +800,10 @@
             "label": "อื่นๆ"
           }
         ],
-        "form_snippet": "disaggregate.html"
+        "form_snippet": "disaggregate.html",
+        "display_snippet": "multiple_choice.html",
+        "validators": "scheming_multiple_choice",
+        "output_validators": "scheming_multiple_choice_output"
       },
       {
         "field_name": "disaggregate_other",
