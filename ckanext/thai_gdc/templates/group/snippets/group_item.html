@@ -1,0 +1,22 @@
+{% ckan_extends %}
+
+{% block item_inner %}
+  {% block image %}
+    {{ super() }}
+  {% endblock %}
+  {% block title %}
+    {{ super() }}
+  {% endblock %}
+  {% block description %}
+    {{ super() }}
+  {% endblock %}
+  {% block datasets %}
+    {{ super() }}
+  {% endblock %}
+  {% block link %}
+    {{ super() }}
+  {% endblock %}
+  {% if group.user_member or (h.check_access('member_delete', group) and c.controller in ['package', 'dataset'] and c.action in ['groups']) %}
+    <input name="group_remove.{{ group.id }}" value="{{ _('Remove') }}" type="submit" class="btn btn-danger btn-sm media-edit" title="{{ _('Remove dataset from this group') }}"/>
+  {% endif %}
+{% endblock %}

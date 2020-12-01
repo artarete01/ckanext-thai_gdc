@@ -80,3 +80,21 @@ class OpendModel:
             data.append(my_dict)
 
         return data
+    
+    def get_groups_all_type(self, type=None):
+        sql = '''
+            select gr.id, gr.title as display_name, gr.type from "group" gr where is_organization = false and state = 'active'
+        '''
+        if type:
+            sql = sql + '''
+             and "type"='{}'
+        '''.format(type)
+        
+        resultproxy = model.Session.execute(sql)
+
+        data = []
+        for rowproxy in resultproxy:
+            my_dict = {column: value for column, value in rowproxy.items()}
+            data.append(my_dict)
+
+        return data

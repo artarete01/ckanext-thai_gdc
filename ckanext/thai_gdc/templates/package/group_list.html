@@ -4,10 +4,10 @@
 {% block primary_content_inner %}
   <h2 class="hide-heading">{{ _('Groups') }}</h2>
 
-  {% if h.check_access('package_update', {'id':c.pkg_dict.id }) %}
-    {% set groups = h.thai_gdc_get_all_groups() %}
-  {% else %}
+  {% if c.userobj.sysadmin %}
     {% set groups = c.group_dropdown %}
+  {% elif h.check_access('package_update', {'id':c.pkg_dict.id }) %}
+    {% set groups = h.thai_gdc_get_all_groups_all_type() %}
   {% endif %}
 
   {% if groups %}
