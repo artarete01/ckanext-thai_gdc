@@ -1,4 +1,4 @@
 thai_gdc:
-  output: thai_gdc/css/thai_gdc.css
+  output: thai_gdc/thai_gdc.css
   contents:
     - thai_gdc.css
