@@ -3,5 +3,6 @@
 {% block styles %}
   {{ super() }}
 
-  {% resource 'thai_gdc/css/thai_gdc.css' %}
+  {% set type = 'asset' if h.ckan_version() > '2.9' else 'resource' %}
+  {% include 'thai_gdc/snippets/thai_gdc_' ~ type ~ '.html' %}
 {% endblock %}

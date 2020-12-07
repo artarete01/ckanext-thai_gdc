@@ -1,0 +1,5 @@
+thai_gdc_css:
+  filters: cssrewrite
+  output: ckanext-thai-gdc/%(version)s_thai_gdc.css
+  contents:
+    - css/thai_gdc.css

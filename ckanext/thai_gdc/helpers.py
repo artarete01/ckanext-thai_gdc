@@ -46,6 +46,7 @@ def get_stat_all_view():
     return num
 
 def day_thai(t):
+    log.info('month %r',t)
     month = [
         _('January'), _('February'), _('March'), _('April'),
         _('May'), _('June'), _('July'), _('August'),

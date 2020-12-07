@@ -1,0 +1,407 @@
+/* Open Sans from Google Fonts */
+@import 'https://fonts.googleapis.com/css?family=Quicksand:400,500,700';
+@import 'https://fonts.googleapis.com/css?family=Prompt:400,500,700';
+/* Theme LESS assets */
+/* Colors */
+/* Fonts */
+@font-face {
+  font-family: 'sukhumvitBold';
+  src: url('../fonts/sukhumvitset/sukhumvitset-bold-webfont.woff2') format('woff2'),
+  url('../fonts/sukhumvitset/sukhumvitset-bold-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+
+}
+
+@font-face {
+  font-family: 'sukhumvitLight';
+  src: url('../fonts/sukhumvitset/sukhumvitset-light-webfont.woff2') format('woff2'),
+  url('../fonts/sukhumvitset/sukhumvitset-light-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+
+}
+
+@font-face {
+  font-family: 'sukhumvitMedium';
+  src: url('../fonts/sukhumvitset/sukhumvitset-medium-webfont.woff2') format('woff2'),
+  url('../fonts/sukhumvitset/sukhumvitset-medium-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+
+}
+
+@font-face {
+  font-family: 'sukhumvitSemiBold';
+  src: url('../fonts/sukhumvitset/sukhumvitset-semibold-webfont.woff2') format('woff2'),
+  url('../fonts/sukhumvitset/sukhumvitset-semibold-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'sukhumvitText';
+  src: url('../fonts/sukhumvitset/sukhumvitset-text-webfont.woff2') format('woff2'),
+  url('../fonts/sukhumvitset/sukhumvitset-text-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'sukhumvitThin';
+  src: url('../fonts/sukhumvitset/sukhumvitset-thin-webfont.woff2') format('woff2'),
+  url('../fonts/sukhumvitset/sukhumvitset-thin-webfont.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+/* Responsive */
+/* News */
+/* Hero */
+/* Grid */
+/* Navigation */
+/* Navigation */
+.inputs-style {
+  border-color: #d6dce6;
+}
+.inputs-style:focus {
+  border-color: #CC0066;
+}
+.quicksand {
+  font-family: 'Quicksand', 'Prompt', sans-serif;
+}
+.hero {
+  background-color: #F19A2D;
+  background-image: url("/base/images/bg-banner.jpg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.hero-search .image-credit {
+  color: #ffffff;
+}
+body {
+  background: #ffffff;
+  font-family: "sukhumvitText";
+}
+.site-footer {
+  background: #495A74;
+}
+.homepage .module-search .module-content {
+  background-color: #CC0066;
+}
+.homepage .module-search .tags {
+  background-color: #F19A2D;
+}
+[role=main]:not(.hero),
+.main:not(.hero) {
+  background: #ffffff;
+}
+textarea:focus,
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="datetime"]:focus,
+input[type="datetime-local"]:focus,
+input[type="date"]:focus,
+input[type="month"]:focus,
+input[type="time"]:focus,
+input[type="week"]:focus,
+input[type="number"]:focus,
+input[type="email"]:focus,
+input[type="url"]:focus,
+input[type="search"]:focus,
+input[type="tel"]:focus,
+input[type="color"]:focus {
+  border-color: #CC0066;
+}
+.pill {
+  background-color: #495A74;
+}
+.page-heading,
+.media-heading {
+  font-family: "sukhumvitBold";
+}
+.media-grid {
+  background-color: #f6f7f9;
+  border-color: #d6dce6;
+}
+.account-masthead {
+  background-color: #495A74;
+}
+.account-masthead .account .notifications a span.badge {
+  background-color: #CC0066;
+}
+.account-masthead .account ul li a {
+  color: #d6dce6;
+}
+.account-masthead .account ul li a:hover {
+  background-color: #354255;
+}
+.masthead {
+  background: #ffffff;
+}
+.masthead a {
+  color: #CC0066;
+}
+.masthead .btn-navbar {
+  background-color: #495A74;
+}
+.masthead .btn-navbar:hover,
+.masthead .btn-navbar:focus {
+  background-color: #CC0066;
+}
+.language-picker li.active a {
+  color: #ffffff;
+}
+.language-picker li.active a,
+.language-picker li.active a:hover {
+  background-color: #495A74;
+}
+.language-picker li a {
+  color: #495A74;
+  background-color: #d6dce6;
+}
+.language-picker li a:hover {
+  color: #ffffff;
+  background-color: #889ab4;
+}
+.btn {
+  font-family: "sukhumvitText";
+}
+.btn-primary {
+  background-color: #CC0066;
+}
+.nav-main {
+  font-family: "sukhumvitText";
+  background-color: #CC0066;
+}
+.nav-main .nav-collapse .nav > li a {
+  color: #ffffff;
+}
+.nav-main .nav a:hover,
+.nav-main .nav a:focus {
+  color: #ffffff;
+  background-color: #F19A2D;
+}
+.nav-main .nav a:hover:before,
+.nav-main .nav a:focus:before {
+  border-top: 17px solid #ffffff;
+  border-bottom: 17px solid #ffffff;
+  border-left: 6px solid #F19A2D;
+}
+.nav-main .nav .active a {
+  color: #ffffff;
+  background-color: #F19A2D;
+}
+.nav-main .nav .active a:before {
+  border-top: 17px solid #ffffff;
+  border-bottom: 17px solid #ffffff;
+  border-left: 6px solid #F19A2D;
+}
+.secondary .nav > li a:hover {
+  border-radius: 15px;
+}
+.secondary .nav > li a:hover,
+.secondary .nav > li a:focus {
+  color: #ffffff;
+  background-color: #495A74;
+}
+.secondary .nav > li a:hover:before,
+.secondary .nav > li a:focus:before {
+  border-top: 17px solid #ffffff;
+  border-bottom: 17px solid #ffffff;
+  border-left: 6px solid #495A74;
+}
+.nav-item.active a,
+.nav-aside.active a,
+.nav-item.active a:hover,
+.nav-aside.active a:hover,
+.nav-item.active a:focus,
+.nav-aside.active a:focus {
+  color: #ffffff;
+  background-color: #495A74;
+}
+.nav-item.active a:before,
+.nav-aside.active a:before,
+.nav-item.active a:hover:before,
+.nav-aside.active a:hover:before,
+.nav-item.active a:focus:before,
+.nav-aside.active a:focus:before {
+  border-top: 17px solid #ffffff;
+  border-bottom: 17px solid #ffffff;
+  border-left: 6px solid #495A74;
+}
+/* All modules */
+.module-heading {
+  font-family: "sukhumvitBold";
+  background-color: #d6dce6;
+}
+.module-content h1 {
+  font-family: "sukhumvitText";
+}
+/* Search */
+.module-hero-search .search-input input {
+  border-color: #F19A2D;
+}
+.module-hero-search .search-input input:focus {
+  border-color: #CC0066;
+}
+.module-hero-search .search-input button i {
+  color: #F19A2D;
+}
+/* Topics */
+.module-topics a {
+  color: #F19A2D;
+}
+.news-header {
+  font-family: "sukhumvitText";
+  background-color: #d6dce6;
+}
+.news-header .btn:hover {
+  background-color: #ffffff;
+}
+.news-item {
+  color: #354255;
+  border: 1px solid #d6dce6;
+}
+.news-item:hover,
+.news-item:focus {
+  box-shadow: 0 0 30px #d6dce6;
+  color: #354255;
+}
+.news-item-title {
+  font-family: "sukhumvitText";
+}
+.add-dataset-modal {
+  position: fixed;
+  left: 50%;
+  top: 20%;
+  transform: translateX(-50%);
+  z-index: 1050;
+  display: none;
+}
+.add-dataset-modal-box {
+  display: table-cell;
+  background-color: #ffffff;
+  border: 1px solid #999;
+  border-radius: 6px;
+  box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+  background-clip: padding-box;
+  outline: none;
+  text-align: center;
+}
+.add-dataset-modal-description {
+  margin-top: 30px;
+}
+.add-dataset-modal-description p {
+  font-weight: bold;
+}
+.add-dataset-modal-description ul {
+  text-align: left;
+}
+.add-dataset-modal .close {
+  font-size: 35px;
+  color: white;
+  position: relative;
+  top: -32px;
+}
+.add-dataset-modal-backdrop {
+  display: none;
+}
+#dataset-resources {
+  border: 1px solid #dddddd;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+}
+#dataset-resources h3,
+#dataset-resources .search-form {
+  display: inline;
+}
+.resource-list {
+  margin-top: 15px;
+}
+.search-giant.search-input button i:hover {
+  color: #CC0066;
+}
+.simple-input .field .btn-search:hover {
+  color: #CC0066;
+}
+#field-user-search {
+  border-color: #d6dce6;
+}
+.search-icon-hover {
+  color: #CC0066;
+}
+.organization-logos {
+  background-color: #d6dce6;
+}
+.organization-logos figure figcaption {
+  color: #495A74;
+}
+.js .image-upload input[type=file] {
+  cursor: pointer;
+  position: absolute;
+  z-index: 1;
+  opacity: 0;
+}
+.nav-tabs .fa:last-child,
+.module-heading .fa:last-child,
+.btn .fa:last-child {
+  margin-right: 3px;
+}
+.resource-tracking-summary {
+  margin-top: -20px !important;
+  border-top: none !important;
+}
+.masthead .nav li a {
+  background-color: #003647;
+}
+.header {
+  font-family: sukhumvitBold;
+}
+h1, h2, h3 {
+  font-family: sukhumvitBold;
+}
+.masthead .section {
+  font-family: sukhumvitBold;
+}
+.divIconFooter {
+  float: left;
+  margin-right: 5px;
+}
+.iconFooter {
+  margin-right: 15px;
+  width: 15px;
+  -webkit-transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  transition: all 0.5s ease;
+}
+.ml35px {
+  margin-left: 35px !important;
+}
+.totalVisitor {
+  color: #ffffff;
+  font-family: "sukhumvitBold";
+  font-size: 20px;
+  -webkit-transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  transition: all 0.5s ease;
+}
+.navbar-toggle {
+  background-color: #003647;
+}
+.toolbar .breadcrumb a {
+  text-shadow: none;
+  color: #505050;
+}
+.textRecentViews {
+  color: #EF7100;
+  margin-left: 5px;
+  font-family: sukhumvitText;
+  font-size: 12px;
+}
+.package_count {
+  font-family: sukhumvitText;
+}

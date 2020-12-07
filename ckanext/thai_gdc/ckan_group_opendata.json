@@ -8,15 +8,13 @@
         "label": "Open Data Group Name",
         "validators": "ignore_missing unicode",
         "form_snippet": "large_text.html",
-        "form_attrs": {"data-module": "slug-preview-target"},
-        "form_placeholder": "My theme"
+        "form_attrs": {"data-module": "slug-preview-target"}
       },
       {
         "field_name": "name",
         "label": "URL",
         "validators": "not_empty unicode name_validator group_name_validator",
-        "form_snippet": "slug.html",
-        "form_placeholder": "my-theme"
+        "form_snippet": "slug.html"
       },
       {
         "field_name": "notes",

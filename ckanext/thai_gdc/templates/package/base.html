@@ -1,0 +1,22 @@
+{% ckan_extends %}
+
+{% block breadcrumb_content %}
+    {% if pkg %}
+        {% set dataset = h.dataset_display_name(pkg) %}
+        {% if pkg.organization %}
+            {% set organization = pkg.organization.title %}
+            <li>{% link_for _('Organizations'), named_route=pkg.organization.type ~ '.index' %}</li>
+            {% set parent_list =  h.group_tree_parents(pkg.organization.name)  %}
+            {% for parent_node in parent_list %}
+                <li>{% link_for  parent_node.title|truncate(35), named_route=pkg.organization.type ~ '.read', id=parent_node.name %}</li>
+            {% endfor %}
+            <li>{% link_for organization|truncate(30), named_route=pkg.organization.type ~ '.read', id=pkg.organization.name %}</li>
+        {% else %}
+            <li>{% link_for _(dataset_type.title()), named_route=dataset_type ~ '.search' %}</li>
+        {% endif %}
+        <li{{ self.breadcrumb_content_selected() }}>{% link_for dataset|truncate(30), named_route=pkg.type ~ '.read', id=pkg.id if is_activity_archive else pkg.name %}</li>
+    {% else %}
+      <li>{% link_for _(dataset_type.title()), named_route=dataset_type ~ '.search' %}</li>
+      <li class="active"><a href="">{{ _('Create Dataset') }}</a></li>
+    {% endif %}
+{% endblock %}

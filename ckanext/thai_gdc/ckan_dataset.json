@@ -274,8 +274,7 @@
           }
         ],
         "form_snippet": "select_admin_only.html",
-        "display_snippet": "select.html",
-        "validators": "scheming_required scheming_choices"
+        "display_snippet": "select.html"
       },
       {
         "field_name": "reference_data",
@@ -294,8 +293,7 @@
           }
         ],
         "form_snippet": "select_admin_only.html",
-        "display_snippet": "select.html",
-        "validators": "scheming_required scheming_choices"
+        "display_snippet": "select.html"
       },
       {
         "field_name": "official_statistics",
@@ -314,8 +312,7 @@
           }
         ],
         "form_snippet": "select_admin_only.html",
-        "display_snippet": "select.html",
-        "validators": "scheming_required scheming_choices"
+        "display_snippet": "select.html"
       }
     ],
     "resource_fields": [
@@ -591,8 +588,7 @@
           }
         ],
         "form_snippet": "data_support.html",
-        "display_snippet": "select.html",
-        "validators": "scheming_required scheming_choices"
+        "display_snippet": "select.html"
       },
       {
         "field_name": "data_support_other",
@@ -655,8 +651,7 @@
           }
         ],
         "form_snippet": "data_collect.html",
-        "display_snippet": "select.html",
-        "validators": "scheming_required scheming_choices"
+        "display_snippet": "select.html"
       },
       {
         "field_name": "data_collect_other",
@@ -727,8 +722,7 @@
           }
         ],
         "form_snippet": "data_language.html",
-        "display_snippet": "select.html",
-        "validators": "scheming_required scheming_choices"
+        "display_snippet": "select.html"
       },
       {
         "field_name": "data_language_other",
@@ -907,8 +901,7 @@
           }
         ],
         "form_snippet": "unit_of_multiplier.html",
-        "display_snippet": "select.html",
-        "validators": "scheming_required scheming_choices"
+        "display_snippet": "select.html"
       },
       {
         "field_name": "unit_of_multiplier_other",

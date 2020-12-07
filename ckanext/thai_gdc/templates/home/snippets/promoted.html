@@ -1,18 +1,4 @@
-{% set intro = g.site_intro_text %}
-
-<div class="module-content box" style="margin-top: 15px;">
-  <header>
-    {% if intro %}
-      {{ h.render_markdown(intro) }}
-    {% else %}
-      <h1 class="page-heading">{{ _("Welcome to CKAN") }}</h1>
-      <p>
-        {% trans %}This is a nice introductory paragraph about CKAN or the site
-        in general. We don't have any copy to go here yet but soon we will
-        {% endtrans %}
-      </p>
-    {% endif %}
-  </header>
+{% ckan_extends %}
 
   {% block home_image %}
     <section class="featured media-overlay hidden-xs">
@@ -25,9 +11,8 @@
           {% set list2 = list1[1].split('"') %}
           <img class="img-responsive" style="min-width: 100%;" src="{{ h.url_for_static(list2[0]) }}" width="420" height="220" />
         {% else %}
-          <img class="img-responsive" style="min-width: 100%;" src="{{ h.url_for_static_or_external(g.promoted_banner) }}" alt="Placeholder" width="420" height="220" />
+          <img class="img-responsive" style="min-width: 100%;" src="{{ h.url_for_static('/base/images/placeholder-420x220.png') }}" alt="Placeholder" width="420" height="220" />
         {% endif %}
       {% endblock %}
     </section>
   {% endblock %}
-</div>

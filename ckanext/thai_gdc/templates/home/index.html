@@ -1,10 +1,4 @@
-{% extends "page.html" %}
-{% set homepage_style = ( g.homepage_style or '1' ) %}
-
-{% block subtitle %}{{ _("Welcome") }}{% endblock %}
-
-{% block maintag %}{% endblock %}
-{% block toolbar %}{% endblock %}
+{% ckan_extends %}
 
 {% set site_protocol_and_host = h.get_site_protocol_and_host() %}
 {% set search_background_page = h.thai_gdc_get_page('search-background') %}

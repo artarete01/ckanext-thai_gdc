@@ -18,6 +18,7 @@ from ckanext.thai_gdc import helpers as noh
 from ckanext.pages.interfaces import IPagesSchema
 
 import logging
+import os
 
 log = logging.getLogger(__name__)
 
@@ -35,7 +36,18 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
     def update_config(self, config_):
         toolkit.add_template_directory(config_, 'templates')
         toolkit.add_public_directory(config_, 'public')
+        toolkit.add_public_directory(config_, 'fanstatic')
         toolkit.add_resource('fanstatic', 'thai_gdc')
+
+        try:
+            from ckan.lib.webassets_tools import add_public_path
+        except ImportError:
+            pass
+        else:
+            asset_path = os.path.join(
+                os.path.dirname(__file__), 'fanstatic'
+            )
+            add_public_path(asset_path, '/')
     
     def before_map(self, map):
         opend_controller = 'ckanext.thai_gdc.controllers.opend:OpendController'

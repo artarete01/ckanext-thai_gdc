@@ -46,3 +46,42 @@ msgstr "สร้างเมื่อ"
 
 msgid "Format"
 msgstr "นามสกุลของไฟล์"
+
+msgid "January"
+msgstr "มกราคม"
+
+msgid "February"
+msgstr "กุมภาพันธ์"
+
+msgid "March"
+msgstr "มีนาคม"
+
+msgid "April"
+msgstr "เมษายน"
+
+msgid "May"
+msgstr "พฤษภาคม"
+
+msgid "June"
+msgstr "มิถุนายน"
+
+msgid "July"
+msgstr "กรกฎาคม"
+
+msgid "August"
+msgstr "สิงหาคม"
+
+msgid "September"
+msgstr "กันยายน"
+
+msgid "October"
+msgstr "ตุลาคม"
+
+msgid "November"
+msgstr "พฤศจิกายน"
+
+msgid "December"
+msgstr "ธันวาคม"
+
+msgid "Just now"
+msgstr "เมื่อสักครู่"
