@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import ckan.model as model
 import ckan.plugins.toolkit as toolkit
+from sqlalchemy.exc import SQLAlchemyError
 
 class OpendModel:
 
@@ -8,8 +9,14 @@ class OpendModel:
         sql = '''
             select sum(count) as page_view from tracking_summary where tracking_type = 'page'
         '''
-        resultproxy = model.Session.execute(sql)
-        row = resultproxy.fetchone()
+        try:
+            resultproxy = model.Session.execute(sql)
+            row = resultproxy.fetchone()
+            model.Session.commit()
+        except SQLAlchemyError as e:
+            print(str(e))
+            model.Session.rollback()
+
         return row['page_view'] is not None and row['page_view'] or 0
 
     def get_resource_download_top(self, limit):
