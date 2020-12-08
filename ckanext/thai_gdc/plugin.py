@@ -60,7 +60,6 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
         remove_whitespace = toolkit.get_validator('remove_whitespace')
 
         schema.update({
-            'ckan.promoted_banner': [ignore_missing, unicode, remove_whitespace],
             'ckan.site_org_address': [ignore_missing, unicode],
             'ckan.site_org_contact': [ignore_missing, unicode],
             'ckan.site_org_email': [ignore_missing, unicode],

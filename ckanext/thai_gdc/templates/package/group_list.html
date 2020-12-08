@@ -4,8 +4,8 @@
   <h2 class="hide-heading">{{ _('Groups') }}</h2>
 
   {% if c.userobj.sysadmin %}
-    {% set groups = group_dropdown %}
-  {% elif h.check_access('package_update', {'id':pkg_dict.id }) %}
+    {% set groups = c.group_dropdown %}
+  {% elif h.check_access('package_update', {'id':c.pkg_dict.id }) %}
     {% set groups = h.thai_gdc_get_all_groups_all_type() %}
   {% endif %}
 
@@ -22,9 +22,9 @@
     </form>
   {% endif %}
 
-  {% if pkg_dict.groups %}
+  {% if c.pkg_dict.groups %}
     <form method="post">
-      {% snippet 'group/snippets/group_list.html', groups=pkg_dict.groups %}
+      {% snippet 'group/snippets/group_list.html', groups=c.pkg_dict.groups %}
     </form>
   {% else %}
     <p class="empty">{{ _('There are no groups associated with this dataset') }}</p>

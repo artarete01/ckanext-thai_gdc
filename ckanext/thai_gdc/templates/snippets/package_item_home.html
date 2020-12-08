@@ -19,7 +19,11 @@
                 {% endif %}
               {% endblock %}
               {% block heading_title %}
-      {{ h.link_to(h.truncate(title, truncate_title), h.url_for('%s.read' % package.type, id=package.name)) }}
+              {% if h.ckan_version() > '2.9' %}
+              {{ h.link_to(h.truncate(title, truncate_title), h.url_for('%s.read' % package.type, id=package.name)) }}
+                      {% else %}
+              {{ h.link_to(h.truncate(title, truncate_title), h.url_for(package.type + '_read', controller='package', action='read', id=package.name)) }}
+                      {% endif %}
               {% endblock %}
               {% block heading_meta %}
                 {% if package.get('state', '').startswith('draft') %}
@@ -51,7 +55,11 @@
                 {% block resources_inner %}
                   {% for resource in h.dict_list_reduce(package.resources, 'format') %}
                   <li>
+                    {% if h.ckan_version() > '2.9' %}
                     <a href="{{ h.url_for(package.type ~ '.read', id=package.name) }}" class="label label-default" data-format="{{ resource.lower() }}">{{ resource }}</a>
+                    {% else %}
+                    <a href="{{ h.url_for(controller='package', action='read', id=package.name) }}" class="label label-default" data-format="{{ resource.lower() }}">{{ resource }}</a>
+                    {% endif %}
                   </li>
                   {% endfor %}
                 {% endblock %}

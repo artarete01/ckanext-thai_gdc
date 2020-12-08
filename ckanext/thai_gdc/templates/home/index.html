@@ -1,14 +1,14 @@
 {% ckan_extends %}
 
-{% set site_protocol_and_host = h.get_site_protocol_and_host() %}
-{% set search_background_page = h.thai_gdc_get_page('search-background') %}
-{% if search_background_page and site_protocol_and_host[0]+'://'+site_protocol_and_host[1] in search_background_page[0].content %}
-  {% set list1 = search_background_page[0].content.split(site_protocol_and_host[0]+'://'+site_protocol_and_host[1]) %}
-  {% set list2 = list1[1].split('"') %}
-  {% set background = list2[0] %}
-{% else %}
+{#% set site_protocol_and_host = h.get_site_protocol_and_host() %#}
+{#% set search_background_page = h.thai_gdc_get_page('search-background') %#}
+{#% if search_background_page and site_protocol_and_host[0]+'://'+site_protocol_and_host[1] in search_background_page[0].content %#}
+  {#% set list1 = search_background_page[0].content.split(site_protocol_and_host[0]+'://'+site_protocol_and_host[1]) %#}
+  {#% set list2 = list1[1].split('"') %#}
+  {#% set background = list2[0] %#}
+{#% else %#}
   {% set background = '/base/images/bg-banner.jpg' %}
-{% endif %}
+{#% endif %#}
 
 {% block content %}
   <div class="homepage layout-{{ homepage_style }}">

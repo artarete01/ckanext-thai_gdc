@@ -5,7 +5,11 @@
   {{ super() }}
 
   {% if h.check_access('package_update', {'id':pkg.id }) %}
-    {% link_for _('Add new resource'), named_route=pkg_dict.type ~ '_resource.new', id=pkg_dict.name, class_='btn btn-default', icon='plus' %}
+    {% if h.ckan_version() > '2.9' %}
+      {% link_for _('Add new resource'), named_route=c.pkg_dict.type ~ '_resource.new', id=c.pkg_dict.name, class_='btn btn-default', icon='plus' %}
+    {% else %}
+      {% link_for _('Add New Resource'), controller='package', action='new_resource', id=c.pkg_dict.name, class_='btn btn-default', icon='plus' %}
+    {% endif %}
   {% endif %}
 
 {% endblock %}
