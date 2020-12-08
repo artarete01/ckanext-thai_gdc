@@ -15,7 +15,7 @@ from six import string_types
 from ckan.model import (MAX_TAG_LENGTH, MIN_TAG_LENGTH)
 from ckan.lib.helpers import json
 from ckanext.thai_gdc import helpers as noh
-from ckanext.pages.interfaces import IPagesSchema
+#from ckanext.pages.interfaces import IPagesSchema
 
 import logging
 import os
@@ -30,7 +30,7 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
     plugins.implements(plugins.IPackageController, inherit=True)
     plugins.implements(plugins.IValidators)
     plugins.implements(plugins.IRoutes, inherit=True)
-    plugins.implements(IPagesSchema)
+    #plugins.implements(IPagesSchema)
 
     # IConfigurer
     def update_config(self, config_):
@@ -111,15 +111,15 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             return {'success': True}
 
     #IPagesSchema 
-    def update_pages_schema(self, schema):
-        ignore_missing = toolkit.get_validator('ignore_missing')
-        boolean_validator = toolkit.get_validator('boolean_validator')
+    # def update_pages_schema(self, schema):
+    #     ignore_missing = toolkit.get_validator('ignore_missing')
+    #     boolean_validator = toolkit.get_validator('boolean_validator')
 
-        schema.update({
-            'featured': [ignore_missing, boolean_validator],
-        })
+    #     schema.update({
+    #         'featured': [ignore_missing, boolean_validator],
+    #     })
 
-        return schema
+    #     return schema
     
     def before_view(self, pkg_dict):
         pkg_dict = logic.get_action("package_show")({}, {
