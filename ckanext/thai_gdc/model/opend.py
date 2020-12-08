@@ -13,11 +13,12 @@ class OpendModel:
             resultproxy = model.Session.execute(sql)
             row = resultproxy.fetchone()
             model.Session.commit()
+            return row['page_view'] is not None and row['page_view'] or 0
         except SQLAlchemyError as e:
             print(str(e))
             model.Session.rollback()
 
-        return row['page_view'] is not None and row['page_view'] or 0
+        
 
     def get_resource_download_top(self, limit):
         sql = '''
