@@ -17,6 +17,7 @@ class OpendModel:
         except SQLAlchemyError as e:
             print(str(e))
             model.Session.rollback()
+            return 0
 
         
 
