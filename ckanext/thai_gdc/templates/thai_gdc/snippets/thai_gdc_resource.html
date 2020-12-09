@@ -1,1 +1,16 @@
 {% resource 'thai_gdc/css/thai_gdc.css' %}
+{% if 'fuchsia.css' in g.main_css %}
+    {% resource 'thai_gdc/css/thai_gdc_fuchsia.css' %}
+{% endif %}
+{% if 'green.css' in g.main_css %}
+    {% resource 'thai_gdc/css/thai_gdc_green.css' %}
+{% endif %}
+{% if 'main.css' in g.main_css %}
+    {% resource 'thai_gdc/css/thai_gdc_main.css' %}
+{% endif %}
+{% if 'maroon.css' in g.main_css %}
+    {% resource 'thai_gdc/css/thai_gdc_maroon.css' %}
+{% endif %}
+{% if 'red.css' in g.main_css %}
+    {% resource 'thai_gdc/css/thai_gdc_red.css' %}
+{% endif %}
