@@ -13,9 +13,7 @@ import re
 from itertools import count
 from six import string_types
 from ckan.model import (MAX_TAG_LENGTH, MIN_TAG_LENGTH)
-from ckan.lib.helpers import json
 from ckanext.thai_gdc import helpers as noh
-#from ckanext.pages.interfaces import IPagesSchema
 
 import logging
 import os
@@ -30,10 +28,11 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
     plugins.implements(plugins.IPackageController, inherit=True)
     plugins.implements(plugins.IValidators)
     plugins.implements(plugins.IRoutes, inherit=True)
-    #plugins.implements(IPagesSchema)
 
     # IConfigurer
     def update_config(self, config_):
+        toolkit.add_ckan_admin_tab(
+            config_, 'banner_edit', 'Banner Editor', icon='wrench')
         toolkit.add_template_directory(config_, 'templates')
         toolkit.add_public_directory(config_, 'public')
         toolkit.add_public_directory(config_, 'fanstatic')
@@ -52,18 +51,33 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
     def before_map(self, map):
         opend_controller = 'ckanext.thai_gdc.controllers.opend:OpendController'
 
+        map.connect(
+            'banner_edit',
+            '/ckan-admin/banner-edit',
+            action='edit_banner',
+            ckan_icon='wrench',
+            controller='ckanext.thai_gdc.controller:BannerEditController',
+            )
+
         return map
 
     def update_config_schema(self, schema):
 
         ignore_missing = toolkit.get_validator('ignore_missing')
         remove_whitespace = toolkit.get_validator('remove_whitespace')
+        unicode_safe = toolkit.get_validator('unicode_safe')
 
         schema.update({
             'ckan.site_org_address': [ignore_missing, unicode],
             'ckan.site_org_contact': [ignore_missing, unicode],
             'ckan.site_org_email': [ignore_missing, unicode],
             'ckan.site_policy_link': [ignore_missing, unicode],
+            'ckan.promoted_banner': [ignore_missing, unicode_safe],
+            'promoted_banner_upload': [ignore_missing, unicode_safe],
+            'clear_promoted_banner_upload': [ignore_missing, unicode_safe],
+            'ckan.search_background': [ignore_missing, unicode_safe],
+            'search_background_upload': [ignore_missing, unicode_safe],
+            'clear_search_background_upload': [ignore_missing, unicode_safe],
         })
 
         return schema
@@ -109,17 +123,6 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
                            (str(user), group.id)}
         else:
             return {'success': True}
-
-    #IPagesSchema 
-    # def update_pages_schema(self, schema):
-    #     ignore_missing = toolkit.get_validator('ignore_missing')
-    #     boolean_validator = toolkit.get_validator('boolean_validator')
-
-    #     schema.update({
-    #         'featured': [ignore_missing, boolean_validator],
-    #     })
-
-    #     return schema
     
     def before_view(self, pkg_dict):
         pkg_dict = logic.get_action("package_show")({}, {
@@ -145,13 +148,12 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
     def modify_package_before(self, package):
         package.state = 'active'
         
-    
     def get_validators(self):
         return {
             'tag_name_validator': tag_name_validator,
             'tag_length_validator': tag_length_validator,
             'tag_string_convert': tag_string_convert,
-            }
+        }
     
     def get_helpers(self):
         return {
@@ -167,8 +169,7 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             'thai_gdc_get_all_groups': noh.get_all_groups,
             'thai_gdc_get_all_groups_all_type': noh.get_all_groups_all_type
         }
-        
-    
+
 def tag_name_validator(value, context):
     tagname_match = re.compile('[\w \-.]*$', re.UNICODE)
     #if not tagname_match.match(value):

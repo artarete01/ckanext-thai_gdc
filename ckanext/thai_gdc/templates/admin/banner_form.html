@@ -1,0 +1,45 @@
+{% extends "admin/base.html" %}
+
+{% import 'macros/form.html' as form %}
+
+{% block primary_content_inner %}
+
+  {{ form.errors(error_summary) }}
+
+  <form method='post' action="" id="admin-config-form" enctype="multipart/form-data">
+    {% block admin_form %}
+    <label class="control-label" for="field-image-url">Promoted banner</label>
+    {% set field_url = 'ckan.promoted_banner' %}
+    {% set is_upload = data[field_url] and not data[field_url].startswith('http') %}
+    {% set is_url = data[field_url] and data[field_url].startswith('http') %}
+    {{ form.image_upload(data, errors, is_upload_enabled=h.uploads_enabled(), is_url=is_url, is_upload=is_upload, upload_label = '', url_label='',  field_url=field_url, field_upload='promoted_banner_upload', field_clear='clear_promoted_banner_upload' )}}
+
+    <label class="control-label" for="field-image-url">Search background</label>
+    {% set field_url = 'ckan.search_background' %}
+    {% set is_upload = data[field_url] and not data[field_url].startswith('http') %}
+    {% set is_url = data[field_url] and data[field_url].startswith('http') %}
+    {{ form.image_upload(data, errors, is_upload_enabled=h.uploads_enabled(), is_url=is_url, is_upload=is_upload, upload_label = '', url_label='',  field_url=field_url, field_upload='search_background_upload', field_clear='clear_search_background_upload' )}}
+
+    {% endblock %}
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" name="save">{{ _('Update Config') }}</button>
+      </div>
+  </form>
+{% endblock %}
+
+{% block secondary_content %}
+  <div class="module module-narrow module-shallow">
+    <h2 class="module-heading">
+      <i class="fa fa-info-circle"></i>
+      การปรับแต่ง Banner
+    </h2>
+    <div class="module-content">
+      {% block admin_form_help %}
+        {% trans %}
+          <p><strong>Promoted banner:</strong> ภาพในส่วนแนะนำเว็บไซต์</p>
+          <p><strong>Search background:</strong> ภาพพื้นหลังส่วนค้นหาชุดข้อมูลในหน้าหลัก</p>
+      {% endtrans %}
+    {% endblock %}
+    </div>
+  </div>
+{% endblock %}
