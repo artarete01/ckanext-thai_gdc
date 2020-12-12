@@ -31,8 +31,10 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
 
     # IConfigurer
     def update_config(self, config_):
-        toolkit.add_ckan_admin_tab(
-            config_, 'banner_edit', 'Banner Editor', icon='wrench')
+        if toolkit.check_ckan_version(max_version='2.9'):
+            toolkit.add_ckan_admin_tab(config_, 'banner_edit', 'Banner Editor')
+        else:
+            toolkit.add_ckan_admin_tab(config_, 'banner_edit', 'Banner Editor', icon='wrench')
         toolkit.add_template_directory(config_, 'templates')
         toolkit.add_public_directory(config_, 'public')
         toolkit.add_public_directory(config_, 'fanstatic')

@@ -4,3 +4,6 @@
 .nav-pills > li > a {
   background: #e1388f;
 }
+.navbar-toggle {
+  background-color: #d31979;
+}
