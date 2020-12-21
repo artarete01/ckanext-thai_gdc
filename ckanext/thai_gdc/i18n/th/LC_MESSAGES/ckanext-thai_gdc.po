@@ -85,3 +85,45 @@ msgstr "ธันวาคม"
 
 msgid "Just now"
 msgstr "เมื่อสักครู่"
+
+msgid "{number} dataset found"
+msgstr "พบ {number} ชุดข้อมูล"
+
+msgid "{number} datasets found"
+msgstr "พบ {number} ชุดข้อมูล"
+
+msgid "{number} dataset found for \"{query}\""
+msgstr "พบ {number} ชุดข้อมูลสำหรับ \"{query}\""
+
+msgid "{number} datasets found for \"{query}\""
+msgstr "พบ {number} ชุดข้อมูลสำหรับ \"{query}\""
+
+msgid "{number} group found"
+msgstr "พบ {number} กลุ่ม"
+
+msgid "{number} groups found"
+msgstr "พบ {number} กลุ่ม"
+
+msgid "{number} group found for \"{query}\""
+msgstr "พบ {number} กลุ่มสำหรับ \"{query}\""
+
+msgid "{number} groups found for \"{query}\""
+msgstr "พบ {number} กลุ่มสำหรับ \"{query}\""
+
+msgid "{number} organization found"
+msgstr "พบ {number} องค์กร"
+
+msgid "{number} organizations found"
+msgstr "พบ {number} องค์กร"
+
+msgid "{number} organization found for \"{query}\""
+msgstr "พบ {number} องค์กรสำหรับ \"{query}\""
+
+msgid "{number} organizations found for \"{query}\""
+msgstr "พบ {number} องค์กรสำหรับ \"{query}\""
+
+msgid "{num} Dataset"
+msgstr "{num} ชุดข้อมูล"
+
+msgid "{num} Datasets"
+msgstr "{num} ชุดข้อมูล"

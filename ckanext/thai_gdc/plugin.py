@@ -49,6 +49,19 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
                 os.path.dirname(__file__), 'fanstatic'
             )
             add_public_path(asset_path, '/')
+        
+        config_['ckan.tracking_enabled'] = 'true'
+        config_['scheming.dataset_schemas'] = 'ckanext.thai_gdc:ckan_dataset.json'
+        config_['ckan.activity_streams_enabled'] = 'true'
+        config_['ckan.auth.user_delete_groups'] = 'false'
+        config_['ckan.auth.user_delete_organizations'] = 'false'
+        config_['ckan.auth.public_user_details'] = 'false'
+        config_['ckan.datapusher.assume_task_stale_after'] = '60'
+        config_['ckan.locale_default'] = 'th'
+        config_['ckan.locale_order'] = 'en th pt_BR ja it cs_CZ ca es fr el sv sr sr@latin no sk fi ru de pl nl bg ko_KR hu sa sl lv'
+        config_['ckan.datapusher.formats'] = 'csv xls xlsx tsv application/csv application/vnd.ms-excel application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+
+
     
     def before_map(self, map):
         opend_controller = 'ckanext.thai_gdc.controllers.opend:OpendController'
