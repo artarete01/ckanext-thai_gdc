@@ -49,6 +49,10 @@ To install ckanext-thai_gdc:
 
      sudo service apache2 reload
 
+     or
+
+     sudo supervisorctl reload
+
 
 ---------------
 Config Settings
