@@ -20,7 +20,7 @@ Requirements
 สามารถติดตั้งร่วมกับ CKAN 2.8 ขึ้นไป โดยจำเป็นต้องติดตั้ง Extensions เหล่านี้ก่อน 
 
 - https://github.com/ckan/ckanext-scheming
-.. - https://gitlab.nectec.or.th/opend/ckanext-pages
+- https://github.com/davidread/ckanext-hierarchy
 
 
 ------------
@@ -43,7 +43,7 @@ To install ckanext-thai_gdc:
 
 3. Add ``thai_gdc`` to the ``ckan.plugins`` setting in your CKAN
    config file (by default the config file is located at
-   ``/etc/ckan/default/production.ini``).
+   ``/etc/ckan/default/production.ini`` or ``/etc/ckan/default/ckan.ini``).
 
 4. Restart CKAN. For example if you've deployed CKAN with Apache on Ubuntu::
 
