@@ -45,14 +45,9 @@ To install ckanext-thai_gdc:
    config file (by default the config file is located at
    ``/etc/ckan/default/production.ini`` or ``/etc/ckan/default/ckan.ini``).
 
-4. Restart CKAN. For example if you've deployed CKAN with Apache on Ubuntu::
+4. Restart CKAN. For example if you've deployed CKAN with Apache or Supervisor on Ubuntu::
 
      sudo service apache2 reload
-
-or
-
-     sudo supervisorctl reload
-
 
 ---------------
 Config Settings
