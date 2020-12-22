@@ -49,7 +49,7 @@ To install ckanext-thai_gdc:
 
      sudo service apache2 reload
 
-     or
+or
 
      sudo supervisorctl reload
 
