@@ -169,6 +169,171 @@
         "form_snippet": "objective_other.html"
       },
       {
+        "field_name": "data_category",
+        "label": {
+          "en": "Data Category",
+          "th": "หมวดหมู่ข้อมูลตามธรรมาภิบาลข้อมูลภาครัฐ"
+        },
+        "preset": "select",
+        "choices": [
+          {
+            "value": "ข้อมูลสาธารณะ",
+            "label": "ข้อมูลสาธารณะ"
+          },
+          {
+            "value": "ข้อมูลส่วนบุคคล",
+            "label": "ข้อมูลส่วนบุคคล"
+          },
+          {
+            "value": "ข้อมูลความมั่นคง",
+            "label": "ข้อมูลความมั่นคง"
+          },
+          {
+            "value": "ข้อมูลความลับทางราชการ",
+            "label": "ข้อมูลความลับทางราชการ"
+          }
+        ],
+        "required": true
+      },
+      {
+        "field_name": "license_id",
+        "label": "License",
+        "choices": [
+          {
+            "value": "License not specified",
+            "label": "License not specified"
+          },
+          {
+            "value": "DGA Open Government License",
+            "label": "DGA Open Government License"
+          },
+          {
+            "value": "Creative Commons Attributions",
+            "label": "Creative Commons Attributions"
+          },
+          {
+            "value": "Creative Commons Attribution Share-Alike",
+            "label": "Creative Commons Attribution Share-Alike"
+          },
+          {
+            "value": "Creative Commons Non-Commercial (Any)",
+            "label": "Creative Commons Non-Commercial (Any)"
+          },
+          {
+            "value": "Open Data Common",
+            "label": "Open Data Common"
+          },
+          {
+            "value": "GNU Free Documentation License",
+            "label": "GNU Free Documentation License"
+          },
+          {
+            "value": "อื่นๆ",
+            "label": "อื่นๆ"
+          }
+        ],
+        "form_snippet": "license_id.html",
+        "display_snippet": "select.html",
+        "validators": "scheming_required scheming_choices",
+        "required": true
+      },
+      {
+        "field_name": "license_id_other",
+        "form_snippet": "license_id_other.html"
+      },
+      {
+        "field_name": "accessible_condition",
+        "label": {
+          "en": "Accessible Condition",
+          "th": "เงื่อนไขในการเข้าถึงข้อมูล"
+        },
+        "form_snippet": "markdown.html",
+        "form_placeholder": "eg. Some useful condition about the data"
+      },
+      {
+        "field_name": "url",
+        "label": "URL",
+        "form_placeholder": "http://example.com/dataset.json",
+        "display_property": "foaf:homepage",
+        "display_snippet": "link.html"
+      },
+      {
+        "field_name": "high_value_dataset",
+        "label": {
+          "en": "High Value Dataset",
+          "th": "ชุดข้อมูลที่มีคุณค่าสูง"
+        },
+        "choices": [
+          {
+            "value": "False",
+            "label": "ไม่ใช่"
+          },
+          {
+            "value": "True",
+            "label": "ใช่"
+          }
+        ],
+        "form_snippet": "select_admin_only.html",
+        "display_snippet": "select.html"
+      },
+      {
+        "field_name": "reference_data",
+        "label": {
+          "en": "Reference Data",
+          "th": "ข้อมูลอ้างอิง"
+        },
+        "choices": [
+          {
+            "value": "False",
+            "label": "ไม่ใช่"
+          },
+          {
+            "value": "True",
+            "label": "ใช่"
+          }
+        ],
+        "form_snippet": "select_admin_only.html",
+        "display_snippet": "select.html"
+      },
+      {
+        "field_name": "official_statistics",
+        "label": {
+          "en": "Official Statistics",
+          "th": "สถิติทางการ"
+        },
+        "choices": [
+          {
+            "value": "False",
+            "label": "ไม่ใช่"
+          },
+          {
+            "value": "True",
+            "label": "ใช่"
+          }
+        ],
+        "form_snippet": "select_admin_only.html",
+        "display_snippet": "select.html"
+      }
+    ],
+    "resource_fields": [
+      {
+        "field_name": "url",
+        "label": "URL",
+        "preset": "resource_url_upload"
+      },
+      {
+        "field_name": "name",
+        "label": "Name",
+        "form_placeholder": "eg. January 2011 Gold Prices",
+        "required": true
+      },
+      {
+        "field_name": "description",
+        "label": "Description",
+        "form_snippet": "markdown.html",
+        "form_placeholder": "Some useful notes about the data"
+      },
+      {
         "field_name": "update_frequency_unit",
         "label": {
           "en": "Update Frequency Unit",
@@ -388,393 +553,6 @@
       },
       {
         "field_name": "data_format_other",
-        "form_snippet": "data_format_other.html"
-      },
-      {
-        "field_name": "data_category",
-        "label": {
-          "en": "Data Category",
-          "th": "หมวดหมู่ข้อมูลตามธรรมาภิบาลข้อมูลภาครัฐ"
-        },
-        "preset": "select",
-        "choices": [
-          {
-            "value": "ข้อมูลสาธารณะ",
-            "label": "ข้อมูลสาธารณะ"
-          },
-          {
-            "value": "ข้อมูลส่วนบุคคล",
-            "label": "ข้อมูลส่วนบุคคล"
-          },
-          {
-            "value": "ข้อมูลความมั่นคง",
-            "label": "ข้อมูลความมั่นคง"
-          },
-          {
-            "value": "ข้อมูลความลับทางราชการ",
-            "label": "ข้อมูลความลับทางราชการ"
-          }
-        ],
-        "required": true
-      },
-      {
-        "field_name": "license_id",
-        "label": "License",
-        "choices": [
-          {
-            "value": "License not specified",
-            "label": "License not specified"
-          },
-          {
-            "value": "DGA Open Government License",
-            "label": "DGA Open Government License"
-          },
-          {
-            "value": "Creative Commons Attributions",
-            "label": "Creative Commons Attributions"
-          },
-          {
-            "value": "Creative Commons Attribution Share-Alike",
-            "label": "Creative Commons Attribution Share-Alike"
-          },
-          {
-            "value": "Creative Commons Non-Commercial (Any)",
-            "label": "Creative Commons Non-Commercial (Any)"
-          },
-          {
-            "value": "Open Data Common",
-            "label": "Open Data Common"
-          },
-          {
-            "value": "GNU Free Documentation License",
-            "label": "GNU Free Documentation License"
-          },
-          {
-            "value": "อื่นๆ",
-            "label": "อื่นๆ"
-          }
-        ],
-        "form_snippet": "license_id.html",
-        "display_snippet": "select.html",
-        "validators": "scheming_required scheming_choices",
-        "required": true
-      },
-      {
-        "field_name": "license_id_other",
-        "form_snippet": "license_id_other.html"
-      },
-      {
-        "field_name": "accessible_condition",
-        "label": {
-          "en": "Accessible Condition",
-          "th": "เงื่อนไขในการเข้าถึงข้อมูล"
-        },
-        "form_snippet": "markdown.html",
-        "form_placeholder": "eg. Some useful condition about the data"
-      },
-      {
-        "field_name": "url",
-        "label": "URL",
-        "form_placeholder": "http://example.com/dataset.json",
-        "display_property": "foaf:homepage",
-        "display_snippet": "link.html"
-      },
-      {
-        "field_name": "high_value_dataset",
-        "label": {
-          "en": "High Value Dataset",
-          "th": "ชุดข้อมูลที่มีคุณค่าสูง"
-        },
-        "choices": [
-          {
-            "value": "False",
-            "label": "ไม่ใช่"
-          },
-          {
-            "value": "True",
-            "label": "ใช่"
-          }
-        ],
-        "form_snippet": "select_admin_only.html",
-        "display_snippet": "select.html"
-      },
-      {
-        "field_name": "reference_data",
-        "label": {
-          "en": "Reference Data",
-          "th": "ข้อมูลอ้างอิง"
-        },
-        "choices": [
-          {
-            "value": "False",
-            "label": "ไม่ใช่"
-          },
-          {
-            "value": "True",
-            "label": "ใช่"
-          }
-        ],
-        "form_snippet": "select_admin_only.html",
-        "display_snippet": "select.html"
-      },
-      {
-        "field_name": "official_statistics",
-        "label": {
-          "en": "Official Statistics",
-          "th": "สถิติทางการ"
-        },
-        "choices": [
-          {
-            "value": "False",
-            "label": "ไม่ใช่"
-          },
-          {
-            "value": "True",
-            "label": "ใช่"
-          }
-        ],
-        "form_snippet": "select_admin_only.html",
-        "display_snippet": "select.html"
-      }
-    ],
-    "resource_fields": [
-      {
-        "field_name": "url",
-        "label": "URL",
-        "preset": "resource_url_upload"
-      },
-      {
-        "field_name": "name",
-        "label": "Name",
-        "form_placeholder": "eg. January 2011 Gold Prices",
-        "required": true
-      },
-      {
-        "field_name": "description",
-        "label": "Description",
-        "form_snippet": "markdown.html",
-        "form_placeholder": "Some useful notes about the data"
-      },
-      {
-        "field_name": "resource_update_frequency_unit",
-        "label": {
-          "en": "Update Frequency Unit",
-          "th": "หน่วยความถี่ของการปรับปรุงข้อมูล"
-        },
-        "choices": [
-          {
-            "value": "ไม่ทราบ",
-            "label": "ไม่ทราบ"
-          },
-          {
-            "value": "ปี",
-            "label": "ปี"
-          },
-          {
-            "value": "ครึ่งปี",
-            "label": "ครึ่งปี"
-          },
-          {
-            "value": "ไตรมาส",
-            "label": "ไตรมาส"
-          },
-          {
-            "value": "เดือน",
-            "label": "เดือน"
-          },
-          {
-            "value": "สัปดาห์",
-            "label": "สัปดาห์"
-          },
-          {
-            "value": "วัน",
-            "label": "วัน"
-          },
-          {
-            "value": "วันทำการ",
-            "label": "วันทำการ"
-          },
-          {
-            "value": "ชั่วโมง",
-            "label": "ชั่วโมง"
-          },
-          {
-            "value": "นาที",
-            "label": "นาที"
-          },
-          {
-            "value": "ตามเวลาจริง",
-            "label": "ตามเวลาจริง"
-          },
-          {
-            "value": "ไม่มีการปรับปรุงหลังจากการจัดเก็บข้อมูล",
-            "label": "ไม่มีการปรับปรุงหลังจากการจัดเก็บข้อมูล"
-          },
-          {
-            "value": "อื่นๆ",
-            "label": "อื่นๆ"
-          }
-        ],
-        "form_snippet": "update_frequency_unit.html",
-        "display_snippet": "select.html",
-        "validators": "scheming_required scheming_choices",
-        "required": true
-      },
-      {
-        "field_name": "resource_update_frequency_unit_other",
-        "form_snippet": "update_frequency_unit_other.html"
-      },
-      {
-        "field_name": "resource_update_frequency_interval",
-        "label": {
-          "en": "Update Frequency Interval",
-          "th": "ค่าความถี่ของการปรับปรุงข้อมูล (ความถี่น้อยที่สุด)"
-        }
-      },
-      {
-        "field_name": "resource_geo_coverage",
-        "label": {
-          "en": "Geo Coverage",
-          "th": "ขอบเขตเชิงภูมิศาสตร์หรือเชิงพื้นที่"
-        },
-        "choices": [
-          {
-            "value": "ไม่ทราบ",
-            "label": "ไม่ทราบ"
-          },
-          {
-            "value": "โลก",
-            "label": "โลก"
-          },
-          {
-            "value": "ทวีป/กลุ่มประเทศในทวีป",
-            "label": "ทวีป/กลุ่มประเทศในทวีป"
-          },
-          {
-            "value": "กลุ่มประเทศทางเศรษฐกิจ",
-            "label": "กลุ่มประเทศทางเศรษฐกิจ"
-          },
-          {
-            "value": "ประเทศ",
-            "label": "ประเทศ"
-          },
-          {
-            "value": "ภาค",
-            "label": "ภาค"
-          },
-          {
-            "value": "จังหวัด",
-            "label": "จังหวัด"
-          },
-          {
-            "value": "อำเภอ",
-            "label": "อำเภอ"
-          },
-          {
-            "value": "ตำบล",
-            "label": "ตำบล"
-          },
-          {
-            "value": "หมู่บ้าน",
-            "label": "หมู่บ้าน"
-          },
-          {
-            "value": "เทศบาล/อบต.",
-            "label": "เทศบาล/อบต."
-          },
-          {
-            "value": "พิกัด",
-            "label": "พิกัด"
-          },
-          {
-            "value": "อื่นๆ",
-            "label": "อื่นๆ"
-          }
-        ],
-        "form_snippet": "geo_coverage.html",
-        "display_snippet": "select.html",
-        "validators": "scheming_required scheming_choices",
-        "required": true
-      },
-      {
-        "field_name": "resource_geo_coverage_other",
-        "form_snippet": "geo_coverage_other.html"
-      },
-      {
-        "field_name": "resource_data_source",
-        "label": {
-          "en": "Data Source",
-          "th": "แหล่งที่มา"
-        },
-        "required": true
-      },
-      {
-        "field_name": "resource_data_format",
-        "label": {
-          "en": "Data Format",
-          "th": "รูปแบบการเก็บข้อมูล"
-        },
-        "choices": [
-          {
-            "value": "ไม่ทราบ",
-            "label": "ไม่ทราบ"
-          },
-          {
-            "value": "Database",
-            "label": "Database"
-          },
-          {
-            "value": "CSV",
-            "label": "CSV"
-          },
-          {
-            "value": "XML",
-            "label": "XML"
-          },
-          {
-            "value": "Image",
-            "label": "Image"
-          },
-          {
-            "value": "Video",
-            "label": "Video"
-          },
-          {
-            "value": "Audio",
-            "label": "Audio"
-          },
-          {
-            "value": "Text",
-            "label": "Text"
-          },
-          {
-            "value": "JSON",
-            "label": "JSON"
-          },
-          {
-            "value": "HTML",
-            "label": "HTML"
-          },
-          {
-            "value": "XLS",
-            "label": "XLS"
-          },
-          {
-            "value": "PDF",
-            "label": "PDF"
-          },
-          {
-            "value": "อื่นๆ",
-            "label": "อื่นๆ"
-          }
-        ],
-        "form_snippet": "data_format.html",
-        "display_snippet": "select.html",
-        "validators": "scheming_required scheming_choices",
-        "required": true
-      },
-      {
-        "field_name": "resource_data_format_other",
         "form_snippet": "data_format_other.html"
       },
       {

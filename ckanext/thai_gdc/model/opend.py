@@ -19,7 +19,19 @@ class OpendModel:
             model.Session.rollback()
             return 0
 
-        
+    def get_last_update_tracking(self):
+        sql = '''
+            select max(tracking_date) as last_tracking from tracking_summary
+        '''
+        try:
+            resultproxy = model.Session.execute(sql)
+            row = resultproxy.fetchone()
+            model.Session.commit()
+            return row['last_tracking'] is not None and row['last_tracking'] or 0
+        except SQLAlchemyError as e:
+            print(str(e))
+            model.Session.rollback()
+            return 0
 
     def get_resource_download_top(self, limit):
         sql = '''

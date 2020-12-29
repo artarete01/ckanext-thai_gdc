@@ -8,6 +8,18 @@
   {% endif %}
 {% endmacro %}
 
+{% block resource_actions_inner %}
+  {{ super() }}
+  {% if res.datastore_active %}
+  {% set site_url_list = g.site_url.split('//') %}
+    <li>
+      <a class="btn btn-warning resource-url-analytics resource-type-{{ res.resource_type }}" href="https://opend.data.go.th/playground/{{site_url_list[1]}}/ckan/{{res.id}}">
+      <i class="fa fa-bar-chart"></i> Visualization
+      </a>
+    </li>
+  {% endif %}
+{% endblock %}
+
 {% block secondary_content %}
   {% block resources_list %}
     {% snippet "package/snippets/resources.html", pkg=pkg, active=res.id %}

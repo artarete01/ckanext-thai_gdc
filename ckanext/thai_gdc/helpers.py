@@ -45,6 +45,10 @@ def get_stat_all_view():
     num = opend_model.get_all_view()
     return num
 
+def get_last_update_tracking():
+    last_update = opend_model.get_last_update_tracking()
+    return last_update
+
 def day_thai(t):
     log.info('month %r',t)
     month = [

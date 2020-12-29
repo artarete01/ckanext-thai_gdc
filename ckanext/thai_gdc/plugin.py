@@ -60,8 +60,6 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
         config_['ckan.locale_default'] = 'th'
         config_['ckan.locale_order'] = 'en th pt_BR ja it cs_CZ ca es fr el sv sr sr@latin no sk fi ru de pl nl bg ko_KR hu sa sl lv'
         config_['ckan.datapusher.formats'] = 'csv xls xlsx tsv application/csv application/vnd.ms-excel application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-
-
     
     def before_map(self, map):
         opend_controller = 'ckanext.thai_gdc.controllers.opend:OpendController'
@@ -177,6 +175,7 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             'thai_gdc_get_resource_download': noh.get_resource_download,
             'thai_gdc_day_thai': noh.day_thai,
             'thai_gdc_get_stat_all_view': noh.get_stat_all_view,
+            'thai_gdc_get_last_update_tracking': noh.get_last_update_tracking,
             'thai_gdc_facet_chart': noh.facet_chart,
             'thai_gdc_get_page': noh.get_page,
             'thai_gdc_get_recent_view_for_package': noh.get_recent_view_for_package,
