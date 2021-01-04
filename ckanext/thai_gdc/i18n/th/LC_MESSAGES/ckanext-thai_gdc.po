@@ -35,6 +35,9 @@ msgstr "ไม่ถูกเลือก"
 msgid "Search dataset..."
 msgstr "ต้นหาชุดข้อมูล..."
 
+msgid "Search datasets..."
+msgstr "ต้นหาชุดข้อมูล..."
+
 msgid "Last Updated"
 msgstr "ปรับปรุงครั้งล่าสุดเมื่อ"
 
