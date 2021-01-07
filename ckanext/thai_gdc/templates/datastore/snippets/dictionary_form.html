@@ -1,4 +1,4 @@
-{% import 'macros/form.html' as form %}
+ {% import 'macros/form.html' as form %}
 
 <h3>{{ _( "Field {num}.").format(num=position) }} {{ field.id }} ({{ field.type }})</h3>
 <table>
@@ -14,14 +14,21 @@
     ], selected=field.get('info', {}).get('type_override', '')) }}
   </td>
   <td style="vertical-align: top;padding-left: 10px;padding-right: 10px;">
-    {{ form.input('info__' ~ position ~ '__label',
-    label=_('Label'), id='field-f' ~ position ~ 'label',
-    value=field.get('info', {}).get('label', ''), classes=['control-full']) }}
-  </td>
-  <td style="padding-left: 10px;padding-right: 10px;width: 50%;">
     {{ form.markdown('info__' ~ position ~ '__notes',
     label=_('Description'), id='field-d' ~ position ~ 'notes',
     value=field.get('info', {}).get('notes', '')) }}
+  </td>
+  <td style="vertical-align: top;padding-left: 10px;padding-right: 10px;">
+    {{ form.select('info__' ~ position ~ '__required',
+    label=_('Required'), options=[
+    {'name': 'No', 'value': 'No'},
+    {'name': 'Yes', 'value': 'Yes'},
+    ], selected=field.get('info', {}).get('required', '')) }}
+  </td>
+  <td style="vertical-align: top;padding-left: 10px;padding-right: 10px;">
+    {{ form.markdown('info__' ~ position ~ '__example',
+    label=_('Example'), id='field-d' ~ position ~ 'example',
+    value=field.get('info', {}).get('example', '')) }}
   </td>
   </tr>
   </tbody>

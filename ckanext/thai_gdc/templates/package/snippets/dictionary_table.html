@@ -1,0 +1,15 @@
+<tr>
+  <td>{{ field.id }}</td>
+  <td>
+    {% set override = h.get_translated(field.get('info', {}), 'type_override') %}
+    {{ field.type }}
+    {% if override!='' %}
+      {{ h.render_markdown('override: '+override) }}
+    {% else %}
+      
+    {% endif %}
+  </td>
+  <td>{{ h.render_markdown(h.get_translated(field.get('info', {}), 'notes')) }}</td>
+  <td>{{ h.render_markdown(h.get_translated(field.get('info', {}), 'required')) }}</td>
+  <td>{{ h.render_markdown(h.get_translated(field.get('info', {}), 'example')) }}</td>
+</tr>

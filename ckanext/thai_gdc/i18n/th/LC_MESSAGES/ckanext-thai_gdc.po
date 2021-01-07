@@ -130,3 +130,12 @@ msgstr "{num} ชุดข้อมูล"
 
 msgid "{num} Datasets"
 msgstr "{num} ชุดข้อมูล"
+
+msgid "Field {num}."
+msgstr "ฟิลด์ {num}."
+
+msgid "Data Type"
+msgstr "ชนิดข้อมูล"
+
+msgid "Example"
+msgstr "ตัวอย่างข้อมูล"
