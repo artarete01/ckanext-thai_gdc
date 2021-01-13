@@ -60,6 +60,7 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
         config_['ckan.locale_default'] = 'th'
         config_['ckan.locale_order'] = 'en th pt_BR ja it cs_CZ ca es fr el sv sr sr@latin no sk fi ru de pl nl bg ko_KR hu sa sl lv'
         config_['ckan.datapusher.formats'] = 'csv xls xlsx tsv application/csv application/vnd.ms-excel application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        config_['ckan.group_and_organization_list_all_fields_max'] = '1000'
     
     def before_map(self, map):
         opend_controller = 'ckanext.thai_gdc.controllers.opend:OpendController'
