@@ -1,0 +1,30 @@
+{% ckan_extends %}
+
+{% block page_primary_action %}
+  {% if h.check_access('package_create', {'owner_org': group_dict.id}) %}
+    {% snippet 'snippets/add_dataset.html', group=group_dict.id %}
+    {% if group_dict.id and c.userobj.sysadmin %}
+      {#% link_for 'Import from template', named_route='dataset.new', group=group, class_='btn btn-primary', icon='plus-square' %#}
+    {% endif %}
+  {% endif %}
+{% endblock %}
+
+{% block groups_search_form %}
+    {# This is the same as the original BUT we also pass the 'include_children_option' parameter to the snippet #}
+
+    {% set facets = {
+        'fields': fields_grouped,
+        'search': search_facets,
+        'titles': facet_titles,
+        'translated_fields': translated_fields,
+        'remove_field': remove_field }
+    %}
+    {% set sorting = [
+        (_('Relevance'), 'score desc, metadata_modified desc'),
+        (_('Name Ascending'), 'title_string asc'),
+        (_('Name Descending'), 'title_string desc'),
+        (_('Last Modified'), 'metadata_modified desc'),
+        (_('Popular'), 'views_recent desc') if g.tracking_enabled else (false, false) ]
+    %}
+    {% snippet 'snippets/search_form.html', form_id='organization-datasets-search-form', type='dataset', query=q, sorting=sorting, sorting_selected=sort_by_selected, count=page.item_count, facets=facets, placeholder=_('Search datasets...'), show_empty=request.params, fields=fields %}
+{% endblock %}

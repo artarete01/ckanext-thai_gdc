@@ -139,3 +139,36 @@ msgstr "ชนิดข้อมูล"
 
 msgid "Example"
 msgstr "ตัวอย่างข้อมูล"
+
+msgid "Site Statistics"
+msgstr "สถิติ"
+
+msgid "Recently Created Datasets"
+msgstr "ชุดข้อมูลที่มีการสร้างล่าสุด"
+
+msgid "Recently Updated Datasets"
+msgstr "ชุดข้อมูลที่มีการแก้ไขล่าสุด"
+
+msgid "Number of edits"
+msgstr "จำนวนการแก้ไข"
+
+msgid "Users Creating Most Datasets"
+msgstr "ผู้ใช้ที่เป็นเจ้าของชุดข้อมูล"
+
+msgid "Datasets by Organization"
+msgstr "ชุดข้อมูลรายองค์กร"
+
+msgid "Resources by Organization"
+msgstr "ทรัพยากรรายองค์กร"
+
+msgid "Most Active Organizations"
+msgstr "ชุดข้อมูลรายองค์กรที่มีการแก้ไขล่าสุด"
+
+msgid "Summary Statistic"
+msgstr "ภาพรวม"
+
+msgid "User Access List"
+msgstr "รายการสิทธิ์ของผู้ใช้"
+
+msgid "Users by Organization"
+msgstr "ผู้ใช้รายองค์กร"
