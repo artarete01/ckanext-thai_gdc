@@ -1,0 +1,88 @@
+{% extends "admin/base.html" %}
+
+{% import 'macros/form.html' as form %}
+
+{% if c.userobj.sysadmin %}
+    {% set organizations = h.thai_gdc_get_organizations(all_fields=True) %}
+{% endif %}
+
+{% block primary_content_inner %}
+
+  {#{ form.errors(error_summary) }#}
+
+  <form method='post' action="" id="admin-config-form" enctype="multipart/form-data">
+    {% block admin_form %}
+    {%- set options=[] -%}
+    {%- set field_name = "import_org" -%}
+    {%- set label = _('Organization') -%}
+    {%- for c in h.thai_gdc_get_organizations(all_fields=True) -%}
+      {%- if not form_restrict_choices_to or c.value in form_restrict_choices_to -%}
+        {%- do options.append({
+          'value': c.get('name')|string,
+          'text': c.get('display_name') }) -%}
+      {%- endif -%}
+    {%- endfor -%}
+    {%- if data[field_name] -%}
+      {%- set option_selected = data[field_name]|string -%}
+    {%- else -%}
+      {%- set option_selected = None -%}
+    {%- endif -%}
+
+{% call form.select(
+    field_name,
+    id='field-' + field_name,
+    label=h.scheming_language_text(label),
+    options=options,
+    selected=option_selected,
+    error=errors[field_name],
+    classes=['control-medium'],
+    attrs=dict({"class": "form-control"})
+    )
+    %}
+{% endcall %}
+    <label class="control-label" for="field-file-url">Template File</label>
+    {% set field_url = 'template_file' %}
+    {% set is_upload = data[field_url] and not data[field_url].startswith('http') %}
+    {% set is_url = data[field_url] and data[field_url].startswith('http') %}
+    {{ form.image_upload(data, errors, is_upload_enabled=h.uploads_enabled(), is_url=is_url, is_upload=is_upload, upload_label = 'ไฟล์', url_label='URL ของไฟล์',  field_url=field_url, field_upload='template_file_upload', field_clear='clear_template_file_upload' )}}
+
+    {% endblock %}
+      <div class="form-actions">
+        <a href="/ckan-admin/clear-import-log" class="btn btn-danger pull-left">ล้างค่า</a>
+        <button type="submit" class="btn btn-primary" name="save">ประมวลผล</button>
+      </div>
+  </form>
+  {% if data["import_log"] %}
+  <h3>{{ _('Process Log') }}</h3>
+  <ul class="activity">
+    {% for item in data["import_log"].strip().split('\n') %}
+      <li class="item no-avatar{{ class }}">
+        <i class="fa icon fa-info"></i>
+        <p>
+          {{item}}
+        </p>
+      </li>
+    {% endfor %}
+    <li class="item no-avatar">
+      <i class="fa icon fa-info"></i>
+      <p class="muted">{{ _('End of log') }}</p>
+    </li>
+  </ul>
+  {% endif %}
+{% endblock %}
+
+{% block secondary_content %}
+  <div class="module module-narrow module-shallow">
+    <h2 class="module-heading">
+      <i class="fa fa-info-circle"></i>
+      การ Import ชุดข้อมูลจากไฟล์ template
+    </h2>
+    <div class="module-content">
+      {% block admin_form_help %}
+        {% trans %}
+        <p>&nbsp;</p>
+        {% endtrans %}
+      {% endblock %}
+    </div>
+  </div>
+{% endblock %}

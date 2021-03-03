@@ -109,7 +109,7 @@ class BannerEditController(BaseController):
                         'error_summary': error_summary, 'form_items': items}
                 return render('admin/banner_form.html', extra_vars=vars)
 
-            h.redirect_to(controller='ckanext.thai_gdc.controller:BannerEditController', action='edit_banner')
+            h.redirect_to(controller='ckanext.thai_gdc.controllers.banner:BannerEditController', action='edit_banner')
 
         schema = logic.schema.update_configuration_schema()
         data = {}

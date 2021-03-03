@@ -50,7 +50,6 @@ def get_last_update_tracking():
     return last_update
 
 def day_thai(t):
-    log.info('month %r',t)
     month = [
         _('January'), _('February'), _('March'), _('April'),
         _('May'), _('June'), _('July'), _('August'),

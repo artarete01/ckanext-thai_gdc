@@ -33,8 +33,10 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
     def update_config(self, config_):
         if toolkit.check_ckan_version(max_version='2.9'):
             toolkit.add_ckan_admin_tab(config_, 'banner_edit', 'Banner Editor')
+            toolkit.add_ckan_admin_tab(config_, 'dataset_import', 'Dataset Importer')
         else:
             toolkit.add_ckan_admin_tab(config_, 'banner_edit', 'Banner Editor', icon='wrench')
+            toolkit.add_ckan_admin_tab(config_, 'dataset_import', 'Dataset Importer', icon='cloud-upload')
         toolkit.add_template_directory(config_, 'templates')
         toolkit.add_public_directory(config_, 'public')
         toolkit.add_public_directory(config_, 'fanstatic')
@@ -60,17 +62,31 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
         config_['ckan.locale_default'] = 'th'
         config_['ckan.locale_order'] = 'en th pt_BR ja it cs_CZ ca es fr el sv sr sr@latin no sk fi ru de pl nl bg ko_KR hu sa sl lv'
         config_['ckan.datapusher.formats'] = 'csv xls xlsx tsv application/csv application/vnd.ms-excel application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        config_['ckan.group_and_organization_list_all_fields_max'] = '1000'
+        config_['ckan.group_and_organization_list_all_fields_max'] = '200'
+        config_['ckan.group_and_organization_list_max'] = '200'
+        config_['ckan.datasets_per_page'] = '200'
     
     def before_map(self, map):
-        opend_controller = 'ckanext.thai_gdc.controllers.opend:OpendController'
 
         map.connect(
             'banner_edit',
             '/ckan-admin/banner-edit',
             action='edit_banner',
             ckan_icon='wrench',
-            controller='ckanext.thai_gdc.controller:BannerEditController',
+            controller='ckanext.thai_gdc.controllers.banner:BannerEditController',
+            )
+        map.connect(
+            'dataset_import',
+            '/ckan-admin/dataset-import',
+            action='import_dataset',
+            ckan_icon='cloud-upload',
+            controller='ckanext.thai_gdc.controllers.dataset:DatasetImportController',
+            )
+        map.connect(
+            'clear_import_log',
+            '/ckan-admin/clear-import-log',
+            action='clear_import_log',
+            controller='ckanext.thai_gdc.controllers.dataset:DatasetImportController',
             )
 
         return map
@@ -92,6 +108,11 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             'ckan.search_background': [ignore_missing, unicode_safe],
             'search_background_upload': [ignore_missing, unicode_safe],
             'clear_search_background_upload': [ignore_missing, unicode_safe],
+            'template_file': [ignore_missing, unicode_safe],
+            'template_file_upload': [ignore_missing, unicode_safe],
+            'clear_template_file_upload': [ignore_missing, unicode_safe],
+            'import_org': [ignore_missing, unicode_safe],
+            'import_log': [ignore_missing, unicode_safe],
         })
 
         return schema
@@ -185,16 +206,22 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             'thai_gdc_get_all_groups_all_type': noh.get_all_groups_all_type
         }
 
+class Invalid(Exception):
+    pass
+
 def tag_name_validator(value, context):
     tagname_match = re.compile('[\w \-.]*$', re.UNICODE)
     #if not tagname_match.match(value):
+    if isinstance(value, str):
+        value = value.decode('utf8')
     if not tagname_match.match(value, re.U):
         raise Invalid(_('Tag "%s" must be alphanumeric '
                         'characters or symbols: -_.') % (value))
     return value
 
 def tag_length_validator(value, context):
-
+    if isinstance(value, str):
+        value = value.decode('utf8')
     if len(value) < MIN_TAG_LENGTH:
         raise Invalid(
             _('Tag "%s" length is less than minimum %s') % (value, MIN_TAG_LENGTH)
