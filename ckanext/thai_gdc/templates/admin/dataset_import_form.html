@@ -9,6 +9,7 @@
 {% block primary_content_inner %}
 
   {#{ form.errors(error_summary) }#}
+  
 
   <form method='post' action="" id="admin-config-form" enctype="multipart/form-data">
     {% block admin_form %}
@@ -52,6 +53,14 @@
         <button type="submit" class="btn btn-primary" name="save">ประมวลผล</button>
       </div>
   </form>
+  <script>
+    const queryString = window.location.search;
+    if (queryString.includes("import_org")) {
+      var res = queryString.split("import_org=");
+      let element = document.getElementById("field-import_org");
+      element.value = res[1];
+    }
+  </script>
   {% if data["import_log"] %}
   <h3>{{ _('Process Log') }}</h3>
   <ul class="activity">

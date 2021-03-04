@@ -29,6 +29,9 @@ ValidationError = logic.ValidationError
 
 log = logging.getLogger(__name__)
 
+reload(sys)
+sys.setdefaultencoding("utf-8")
+
 class DatasetImportController(p.toolkit.BaseController):
 
     logger_str = ''

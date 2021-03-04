@@ -14,9 +14,12 @@ from itertools import count
 from six import string_types
 from ckan.model import (MAX_TAG_LENGTH, MIN_TAG_LENGTH)
 from ckanext.thai_gdc import helpers as noh
+import ckan.lib.navl.dictization_functions as df
 
 import logging
 import os
+
+Invalid = df.Invalid
 
 log = logging.getLogger(__name__)
 
@@ -28,6 +31,14 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
     plugins.implements(plugins.IPackageController, inherit=True)
     plugins.implements(plugins.IValidators)
     plugins.implements(plugins.IRoutes, inherit=True)
+    plugins.implements(plugins.IResourceController, inherit=True)
+
+    # IResourceController
+    def before_show(self, res_dict):
+        res_dict['created_at'] = res_dict.get('created')
+
+        return res_dict
+
 
     # IConfigurer
     def update_config(self, config_):
@@ -98,10 +109,10 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
         unicode_safe = toolkit.get_validator('unicode_safe')
 
         schema.update({
-            'ckan.site_org_address': [ignore_missing, unicode],
-            'ckan.site_org_contact': [ignore_missing, unicode],
-            'ckan.site_org_email': [ignore_missing, unicode],
-            'ckan.site_policy_link': [ignore_missing, unicode],
+            'ckan.site_org_address': [ignore_missing, unicode_safe],
+            'ckan.site_org_contact': [ignore_missing, unicode_safe],
+            'ckan.site_org_email': [ignore_missing, unicode_safe],
+            'ckan.site_policy_link': [ignore_missing, unicode_safe],
             'ckan.promoted_banner': [ignore_missing, unicode_safe],
             'promoted_banner_upload': [ignore_missing, unicode_safe],
             'clear_promoted_banner_upload': [ignore_missing, unicode_safe],
@@ -206,11 +217,8 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             'thai_gdc_get_all_groups_all_type': noh.get_all_groups_all_type
         }
 
-class Invalid(Exception):
-    pass
-
 def tag_name_validator(value, context):
-    tagname_match = re.compile('[\w \-.]*$', re.UNICODE)
+    tagname_match = re.compile('[ก-๙\w \-.]*', re.UNICODE)
     #if not tagname_match.match(value):
     if isinstance(value, str):
         value = value.decode('utf8')
