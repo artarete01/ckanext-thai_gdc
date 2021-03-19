@@ -36,24 +36,29 @@ class DatasetImportController(p.toolkit.BaseController):
 
     logger_str = ''
 
-    def record_type_process(self, ckan_url, owner_org, filename):
+    def record_type_process(self, ckan_url, owner_org, template_org, filename):
         try:
             record_df = pd.read_excel(filename, header=[3], sheet_name='Temp2_Meta_Record', dtype=str)
             record_df.drop(0, inplace=True)
             record_df["data_type"] = 'ข้อมูลระเบียน'
 
-            record_df.columns = ['name', 'title','owner_org','maintainer','maintainer_email','tag_string','notes','objective','update_frequency_unit','update_frequency_interval','geo_coverage','data_source','data_format','data_category','license_id','accessible_condition','created','updated','url','data_support','data_collect','data_language','data_type']
-            record_df.drop(['created', 'updated'], axis=1, inplace=True)
+            record_df.columns = ['name', 'title','owner_org','maintainer','maintainer_email','tag_string','notes','objective','update_frequency_unit','update_frequency_interval','geo_coverage','data_source','data_format','data_category','license_id','accessible_condition','created_date','last_updated_date','url','data_support','data_collect','data_language','data_type']
             record_df = record_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
             record_df.replace(np.nan, '', regex=True, inplace=True)
-            
+
             record_df["dataset_name"] = record_df["name"]
             record_df["name"] = record_df["name"].str.lower()
             record_df["name"].replace('\s', '-', regex=True, inplace=True)
+            if template_org != 'all':
+                record_df = record_df.loc[record_df['owner_org'] == template_org]
+                record_df.reset_index(drop=True, inplace=True)
             record_df["owner_org"] = owner_org
             record_df["private"] = True
             record_df['tag_string'] = record_df.tag_string.astype(str)
             record_df['tag_string'] = record_df['tag_string'].str.split(',').apply(lambda x: [e.strip() for e in x]).tolist()
+
+            record_df["created_date"] = pd.to_datetime((pd.to_numeric(record_df["created_date"].str.slice(stop=4), errors='coerce').astype('Int64')-543).astype(str)+record_df["created_date"].str.slice(start=4), errors='coerce').astype(str)
+            record_df["last_updated_date"] = pd.to_datetime((pd.to_numeric(record_df["last_updated_date"].str.slice(stop=4), errors='coerce').astype('Int64')-543).astype(str)+record_df["last_updated_date"].str.slice(start=4), errors='coerce').astype(str)
 
             objective_choices = ['ยุทธศาสตร์ชาติ', 'แผนพัฒนาเศรษฐกิจและสังคมแห่งชาติ', 'แผนความมั่นคงแห่งชาติ','แผนแม่บทภายใต้ยุทธศาสตร์ชาติ','แผนปฏิรูปประเทศ','แผนระดับที่ 3 (มติครม. 4 ธ.ค. 2560)','นโยบายรัฐบาล/ข้อสั่งการนายกรัฐมนตรี','มติคณะรัฐมนตรี','เพื่อการให้บริการประชาชน','กฎหมายที่เกี่ยวข้อง','พันธกิจหน่วยงาน','ดัชนี/ตัวชี้วัดระดับนานาชาติ','ไม่ทราบ']
             record_df['objective_other'] = record_df['objective'].isin(objective_choices)
@@ -110,10 +115,12 @@ class DatasetImportController(p.toolkit.BaseController):
             record_df['data_language_other'] = np.where(record_df['data_language_other'] == 'True', 'True', record_df['data_language'])
             record_df['data_language'] = np.where(record_df['data_language_other'] == 'True', record_df['data_language'], 'อื่นๆ')
             record_df['data_language_other'].replace('True', '', regex=True, inplace=True)
+
+            record_df.replace('NaT', '', regex=True, inplace=True)
             
         except Exception as err:
            log.info(err)
-           record_df = pd.DataFrame(columns=['name', 'title','owner_org','maintainer','maintainer_email','tag_string','notes','objective','update_frequency_unit','update_frequency_interval','geo_coverage','data_source','data_format','data_category','license_id','accessible_condition','url','data_support','data_collect','data_language','data_type'])
+           record_df = pd.DataFrame(columns=['name', 'title','owner_org','maintainer','maintainer_email','tag_string','notes','objective','update_frequency_unit','update_frequency_interval','geo_coverage','data_source','data_format','data_category','license_id','accessible_condition','created_date','last_updated_date','url','data_support','data_collect','data_language','data_type'])
            record_df = record_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
            record_df.replace(np.nan, '', regex=True, inplace=True)
             
@@ -122,6 +129,9 @@ class DatasetImportController(p.toolkit.BaseController):
         package_dict_list = record_df.to_dict('records')
         for pkg_meta in package_dict_list:
             try:
+                if pkg_meta['data_language'] == '':
+                    pkg_meta.pop('data_language', None)
+                    pkg_meta.pop('data_language_other', None)
                 package = portal.action.package_create(**pkg_meta)
                 log_str = 'package_create: '+datetime.datetime.now().isoformat()+' -- สร้างชุดข้อมูล: '+str(package.get("name"))+' สำเร็จ\n'
                 log.info(log_str)
@@ -129,7 +139,7 @@ class DatasetImportController(p.toolkit.BaseController):
                 record_df.loc[record_df['name'] == pkg_meta['name'], 'success'] = '1'
             except Exception as err:
                 record_df.loc[record_df['name'] == pkg_meta['name'], 'success'] = '0'
-                log_str = 'package_create: '+datetime.datetime.now().isoformat()+' -- ไม่สามารถสร้างชุดข้อมูล: '+str(pkg_meta['name'])+'\n'
+                log_str = 'package_create: '+datetime.datetime.now().isoformat()+' -- ไม่สามารถสร้างชุดข้อมูล: '+str(pkg_meta['name'])+':'+str(err).encode('utf-8').decode('unicode-escape')+'\n'
                 log.info(log_str)
                 DatasetImportController.logger_str += log_str
 
@@ -140,6 +150,7 @@ class DatasetImportController(p.toolkit.BaseController):
             resource_df = resource_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
             resource_df.replace(np.nan, '', regex=True, inplace=True)
             resource_df['resource_name'] = resource_df['resource_url'].str.split('/').str[-1]
+            resource_df['resource_name'] = resource_df[['resource_name', 'dataset_name']].apply(lambda x: x[0] if x[0] else  x[1], axis=1)
         except:
             resource_df = pd.DataFrame(columns=['dataset_name', 'resource_url','description','format'])
             resource_df = resource_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
@@ -149,8 +160,8 @@ class DatasetImportController(p.toolkit.BaseController):
             final_df = pd.merge(record_df,resource_df,how='left',left_on='dataset_name',right_on='dataset_name')
             final_df.replace(np.nan, '', regex=True, inplace=True)
             resource_df = final_df[(final_df['resource_url'] != '') & (final_df['success'] == '1')]
-            resource_df = resource_df[['name','update_frequency_unit','update_frequency_interval','geo_coverage','data_source','data_format','data_support','data_collect','data_language','update_frequency_unit_other','geo_coverage_other','data_format_other','data_support_other','data_collect_other','data_language_other','success','resource_url','description','format','resource_name']]
-            resource_df.columns = ['package_id','resource_update_frequency_unit','resource_update_frequency_interval','resource_geo_coverage','resource_data_source','resource_data_format','data_support','data_collect','data_language','resource_update_frequency_unit_other','resource_geo_coverage_other','resource_data_format_other','data_support_other','data_collect_other','data_language_other','success','url','description','format','name']
+            resource_df = resource_df[['name','success','resource_url','description','format','resource_name']]
+            resource_df.columns = ['package_id','success','url','description','format','name']
             resource_df['created'] = datetime.datetime.now().isoformat()
             resource_df['last_modified'] = datetime.datetime.now().isoformat()
             resource_dict_list = resource_df.to_dict('records')
@@ -162,24 +173,28 @@ class DatasetImportController(p.toolkit.BaseController):
         except Exception as err:
             log.info(err)
 
-    def stat_type_process(self, ckan_url, owner_org, filename):
+    def stat_type_process(self, ckan_url, owner_org, template_org, filename):
         try:
             stat_df = pd.read_excel(filename, header=[3], sheet_name='Temp2_Meta_Stat', dtype=str)
             stat_df.drop(0, inplace=True)
             stat_df["data_type"] = 'ข้อมูลสถิติ'
 
-            stat_df.columns = ['name', 'title','owner_org','maintainer','maintainer_email','tag_string','notes','objective','update_frequency_unit','update_frequency_interval','geo_coverage','data_source','data_format','data_category','license_id','accessible_condition','first_year_of_data','last_year_of_data','data_release_calendar','updated','disaggregate','unit_of_measure','unit_of_multiplier','calculation_method','standard','url','data_language','data_type']
-            stat_df.drop(['updated'], axis=1, inplace=True)
+            stat_df.columns = ['name', 'title','owner_org','maintainer','maintainer_email','tag_string','notes','objective','update_frequency_unit','update_frequency_interval','geo_coverage','data_source','data_format','data_category','license_id','accessible_condition','first_year_of_data','last_year_of_data','data_release_calendar','last_updated_date','disaggregate','unit_of_measure','unit_of_multiplier','calculation_method','standard','url','data_language','data_type']
             stat_df = stat_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
             stat_df.replace(np.nan, '', regex=True, inplace=True)
             
             stat_df["dataset_name"] = stat_df["name"]
             stat_df["name"] = stat_df["name"].str.lower()
             stat_df["name"].replace('\s', '-', regex=True, inplace=True)
+            if template_org != 'all':
+                stat_df = stat_df.loc[stat_df['owner_org'] == template_org]
+                stat_df.reset_index(drop=True, inplace=True)
             stat_df["owner_org"] = owner_org
             stat_df["private"] = True
             stat_df['tag_string'] = stat_df.tag_string.astype(str)
             stat_df['tag_string'] = stat_df['tag_string'].str.split(',').apply(lambda x: [e.strip() for e in x]).tolist()
+
+            stat_df["last_updated_date"] = pd.to_datetime((pd.to_numeric(stat_df["last_updated_date"].str.slice(stop=4), errors='coerce').astype('Int64')-543).astype(str)+stat_df["last_updated_date"].str.slice(start=4), errors='coerce').astype(str)
 
             objective_choices = ['ยุทธศาสตร์ชาติ', 'แผนพัฒนาเศรษฐกิจและสังคมแห่งชาติ', 'แผนความมั่นคงแห่งชาติ','แผนแม่บทภายใต้ยุทธศาสตร์ชาติ','แผนปฏิรูปประเทศ','แผนระดับที่ 3 (มติครม. 4 ธ.ค. 2560)','นโยบายรัฐบาล/ข้อสั่งการนายกรัฐมนตรี','มติคณะรัฐมนตรี','เพื่อการให้บริการประชาชน','กฎหมายที่เกี่ยวข้อง','พันธกิจหน่วยงาน','ดัชนี/ตัวชี้วัดระดับนานาชาติ','ไม่ทราบ']
             stat_df['objective_other'] = stat_df['objective'].isin(objective_choices)
@@ -216,8 +231,6 @@ class DatasetImportController(p.toolkit.BaseController):
             stat_df['license_id'] = np.where(stat_df['license_id_other'] == 'True', stat_df['license_id'], 'อื่นๆ')
             stat_df['license_id_other'].replace('True', '', regex=True, inplace=True)
 
-            stat_df["first_year_of_data"] = pd.to_datetime((pd.to_numeric(stat_df["first_year_of_data"].str.slice(stop=4), errors='coerce').astype('Int64')-543).astype(str)+stat_df["first_year_of_data"].str.slice(start=4), errors='coerce').astype(str)
-            stat_df["last_year_of_data"] = pd.to_datetime((pd.to_numeric(stat_df["last_year_of_data"].str.slice(stop=4), errors='coerce').astype('Int64')-543).astype(str)+stat_df["last_year_of_data"].str.slice(start=4), errors='coerce').astype(str)
             stat_df["data_release_calendar"] = pd.to_datetime((pd.to_numeric(stat_df["data_release_calendar"].str.slice(stop=4), errors='coerce').astype('Int64')-543).astype(str)+stat_df["data_release_calendar"].str.slice(start=4), errors='coerce').astype(str)
             
             disaggregate_choices = ['','ไม่มี', 'เพศ', 'อายุ/กลุ่มอายุ','สถานภาพสมรส','ศาสนา','ระดับการศึกษา','อาชีพ','สถานภาพการทางาน','อุตสาหกรรม/ประเภทกิจการ','รายได้','ขอบเขตเชิงภูมิศาสตร์หรือเชิงพื้นที่','ผลิตภัณฑ์','ไม่ทราบ']
@@ -245,7 +258,7 @@ class DatasetImportController(p.toolkit.BaseController):
             
         except Exception as err:
             log.info(err)
-            stat_df = pd.DataFrame(columns=['name', 'title','owner_org','maintainer','maintainer_email','tag_string','notes','objective','update_frequency_unit','update_frequency_interval','geo_coverage','data_source','data_format','data_category','license_id','accessible_condition','first_year_of_data','last_year_of_data','data_release_calendar','updated','disaggregate','unit_of_measure','unit_of_multiplier','calculation_method','standard','url','data_language','data_type'])
+            stat_df = pd.DataFrame(columns=['name', 'title','owner_org','maintainer','maintainer_email','tag_string','notes','objective','update_frequency_unit','update_frequency_interval','geo_coverage','data_source','data_format','data_category','license_id','accessible_condition','first_year_of_data','last_year_of_data','data_release_calendar','last_updated_date','disaggregate','unit_of_measure','unit_of_multiplier','calculation_method','standard','url','data_language','data_type'])
             stat_df = stat_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
             stat_df.replace(np.nan, '', regex=True, inplace=True)
 
@@ -254,6 +267,12 @@ class DatasetImportController(p.toolkit.BaseController):
         package_dict_list = stat_df.to_dict('records')
         for pkg_meta in package_dict_list:
             try:
+                if pkg_meta['disaggregate'] == '':
+                    pkg_meta.pop('disaggregate', None)
+                    pkg_meta.pop('disaggregate_other', None)
+                if pkg_meta['data_language'] == '':
+                    pkg_meta.pop('data_language', None)
+                    pkg_meta.pop('data_language_other', None)
                 package = portal.action.package_create(**pkg_meta)
                 log_str = 'package_create: '+datetime.datetime.now().isoformat()+' -- สร้างชุดข้อมูล: '+str(package.get("name"))+' สำเร็จ\n'
                 log.info(log_str)
@@ -261,7 +280,7 @@ class DatasetImportController(p.toolkit.BaseController):
                 stat_df.loc[stat_df['name'] == pkg_meta['name'], 'success'] = '1'
             except Exception as err:
                 stat_df.loc[stat_df['name'] == pkg_meta['name'], 'success'] = '0'
-                log_str = 'package_create: '+datetime.datetime.now().isoformat()+' -- ไม่สามารถสร้างชุดข้อมูล: '+str(pkg_meta['name'])+'\n'
+                log_str = 'package_create: '+datetime.datetime.now().isoformat()+' -- ไม่สามารถสร้างชุดข้อมูล: '+str(pkg_meta['name'])+':'+str(err).encode('utf-8').decode('unicode-escape')+'\n'
                 log.info(log_str)
                 DatasetImportController.logger_str += log_str
 
@@ -272,6 +291,7 @@ class DatasetImportController(p.toolkit.BaseController):
             resource_df = resource_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
             resource_df.replace(np.nan, '', regex=True, inplace=True)
             resource_df['resource_name'] = resource_df['resource_url'].str.split('/').str[-1]
+            resource_df['resource_name'] = resource_df[['resource_name', 'dataset_name']].apply(lambda x: x[0] if x[0] else  x[1], axis=1)
         except:
             resource_df = pd.DataFrame(columns=['dataset_name', 'resource_url','description','format'])
             resource_df = resource_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
@@ -281,40 +301,41 @@ class DatasetImportController(p.toolkit.BaseController):
             final_df = pd.merge(stat_df,resource_df,how='left',left_on='dataset_name',right_on='dataset_name')
             final_df.replace(np.nan, '', regex=True, inplace=True)
             resource_df = final_df[(final_df['resource_url'] != '') & (final_df['success'] == '1')]
-            resource_df = resource_df[['name','update_frequency_unit','update_frequency_interval','geo_coverage','data_source','data_format','first_year_of_data','last_year_of_data','data_release_calendar','disaggregate','unit_of_measure','unit_of_multiplier','calculation_method','standard','data_language','update_frequency_unit_other','geo_coverage_other','data_format_other','disaggregate_other','unit_of_multiplier_other','data_language_other','success','resource_url','description','format','resource_name']]
-            resource_df.columns = ['package_id','resource_update_frequency_unit','resource_update_frequency_interval','resource_geo_coverage','resource_data_source','resource_data_format','first_year_of_data','last_year_of_data','data_release_calendar','disaggregate','unit_of_measure','unit_of_multiplier','calculation_method','standard','data_language','resource_update_frequency_unit_other','resource_geo_coverage_other','resource_data_format_other','disaggregate_other','unit_of_multiplier_other','data_language_other','success','url','description','format','name']
+            resource_df = resource_df[['name','success','resource_url','description','format','resource_name']]
+            resource_df.columns = ['package_id','success','url','description','format','name']
             resource_df['created'] = datetime.datetime.now().isoformat()
             resource_df['last_modified'] = datetime.datetime.now().isoformat()
             resource_dict_list = resource_df.to_dict('records')
 
             for resource_dict in resource_dict_list:
                 res_meta = resource_dict
-                if res_meta['disaggregate'] == '':
-                    res_meta.pop('disaggregate', None)
-                    res_meta.pop('disaggregate_other', None)
                 resource = portal.action.resource_create(**res_meta)
                 log.info('resource_create: '+datetime.datetime.now().isoformat()+' -- '+str(resource)+'\n')
         except Exception as err:
             log.info(err)
 
-    def gis_type_process(self, ckan_url, owner_org, filename):
+    def gis_type_process(self, ckan_url, owner_org, template_org, filename):
         try:
             gis_df = pd.read_excel(filename, header=[3], sheet_name='Temp2_Meta_GIS', dtype=str)
             gis_df.drop(0, inplace=True)
             gis_df["data_type"] = 'ข้อมูลภูมิสารสนเทศเชิงพื้นที่'
 
-            gis_df.columns = ['name','title','owner_org','maintainer','maintainer_email','tag_string','notes','objective','update_frequency_unit','update_frequency_interval','geo_coverage','data_source','data_format','data_category','license_id','accessible_condition','geographic_data_set','equivalent_scale','west_bound_longitude','east_bound_longitude','north_bound_longitude','south_bound_longitude','positional_accuracy','reference_period','updated','data_release_calendar','data_release_date','url','data_language','data_type']
-            gis_df.drop(['updated'], axis=1, inplace=True)
+            gis_df.columns = ['name','title','owner_org','maintainer','maintainer_email','tag_string','notes','objective','update_frequency_unit','update_frequency_interval','geo_coverage','data_source','data_format','data_category','license_id','accessible_condition','geographic_data_set','equivalent_scale','west_bound_longitude','east_bound_longitude','north_bound_longitude','south_bound_longitude','positional_accuracy','reference_period','last_updated_date','data_release_calendar','data_release_date','url','data_language','data_type']
             gis_df = gis_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
             gis_df.replace(np.nan, '', regex=True, inplace=True)
 
             gis_df["dataset_name"] = gis_df["name"]
             gis_df["name"] = gis_df["name"].str.lower()
             gis_df["name"].replace('\s', '-', regex=True, inplace=True)
+            if template_org != 'all':
+                gis_df = gis_df.loc[gis_df['owner_org'] == template_org]
+                gis_df.reset_index(drop=True, inplace=True)
             gis_df["owner_org"] = owner_org
             gis_df["private"] = True
             gis_df['tag_string'] = gis_df.tag_string.astype(str)
             gis_df['tag_string'] = gis_df['tag_string'].str.split(',').apply(lambda x: [e.strip() for e in x]).tolist()
+
+            gis_df["last_updated_date"] = pd.to_datetime((pd.to_numeric(gis_df["last_updated_date"].str.slice(stop=4), errors='coerce').astype('Int64')-543).astype(str)+gis_df["last_updated_date"].str.slice(start=4), errors='coerce').astype(str)
 
             objective_choices = ['ยุทธศาสตร์ชาติ', 'แผนพัฒนาเศรษฐกิจและสังคมแห่งชาติ', 'แผนความมั่นคงแห่งชาติ','แผนแม่บทภายใต้ยุทธศาสตร์ชาติ','แผนปฏิรูปประเทศ','แผนระดับที่ 3 (มติครม. 4 ธ.ค. 2560)','นโยบายรัฐบาล/ข้อสั่งการนายกรัฐมนตรี','มติคณะรัฐมนตรี','เพื่อการให้บริการประชาชน','กฎหมายที่เกี่ยวข้อง','พันธกิจหน่วยงาน','ดัชนี/ตัวชี้วัดระดับนานาชาติ','ไม่ทราบ']
             gis_df['objective_other'] = gis_df['objective'].isin(objective_choices)
@@ -372,7 +393,7 @@ class DatasetImportController(p.toolkit.BaseController):
 
         except Exception as err:
             log.info(err)
-            gis_df = pd.DataFrame(columns=['name','title','owner_org','maintainer','maintainer_email','tag_string','notes','objective','update_frequency_unit','update_frequency_interval','geo_coverage','data_source','data_format','data_category','license_id','accessible_condition','geographic_data_set','equivalent_scale','west_bound_longitude','east_bound_longitude','north_bound_longitude','south_bound_longitude','positional_accuracy','reference_period','updated','data_release_calendar','data_release_date','url','data_language','data_type'])
+            gis_df = pd.DataFrame(columns=['name','title','owner_org','maintainer','maintainer_email','tag_string','notes','objective','update_frequency_unit','update_frequency_interval','geo_coverage','data_source','data_format','data_category','license_id','accessible_condition','geographic_data_set','equivalent_scale','west_bound_longitude','east_bound_longitude','north_bound_longitude','south_bound_longitude','positional_accuracy','reference_period','last_updated_date','data_release_calendar','data_release_date','url','data_language','data_type'])
             gis_df = gis_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
             gis_df.replace(np.nan, '', regex=True, inplace=True)
 
@@ -381,6 +402,9 @@ class DatasetImportController(p.toolkit.BaseController):
         package_dict_list = gis_df.to_dict('records')
         for pkg_meta in package_dict_list:
             try:
+                if pkg_meta['data_language'] == '':
+                    pkg_meta.pop('data_language', None)
+                    pkg_meta.pop('data_language_other', None)
                 package = portal.action.package_create(**pkg_meta)
                 log_str = 'package_create: '+datetime.datetime.now().isoformat()+' -- สร้างชุดข้อมูล: '+str(package.get("name"))+' สำเร็จ\n'
                 log.info(log_str)
@@ -388,7 +412,7 @@ class DatasetImportController(p.toolkit.BaseController):
                 gis_df.loc[gis_df['name'] == pkg_meta['name'], 'success'] = '1'
             except Exception as err:
                 gis_df.loc[gis_df['name'] == pkg_meta['name'], 'success'] = '0'
-                log_str = 'package_create: '+datetime.datetime.now().isoformat()+' -- ไม่สามารถสร้างชุดข้อมูล: '+str(pkg_meta['name'])+'\n'
+                log_str = 'package_create: '+datetime.datetime.now().isoformat()+' -- ไม่สามารถสร้างชุดข้อมูล: '+str(pkg_meta['name'])+':'+str(err).encode('utf-8').decode('unicode-escape')+'\n'
                 log.info(log_str)
                 DatasetImportController.logger_str += log_str
 
@@ -399,6 +423,7 @@ class DatasetImportController(p.toolkit.BaseController):
             resource_df = resource_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
             resource_df.replace(np.nan, '', regex=True, inplace=True)
             resource_df['resource_name'] = resource_df['resource_url'].str.split('/').str[-1]
+            resource_df['resource_name'] = resource_df[['resource_name', 'dataset_name']].apply(lambda x: x[0] if x[0] else  x[1], axis=1)
         except:
             resource_df = pd.DataFrame(columns=['dataset_name', 'resource_url','description','format'])
             resource_df = resource_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
@@ -408,8 +433,8 @@ class DatasetImportController(p.toolkit.BaseController):
             final_df = pd.merge(gis_df,resource_df,how='left',left_on='dataset_name',right_on='dataset_name')
             final_df.replace(np.nan, '', regex=True, inplace=True)
             resource_df = final_df[(final_df['resource_url'] != '') & (final_df['success'] == '1')]
-            resource_df = resource_df[['name','update_frequency_unit','update_frequency_interval','geo_coverage','data_source','data_format','geographic_data_set','equivalent_scale','west_bound_longitude','east_bound_longitude','north_bound_longitude','south_bound_longitude','positional_accuracy','reference_period','data_release_calendar','data_release_date','data_language','update_frequency_unit_other','geo_coverage_other','data_format_other','equivalent_scale_other','data_language_other','success','resource_url','description','format','resource_name']]
-            resource_df.columns = ['package_id','resource_update_frequency_unit','resource_update_frequency_interval','resource_geo_coverage','resource_data_source','resource_data_format','geographic_data_set','equivalent_scale','west_bound_longitude','east_bound_longitude','north_bound_longitude','south_bound_longitude','positional_accuracy','reference_period','data_release_calendar','data_release_date','data_language','resource_update_frequency_unit_other','resource_geo_coverage_other','resource_data_format_other','equivalent_scale_other','data_language_other','success','url','description','format','name']
+            resource_df = resource_df[['name','success','resource_url','description','format','resource_name']]
+            resource_df.columns = ['package_id','success','url','description','format','name']
             resource_df['created'] = datetime.datetime.now().isoformat()
             resource_df['last_modified'] = datetime.datetime.now().isoformat()
             resource_dict_list = resource_df.to_dict('records')
@@ -421,24 +446,29 @@ class DatasetImportController(p.toolkit.BaseController):
         except Exception as err:
             log.info(err)
 
-    def multi_type_process(self, ckan_url, owner_org, filename):
+    def multi_type_process(self, ckan_url, owner_org, template_org, filename):
         try:
             multi_df = pd.read_excel(filename, header=[3], sheet_name='Temp2_Meta_Multi', dtype=str)
             multi_df.drop(0, inplace=True)
             multi_df["data_type"] = 'ข้อมูลหลากหลายประเภท'
 
-            multi_df.columns = ['name', 'title','owner_org','maintainer','maintainer_email','tag_string','notes','objective','update_frequency_unit','update_frequency_interval','geo_coverage','data_source','data_format','data_category','license_id','accessible_condition','created','updated','url','data_support','data_collect','data_language','data_type']
-            multi_df.drop(['created', 'updated'], axis=1, inplace=True)
+            multi_df.columns = ['name', 'title','owner_org','maintainer','maintainer_email','tag_string','notes','objective','update_frequency_unit','update_frequency_interval','geo_coverage','data_source','data_format','data_category','license_id','accessible_condition','created_date','last_updated_date','url','data_support','data_collect','data_language','data_type']
             multi_df = multi_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
             multi_df.replace(np.nan, '', regex=True, inplace=True)
             
             multi_df["dataset_name"] = multi_df["name"]
             multi_df["name"] = multi_df["name"].str.lower()
             multi_df["name"].replace('\s', '-', regex=True, inplace=True)
+            if template_org != 'all':
+                multi_df = multi_df.loc[multi_df['owner_org'] == template_org]
+                multi_df.reset_index(drop=True, inplace=True)
             multi_df["owner_org"] = owner_org
             multi_df["private"] = True
             multi_df['tag_string'] = multi_df.tag_string.astype(str)
             multi_df['tag_string'] = multi_df['tag_string'].str.split(',').apply(lambda x: [e.strip() for e in x]).tolist()
+
+            multi_df["created_date"] = pd.to_datetime((pd.to_numeric(multi_df["created_date"].str.slice(stop=4), errors='coerce').astype('Int64')-543).astype(str)+multi_df["created_date"].str.slice(start=4), errors='coerce').astype(str)
+            multi_df["last_updated_date"] = pd.to_datetime((pd.to_numeric(multi_df["last_updated_date"].str.slice(stop=4), errors='coerce').astype('Int64')-543).astype(str)+multi_df["last_updated_date"].str.slice(start=4), errors='coerce').astype(str)
 
             objective_choices = ['ยุทธศาสตร์ชาติ', 'แผนพัฒนาเศรษฐกิจและสังคมแห่งชาติ', 'แผนความมั่นคงแห่งชาติ','แผนแม่บทภายใต้ยุทธศาสตร์ชาติ','แผนปฏิรูปประเทศ','แผนระดับที่ 3 (มติครม. 4 ธ.ค. 2560)','นโยบายรัฐบาล/ข้อสั่งการนายกรัฐมนตรี','มติคณะรัฐมนตรี','เพื่อการให้บริการประชาชน','กฎหมายที่เกี่ยวข้อง','พันธกิจหน่วยงาน','ดัชนี/ตัวชี้วัดระดับนานาชาติ','ไม่ทราบ']
             multi_df['objective_other'] = multi_df['objective'].isin(objective_choices)
@@ -495,10 +525,12 @@ class DatasetImportController(p.toolkit.BaseController):
             multi_df['data_language_other'] = np.where(multi_df['data_language_other'] == 'True', 'True', multi_df['data_language'])
             multi_df['data_language'] = np.where(multi_df['data_language_other'] == 'True', multi_df['data_language'], 'อื่นๆ')
             multi_df['data_language_other'].replace('True', '', regex=True, inplace=True)
+
+            multi_df.replace('NaT', '', regex=True, inplace=True)
             
         except Exception as err:
             log.info(err)
-            multi_df = pd.DataFrame(columns=['name', 'title','owner_org','maintainer','maintainer_email','tag_string','notes','objective','update_frequency_unit','update_frequency_interval','geo_coverage','data_source','data_format','data_category','license_id','accessible_condition','url','data_support','data_collect','data_language','data_type'])
+            multi_df = pd.DataFrame(columns=['name', 'title','owner_org','maintainer','maintainer_email','tag_string','notes','objective','update_frequency_unit','update_frequency_interval','geo_coverage','data_source','data_format','data_category','license_id','accessible_condition','created_date','last_updated_date','url','data_support','data_collect','data_language','data_type'])
             multi_df = multi_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
             multi_df.replace(np.nan, '', regex=True, inplace=True)
             
@@ -507,6 +539,9 @@ class DatasetImportController(p.toolkit.BaseController):
         package_dict_list = multi_df.to_dict('records')
         for pkg_meta in package_dict_list:
             try:
+                if pkg_meta['data_language'] == '':
+                    pkg_meta.pop('data_language', None)
+                    pkg_meta.pop('data_language_other', None)
                 package = portal.action.package_create(**pkg_meta)
                 log_str = 'package_create: '+datetime.datetime.now().isoformat()+' -- สร้างชุดข้อมูล: '+str(package.get("name"))+' สำเร็จ\n'
                 log.info(log_str)
@@ -514,7 +549,7 @@ class DatasetImportController(p.toolkit.BaseController):
                 multi_df.loc[multi_df['name'] == pkg_meta['name'], 'success'] = '1'
             except Exception as err:
                 multi_df.loc[multi_df['name'] == pkg_meta['name'], 'success'] = '0'
-                log_str = 'package_create: '+datetime.datetime.now().isoformat()+' -- ไม่สามารถสร้างชุดข้อมูล: '+str(pkg_meta['name'])+'\n'
+                log_str = 'package_create: '+datetime.datetime.now().isoformat()+' -- ไม่สามารถสร้างชุดข้อมูล: '+str(pkg_meta['name'])+':'+str(err).encode('utf-8').decode('unicode-escape')+'\n'
                 log.info(log_str)
                 DatasetImportController.logger_str += log_str
 
@@ -525,6 +560,7 @@ class DatasetImportController(p.toolkit.BaseController):
             resource_df = resource_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
             resource_df.replace(np.nan, '', regex=True, inplace=True)
             resource_df['resource_name'] = resource_df['resource_url'].str.split('/').str[-1]
+            resource_df['resource_name'] = resource_df[['resource_name', 'dataset_name']].apply(lambda x: x[0] if x[0] else  x[1], axis=1)
         except:
             resource_df = pd.DataFrame(columns=['dataset_name', 'resource_url','description','format'])
             resource_df = resource_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
@@ -534,8 +570,8 @@ class DatasetImportController(p.toolkit.BaseController):
             final_df = pd.merge(multi_df,resource_df,how='left',left_on='dataset_name',right_on='dataset_name')
             final_df.replace(np.nan, '', regex=True, inplace=True)
             resource_df = final_df[(final_df['resource_url'] != '') & (final_df['success'] == '1')]
-            resource_df = resource_df[['name','update_frequency_unit','update_frequency_interval','geo_coverage','data_source','data_format','data_support','data_collect','data_language','update_frequency_unit_other','geo_coverage_other','data_format_other','data_support_other','data_collect_other','data_language_other','success','resource_url','description','format','resource_name']]
-            resource_df.columns = ['package_id','resource_update_frequency_unit','resource_update_frequency_interval','resource_geo_coverage','resource_data_source','resource_data_format','data_support','data_collect','data_language','resource_update_frequency_unit_other','resource_geo_coverage_other','resource_data_format_other','data_support_other','data_collect_other','data_language_other','success','url','description','format','name']
+            resource_df = resource_df[['name','success','resource_url','description','format','resource_name']]
+            resource_df.columns = ['package_id','success','url','description','format','name']
             resource_df['created'] = datetime.datetime.now().isoformat()
             resource_df['last_modified'] = datetime.datetime.now().isoformat()
             resource_dict_list = resource_df.to_dict('records')
@@ -547,24 +583,29 @@ class DatasetImportController(p.toolkit.BaseController):
         except Exception as err:
             log.info(err)
 
-    def other_type_process(self, ckan_url, owner_org, filename):
+    def other_type_process(self, ckan_url, owner_org, template_org, filename):
         try:
             other_df = pd.read_excel(filename, header=[3], sheet_name='Temp2_Meta_Other', dtype=str)
             other_df.drop(0, inplace=True)
             other_df["data_type"] = 'ข้อมูลประเภทอื่นๆ'
 
-            other_df.columns = ['name','data_type_other','title','owner_org','maintainer','maintainer_email','tag_string','notes','objective','update_frequency_unit','update_frequency_interval','geo_coverage','data_source','data_format','data_category','license_id','accessible_condition','created','updated','url','data_support','data_collect','data_language','data_type']
-            other_df.drop(['created', 'updated'], axis=1, inplace=True)
+            other_df.columns = ['name','data_type_other','title','owner_org','maintainer','maintainer_email','tag_string','notes','objective','update_frequency_unit','update_frequency_interval','geo_coverage','data_source','data_format','data_category','license_id','accessible_condition','created_date','last_updated_date','url','data_support','data_collect','data_language','data_type']
             other_df = other_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
             other_df.replace(np.nan, '', regex=True, inplace=True)
             
             other_df["dataset_name"] = other_df["name"]
             other_df["name"] = other_df["name"].str.lower()
             other_df["name"].replace('\s', '-', regex=True, inplace=True)
+            if template_org != 'all':
+                other_df = other_df.loc[other_df['owner_org'] == template_org]
+                other_df.reset_index(drop=True, inplace=True)
             other_df["owner_org"] = owner_org
             other_df["private"] = True
             other_df['tag_string'] = other_df.tag_string.astype(str)
             other_df['tag_string'] = other_df['tag_string'].str.split(',').apply(lambda x: [e.strip() for e in x]).tolist()
+
+            other_df["created_date"] = pd.to_datetime((pd.to_numeric(other_df["created_date"].str.slice(stop=4), errors='coerce').astype('Int64')-543).astype(str)+other_df["created_date"].str.slice(start=4), errors='coerce').astype(str)
+            other_df["last_updated_date"] = pd.to_datetime((pd.to_numeric(other_df["last_updated_date"].str.slice(stop=4), errors='coerce').astype('Int64')-543).astype(str)+other_df["last_updated_date"].str.slice(start=4), errors='coerce').astype(str)
 
             objective_choices = ['ยุทธศาสตร์ชาติ', 'แผนพัฒนาเศรษฐกิจและสังคมแห่งชาติ', 'แผนความมั่นคงแห่งชาติ','แผนแม่บทภายใต้ยุทธศาสตร์ชาติ','แผนปฏิรูปประเทศ','แผนระดับที่ 3 (มติครม. 4 ธ.ค. 2560)','นโยบายรัฐบาล/ข้อสั่งการนายกรัฐมนตรี','มติคณะรัฐมนตรี','เพื่อการให้บริการประชาชน','กฎหมายที่เกี่ยวข้อง','พันธกิจหน่วยงาน','ดัชนี/ตัวชี้วัดระดับนานาชาติ','ไม่ทราบ']
             other_df['objective_other'] = other_df['objective'].isin(objective_choices)
@@ -621,10 +662,12 @@ class DatasetImportController(p.toolkit.BaseController):
             other_df['data_language_other'] = np.where(other_df['data_language_other'] == 'True', 'True', other_df['data_language'])
             other_df['data_language'] = np.where(other_df['data_language_other'] == 'True', other_df['data_language'], 'อื่นๆ')
             other_df['data_language_other'].replace('True', '', regex=True, inplace=True)
+
+            other_df.replace('NaT', '', regex=True, inplace=True)
             
         except Exception as err:
             log.info(err)
-            other_df = pd.DataFrame(columns=['name','data_type_other','title','owner_org','maintainer','maintainer_email','tag_string','notes','objective','update_frequency_unit','update_frequency_interval','geo_coverage','data_source','data_format','data_category','license_id','accessible_condition','url','data_support','data_collect','data_language','data_type'])
+            other_df = pd.DataFrame(columns=['name','data_type_other','title','owner_org','maintainer','maintainer_email','tag_string','notes','objective','update_frequency_unit','update_frequency_interval','geo_coverage','data_source','data_format','data_category','license_id','accessible_condition','created_date','last_updated_date','url','data_support','data_collect','data_language','data_type'])
             other_df = other_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
             other_df.replace(np.nan, '', regex=True, inplace=True)
 
@@ -633,6 +676,9 @@ class DatasetImportController(p.toolkit.BaseController):
         package_dict_list = other_df.to_dict('records')
         for pkg_meta in package_dict_list:
             try:
+                if pkg_meta['data_language'] == '':
+                    pkg_meta.pop('data_language', None)
+                    pkg_meta.pop('data_language_other', None)
                 package = portal.action.package_create(**pkg_meta)
                 log_str = 'package_create: '+datetime.datetime.now().isoformat()+' -- สร้างชุดข้อมูล: '+str(package.get("name"))+' สำเร็จ\n'
                 log.info(log_str)
@@ -640,7 +686,7 @@ class DatasetImportController(p.toolkit.BaseController):
                 other_df.loc[other_df['name'] == pkg_meta['name'], 'success'] = '1'
             except Exception as err:
                 other_df.loc[other_df['name'] == pkg_meta['name'], 'success'] = '0'
-                log_str = 'package_create: '+datetime.datetime.now().isoformat()+' -- ไม่สามารถสร้างชุดข้อมูล: '+str(pkg_meta['name'])+'\n'
+                log_str = 'package_create: '+datetime.datetime.now().isoformat()+' -- ไม่สามารถสร้างชุดข้อมูล: '+str(pkg_meta['name'])+':'+str(err).encode('utf-8').decode('unicode-escape')+'\n'
                 log.info(log_str)
                 DatasetImportController.logger_str += log_str
 
@@ -651,6 +697,7 @@ class DatasetImportController(p.toolkit.BaseController):
             resource_df = resource_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
             resource_df.replace(np.nan, '', regex=True, inplace=True)
             resource_df['resource_name'] = resource_df['resource_url'].str.split('/').str[-1]
+            resource_df['resource_name'] = resource_df[['resource_name', 'dataset_name']].apply(lambda x: x[0] if x[0] else  x[1], axis=1)
         except:
             resource_df = pd.DataFrame(columns=['dataset_name', 'resource_url','description','format'])
             resource_df = resource_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
@@ -660,8 +707,8 @@ class DatasetImportController(p.toolkit.BaseController):
             final_df = pd.merge(other_df,resource_df,how='left',left_on='dataset_name',right_on='dataset_name')
             final_df.replace(np.nan, '', regex=True, inplace=True)
             resource_df = final_df[(final_df['resource_url'] != '') & (final_df['success'] == '1')]
-            resource_df = resource_df[['name','update_frequency_unit','update_frequency_interval','geo_coverage','data_source','data_format','data_support','data_collect','data_language','update_frequency_unit_other','geo_coverage_other','data_format_other','data_support_other','data_collect_other','data_language_other','success','resource_url','description','format','resource_name']]
-            resource_df.columns = ['package_id','resource_update_frequency_unit','resource_update_frequency_interval','resource_geo_coverage','resource_data_source','resource_data_format','data_support','data_collect','data_language','resource_update_frequency_unit_other','resource_geo_coverage_other','resource_data_format_other','data_support_other','data_collect_other','data_language_other','success','url','description','format','name']
+            resource_df = resource_df[['name','success','resource_url','description','format','resource_name']]
+            resource_df.columns = ['package_id','success','url','description','format','name']
             resource_df['created'] = datetime.datetime.now().isoformat()
             resource_df['last_modified'] = datetime.datetime.now().isoformat()
             resource_dict_list = resource_df.to_dict('records')
@@ -725,14 +772,15 @@ class DatasetImportController(p.toolkit.BaseController):
                 
                 ckan_url = config.get('ckan.site_url')
                 owner_org = data['import_org']
+                template_org = data['template_org'] or 'all'
                 filename = str(config['ckan.storage_path'])+'/storage/uploads/admin/'+data['template_file']
-                log.info('filename %r',filename)
+                log.info('Prepare to import data from template file: %r Org: %r to Org: %r',filename, template_org, owner_org)
                 DatasetImportController.logger_str = ''
-                self.record_type_process(ckan_url,owner_org,filename)
-                self.stat_type_process(ckan_url,owner_org,filename)
-                self.gis_type_process(ckan_url,owner_org,filename)
-                self.multi_type_process(ckan_url,owner_org,filename)
-                self.other_type_process(ckan_url,owner_org,filename)
+                self.record_type_process(ckan_url,owner_org,template_org,filename)
+                self.stat_type_process(ckan_url,owner_org,template_org,filename)
+                self.gis_type_process(ckan_url,owner_org,template_org,filename)
+                self.multi_type_process(ckan_url,owner_org,template_org,filename)
+                self.other_type_process(ckan_url,owner_org,template_org,filename)
                 config["import_log"] = DatasetImportController.logger_str
             except logic.ValidationError as e:
                 errors = e.error_dict
@@ -756,6 +804,7 @@ class DatasetImportController(p.toolkit.BaseController):
         config["import_log"] = ''
         config['template_file'] = ''
         config['import_org'] = ''
+        config['template_org'] = ''
 
         return render('admin/clear_import_log.html')
 

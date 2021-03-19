@@ -15,7 +15,7 @@
     {% block admin_form %}
     {%- set options=[] -%}
     {%- set field_name = "import_org" -%}
-    {%- set label = _('Organization') -%}
+    {%- set label = "ชื่อองค์กรในระบบ" -%}
     {%- for c in h.thai_gdc_get_organizations(all_fields=True) -%}
       {%- if not form_restrict_choices_to or c.value in form_restrict_choices_to -%}
         {%- do options.append({
@@ -41,6 +41,7 @@
     )
     %}
 {% endcall %}
+{{ form.input('template_org', id='field-template-org', label='ชื่อองค์กรในไฟล์ template ที่จะนำเข้า: (หากไม่ระบุ จะนำเข้าทุกแถว)', value=data['template_org'], error=error, classes=['control-medium']) }}
     <label class="control-label" for="field-file-url">Template File</label>
     {% set field_url = 'template_file' %}
     {% set is_upload = data[field_url] and not data[field_url].startswith('http') %}

@@ -8,6 +8,7 @@ from ckan.common import _, c
 import ckan.lib.helpers as h
 import ckan.lib.formatters as formatters
 import json
+import os
 import collections
 from ckan.lib.search import make_connection
 import logging
@@ -15,12 +16,25 @@ from ckanapi import LocalCKAN, NotFound, NotAuthorized
 
 from ckanext.thai_gdc.model.opend import OpendModel
 
+
 #from ckanext.pages import db
 
 get_action = logic.get_action
 opend_model = OpendModel()
 
 log = logging.getLogger(__name__)
+
+def get_extension_version():
+    dirname, filename = os.path.split(os.path.abspath(__file__))
+    f = open(dirname+'/public/base/admin/thai-gdc-update.json',) 
+    data = json.load(f)
+    return data['ckanext-thai-gdc'].replace('-','.')
+
+def get_action(action_name, data_dict=None):
+    '''Calls an action function from a template. Deprecated in CKAN 2.3.'''
+    if data_dict is None:
+        data_dict = {}
+    return logic.get_action(action_name)({}, data_dict)
 
 def get_organizations(all_fields=False, include_dataset_count=False, sort="name asc"):
     context = {'user': c.user}

@@ -1,0 +1,83 @@
+{#- master snippet for all scheming form fields -#}
+{#- render the field the user requested, or use a default field -#}
+
+{% if request.endpoint == 'dataset.new' %}
+  {% set ctype = request.args.get('ctype') or 'record' %}
+  {% if ctype == 'record' %}
+    {% set ctype = 'ข้อมูลระเบียน' %}
+  {% elif ctype == 'stat' %}
+    {% set ctype = 'ข้อมูลสถิติ' %}
+  {% elif ctype == 'gis' %}
+    {% set ctype = 'ข้อมูลภูมิสารสนเทศเชิงพื้นที่' %}
+  {% elif ctype == 'multi' %}
+    {% set ctype = 'ข้อมูลหลากหลายประเภท' %}
+  {% else %}
+    {% set ctype = 'ข้อมูลประเภทอื่นๆ' %}
+  {% endif %}
+
+  {% set form_data_type = field.form_data_type %}
+
+  {% if ctype in form_data_type %}
+    {%- set form_snippet = field.form_snippet -%}
+  
+    {%- if not form_snippet -%}
+      {%- set form_snippet = 'text.html' -%}
+    {%- endif -%}
+
+    {%- if '/' not in form_snippet -%}
+      {%- set form_snippet = 'scheming/form_snippets/' + form_snippet -%}
+    {%- endif -%}
+
+    {%- snippet form_snippet, field=field, data=data, errors=errors,
+      licenses=licenses, entity_type=entity_type, object_type=object_type -%}
+  {% endif %}
+{% elif request.endpoint == 'dataset.edit' %}
+    {% set pkg = h.thai_gdc_get_action('package_show', {'id':data.name}) %}
+    {% set form_data_type = field.form_data_type %}
+    {% if pkg.data_type in form_data_type %}
+      {%- set form_snippet = field.form_snippet -%}
+    
+      {%- if not form_snippet -%}
+        {%- set form_snippet = 'text.html' -%}
+      {%- endif -%}
+
+      {%- if '/' not in form_snippet -%}
+        {%- set form_snippet = 'scheming/form_snippets/' + form_snippet -%}
+      {%- endif -%}
+
+      {%- snippet form_snippet, field=field, data=data, errors=errors,
+        licenses=licenses, entity_type=entity_type, object_type=object_type -%}
+    {% endif %}
+{% elif request.endpoint == 'resource.new' or request.endpoint == 'resource.edit'  %}
+  {% set pkg = h.thai_gdc_get_action('package_show', {'id':package_name}) %}
+  {% set form_data_type = field.form_data_type %}
+
+  {% if pkg.data_type in form_data_type %}
+    {%- set form_snippet = field.form_snippet -%}
+  
+    {%- if not form_snippet -%}
+      {%- set form_snippet = 'text.html' -%}
+    {%- endif -%}
+
+    {%- if '/' not in form_snippet -%}
+      {%- set form_snippet = 'scheming/form_snippets/' + form_snippet -%}
+    {%- endif -%}
+
+    {%- snippet form_snippet, field=field, data=data, errors=errors,
+      licenses=licenses, entity_type=entity_type, object_type=object_type -%}
+  {% endif %}
+{% else %}
+  {%- set form_snippet = field.form_snippet -%}
+
+  {%- if not form_snippet -%}
+    {%- set form_snippet = 'text.html' -%}
+  {%- endif -%}
+
+  {%- if '/' not in form_snippet -%}
+    {%- set form_snippet = 'scheming/form_snippets/' + form_snippet -%}
+  {%- endif -%}
+
+  {%- snippet form_snippet, field=field, data=data, errors=errors,
+    licenses=licenses, entity_type=entity_type, object_type=object_type -%}
+{% endif %}
+

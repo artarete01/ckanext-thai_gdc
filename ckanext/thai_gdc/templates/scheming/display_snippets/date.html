@@ -1,0 +1,3 @@
+{% if data[field.field_name] %}
+  {{ h.thai_gdc_day_thai(h.date_str_to_datetime(data[field.field_name].split()[0])) }}
+{% endif %}

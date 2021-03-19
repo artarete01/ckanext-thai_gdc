@@ -1,0 +1,58 @@
+{% ckan_extends %}
+
+  {% block info_module %}
+    <section class="module module-narrow module-shallow">
+			<h2 class="module-heading"><i class="fa fa-filter"></i> กรุณาเลือกประเภทของชุดข้อมูล</h2>
+				<nav aria-label="ประเภทชุดข้อมูล">
+				    <ul class="list-unstyled nav nav-simple">
+					    <li id="record" class="nav-item"><a href="/dataset/new?data_type=ข้อมูลระเบียน&ctype=record" title="">ข้อมูลระเบียน</a></li>
+              <li id="stat" class="nav-item"><a href="/dataset/new?data_type=ข้อมูลสถิติ&ctype=stat" title="">ข้อมูลสถิติ</a></li>
+              <li id="gis" class="nav-item"><a href="/dataset/new?data_type=ข้อมูลภูมิสารสนเทศเชิงพื้นที่&ctype=gis" title="">ข้อมูลภูมิสารสนเทศเชิงพื้นที่</a></li>
+              <li id="multi" class="nav-item"><a href="/dataset/new?data_type=ข้อมูลหลากหลายประเภท&ctype=multi" title="">ข้อมูลหลากหลายประเภท</a></li>
+              <li id="other" class="nav-item"><a href="/dataset/new?data_type=ข้อมูลประเภทอื่นๆ&ctype=other" title="">ข้อมูลประเภทอื่นๆ</a></li>
+				    </ul>
+				</nav> 
+		</section>
+    <script>
+      var url = window.location.href;
+      if(url.includes("stat")) {
+        document.getElementById('record').className = 'nav-item';
+        document.getElementById('stat').className = 'nav-item active';
+        document.getElementById('gis').className = 'nav-item';
+        document.getElementById('multi').className = 'nav-item';
+        document.getElementById('other').className = 'nav-item';
+      }
+      else if(url.includes("gis")) {
+        document.getElementById('record').className = 'nav-item';
+        document.getElementById('stat').className = 'nav-item';
+        document.getElementById('gis').className = 'nav-item active';
+        document.getElementById('multi').className = 'nav-item';
+        document.getElementById('other').className = 'nav-item';
+      }
+      else if(url.includes("multi")) {
+        document.getElementById('record').className = 'nav-item';
+        document.getElementById('stat').className = 'nav-item';
+        document.getElementById('gis').className = 'nav-item';
+        document.getElementById('multi').className = 'nav-item active';
+        document.getElementById('other').className = 'nav-item';
+      }
+      else if(url.includes("other")) {
+        document.getElementById('record').className = 'nav-item';
+        document.getElementById('stat').className = 'nav-item';
+        document.getElementById('gis').className = 'nav-item';
+        document.getElementById('multi').className = 'nav-item';
+        document.getElementById('other').className = 'nav-item active';
+      }
+      else {
+        document.getElementById('record').className = 'nav-item active';
+        document.getElementById('stat').className = 'nav-item';
+        document.getElementById('gis').className = 'nav-item';
+        document.getElementById('multi').className = 'nav-item';
+        document.getElementById('other').className = 'nav-item';
+      }
+  </script>
+  {% endblock %}
+
+
+
+

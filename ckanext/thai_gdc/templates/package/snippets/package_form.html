@@ -1,0 +1,28 @@
+{% ckan_extends %}
+
+  {% block form_actions %}
+  {{ super() }}
+  <script>
+
+  var selectElementId = "field-data_type";
+    var selectElement = document.getElementById(selectElementId);
+	if (selectElement){		
+		var parent = selectElement.parentElement;
+		var textValue = selectElement.options[selectElement.options.selectedIndex].textContent;
+		if (!parent){
+			parent=selectElement.parentNode;
+			textValue = selectElement.options[selectElement.options.selectedIndex].text;
+		}
+		var input = document.createElement("input");
+		input.setAttribute("id",selectElement.id);
+		input.setAttribute("type","text");
+    input.setAttribute("class","form-control");
+		input.setAttribute("value",textValue);
+		input.style.background="#eeeeee";
+		input.readOnly = true;
+		parent.appendChild(input);
+	}
+	selectElement.style.display="none";
+    
+  </script>
+  {% endblock %}

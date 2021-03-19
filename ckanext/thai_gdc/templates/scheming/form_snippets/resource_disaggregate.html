@@ -1,13 +1,13 @@
 {% import 'macros/form.html' as form %}
 <script type="text/javascript">
-	function sCheck_data_language(cb){
+	function sCheck_resource_disaggregate(cb){
 		if(cb.value=="อื่นๆ" && cb.checked==true){
-            document.getElementById('field-data_language_other').value = '';
-            document.getElementById('field-data_language_other').disabled = false;
-            document.getElementById('field-data_language_other').focus()
+            document.getElementById('field-resource_disaggregate_other').value = '';
+            document.getElementById('field-resource_disaggregate_other').disabled = false;
+            document.getElementById('field-resource_disaggregate_other').focus()
         } else if(cb.value=="อื่นๆ" && cb.checked==false) {
-            document.getElementById('field-data_language_other').value = '';
-            document.getElementById('field-data_language_other').disabled = true;
+            document.getElementById('field-resource_disaggregate_other').value = '';
+            document.getElementById('field-resource_disaggregate_other').disabled = true;
         }
 	}
 </script>
@@ -46,7 +46,7 @@ fieldset.checkboxes label input {
                     name="{{ field.field_name }}"
                     value="{{ val }}"
                     {{"checked " if val in data[field.field_name] }} 
-                    onclick="sCheck_data_language(this);" />
+                    onclick="sCheck_resource_disaggregate(this);" />
                 {{ label }}
             </label>
         {%- endfor -%}

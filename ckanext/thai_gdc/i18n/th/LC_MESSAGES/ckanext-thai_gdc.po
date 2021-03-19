@@ -39,13 +39,13 @@ msgid "Search datasets..."
 msgstr "ค้นหาชุดข้อมูล..."
 
 msgid "Last Updated"
-msgstr "ปรับปรุงครั้งล่าสุดเมื่อ"
+msgstr "ปรับปรุงครั้งล่าสุดในระบบเมื่อ"
 
 msgid "Last updated"
 msgstr "ปรับปรุงครั้งล่าสุดเมื่อ"
 
 msgid "Created"
-msgstr "สร้างเมื่อ"
+msgstr "สร้างในระบบเมื่อ"
 
 msgid "Format"
 msgstr "นามสกุลของไฟล์"
@@ -172,3 +172,9 @@ msgstr "รายการสิทธิ์ของผู้ใช้"
 
 msgid "Users by Organization"
 msgstr "ผู้ใช้รายองค์กร"
+
+msgid "active"
+msgstr "ใช้งาน"
+
+msgid "deleted"
+msgstr "ลบแล้ว"

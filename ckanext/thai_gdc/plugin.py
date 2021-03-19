@@ -39,7 +39,6 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
 
         return res_dict
 
-
     # IConfigurer
     def update_config(self, config_):
         if toolkit.check_ckan_version(max_version='2.9'):
@@ -124,6 +123,7 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             'clear_template_file_upload': [ignore_missing, unicode_safe],
             'import_org': [ignore_missing, unicode_safe],
             'import_log': [ignore_missing, unicode_safe],
+            'template_org': [ignore_missing, unicode_safe],
         })
 
         return schema
@@ -171,7 +171,8 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             return {'success': True}
     
     def before_view(self, pkg_dict):
-        pkg_dict = logic.get_action("package_show")({}, {
+        context = {'ignore_auth': True}
+        pkg_dict = logic.get_action("package_show")(context, {
             'include_tracking': True,
             'id': pkg_dict['id']
         })
@@ -214,7 +215,9 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             'thai_gdc_get_recent_view_for_package': noh.get_recent_view_for_package,
             'thai_gdc_get_featured_pages': noh.get_featured_pages,
             'thai_gdc_get_all_groups': noh.get_all_groups,
-            'thai_gdc_get_all_groups_all_type': noh.get_all_groups_all_type
+            'thai_gdc_get_all_groups_all_type': noh.get_all_groups_all_type,
+            'thai_gdc_get_action': noh.get_action,
+            'thai_gdc_get_extension_version': noh.get_extension_version
         }
 
 def tag_name_validator(value, context):
