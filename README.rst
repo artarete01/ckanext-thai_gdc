@@ -30,4 +30,4 @@ Requirements
 Installation
 ------------
 
-- https://gitlab.nectec.or.th/opend/installing-ckan/-/blob/master/ckan-extension.md#5-ckanext-thai_gdc
+- [การติดตั้ง ckanext-thai_gdc](ckan-extension.md#5-ckanext-thai_gdc)
