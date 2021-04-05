@@ -178,3 +178,6 @@ msgstr "ใช้งาน"
 
 msgid "deleted"
 msgstr "ลบแล้ว"
+
+msgid "statistics"
+msgstr "สถิติ"

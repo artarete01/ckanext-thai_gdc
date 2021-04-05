@@ -99,7 +99,10 @@
           "en": "Contact Person",
           "th": "ชื่อผู้ติดต่อ"
         },
-        "form_placeholder": "Joe Bloggs",
+        "form_placeholder": {
+          "en": "Organization name",
+          "th": "ชื่อหน่วยงานหรือกลุ่มงาน"
+        },
         "form_data_type": ["ข้อมูลระเบียน","ข้อมูลสถิติ","ข้อมูลภูมิสารสนเทศเชิงพื้นที่","ข้อมูลหลากหลายประเภท","ข้อมูลประเภทอื่นๆ"],
         "required": true
       },
@@ -109,7 +112,7 @@
           "en": "Contact Email",
           "th": "อีเมลผู้ติดต่อ"
         },
-        "form_placeholder": "joe@example.com",
+        "form_placeholder": "department@org.go.th",
         "display_snippet": "email.html",
         "form_data_type": ["ข้อมูลระเบียน","ข้อมูลสถิติ","ข้อมูลภูมิสารสนเทศเชิงพื้นที่","ข้อมูลหลากหลายประเภท","ข้อมูลประเภทอื่นๆ"],
         "required": true
@@ -382,10 +385,6 @@
         },
         "choices": [
           {
-            "value": "ไม่ทราบ",
-            "label": "ไม่ทราบ"
-          },
-          {
             "value": "Database",
             "label": "Database"
           },
@@ -399,7 +398,10 @@
           },
           {
             "value": "Image",
-            "label": "Image"
+            "label": {
+              "en": "Image",
+              "th": "Image"
+            }
           },
           {
             "value": "Video",
@@ -411,7 +413,10 @@
           },
           {
             "value": "Text",
-            "label": "Text"
+            "label": {
+              "en": "Text",
+              "th": "Text"
+            }
           },
           {
             "value": "JSON",
@@ -452,6 +457,10 @@
           {
             "value": "GML",
             "label": "GML"
+          },
+          {
+            "value": "ไม่ทราบ",
+            "label": "ไม่ทราบ"
           },
           {
             "value": "อื่นๆ",
@@ -505,10 +514,6 @@
           {
             "value": "License not specified",
             "label": "License not specified"
-          },
-          {
-            "value": "DGA Open Government License",
-            "label": "DGA Open Government License"
           },
           {
             "value": "Creative Commons Attributions",
@@ -611,6 +616,10 @@
           "th": "หน่วยที่ย่อยที่สุดของการจัดเก็บข้อมูล"
         },
         "choices": [
+          {
+            "value": "ไม่มี",
+            "label": "ไม่มี"
+          },
           {
             "value": "บุคคล",
             "label": "บุคคล"
@@ -834,8 +843,8 @@
             "label": "อาชีพ"
           },
           {
-            "value": "สถานภาพการทางาน",
-            "label": "สถานภาพการทางาน"
+            "value": "สถานภาพการทำงาน",
+            "label": "สถานภาพการทำงาน"
           },
           {
             "value": "อุตสาหกรรม/ประเภทกิจการ",
@@ -1161,7 +1170,7 @@
         ],
         "form_snippet": "select_admin_only.html",
         "display_snippet": "select.html",
-        "form_data_type": ["ข้อมูลระเบียน","ข้อมูลสถิติ","ข้อมูลภูมิสารสนเทศเชิงพื้นที่","ข้อมูลหลากหลายประเภท","ข้อมูลประเภทอื่นๆ"]
+        "form_data_type": ["ข้อมูลระเบียน","ข้อมูลหลากหลายประเภท","ข้อมูลประเภทอื่นๆ"]
       },
       {
         "field_name": "reference_data",
@@ -1187,7 +1196,7 @@
         ],
         "form_snippet": "select_admin_only.html",
         "display_snippet": "select.html",
-        "form_data_type": ["ข้อมูลระเบียน","ข้อมูลภูมิสารสนเทศเชิงพื้นที่","ข้อมูลหลากหลายประเภท","ข้อมูลประเภทอื่นๆ"]
+        "form_data_type": ["ข้อมูลระเบียน","ข้อมูลหลากหลายประเภท","ข้อมูลประเภทอื่นๆ"]
       },
       {
         "field_name": "official_statistics",
@@ -1254,6 +1263,10 @@
           "th": "หน่วยที่ย่อยที่สุดของการจัดเก็บข้อมูล"
         },
         "choices": [
+          {
+            "value": "ไม่มี",
+            "label": "ไม่มี"
+          },
           {
             "value": "บุคคล",
             "label": "บุคคล"
@@ -1364,8 +1377,8 @@
             "label": "อาชีพ"
           },
           {
-            "value": "สถานภาพการทางาน",
-            "label": "สถานภาพการทางาน"
+            "value": "สถานภาพการทำงาน",
+            "label": "สถานภาพการทำงาน"
           },
           {
             "value": "อุตสาหกรรม/ประเภทกิจการ",

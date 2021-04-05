@@ -1,5 +1,15 @@
-{% ckan_extends %}
+{% extends "package/snippets/additional_info.html" %}
 
+{%- set exclude_fields = [
+    'id',
+    'title',
+    'name',
+    'notes',
+    'tag_string',
+    'license_id',
+    'owner_org',
+    ] -%}
+    
         {% block package_additional_info %}
         {%- for field in schema.dataset_fields -%}
         {% set form_data_type = field.form_data_type %}

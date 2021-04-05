@@ -24,6 +24,18 @@ opend_model = OpendModel()
 
 log = logging.getLogger(__name__)
 
+def get_users_non_member():
+    users = opend_model.get_users_non_member()
+    return [d['id'] for d in users]
+
+def get_users_deleted():
+    query = model.Session.query(model.User.name)
+    query = query.filter_by(state='deleted')
+    users_list = []
+    for user in query.all():
+        users_list.append(user[0])
+    return users_list
+
 def get_extension_version():
     dirname, filename = os.path.split(os.path.abspath(__file__))
     f = open(dirname+'/public/base/admin/thai-gdc-update.json',) 

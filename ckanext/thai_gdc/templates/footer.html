@@ -1,5 +1,5 @@
 <footer class="site-footer">
-    <div class="container">
+    <div class="container" style="padding-left: 0px;">
       {% block footer_content %}
       <div class="blockFooter">
           {% block footer_nav %}
@@ -39,20 +39,28 @@
                         <div class="col-md-5 col-sm-5 col-xs-12">
                             <div class="row">
                                 {% block footer_attribution %}
-                                    <div class="col-md-12 col-sm-12 col-xs-12 text-right">
+                                <div class="col-md-12 col-sm-12 col-xs-12 text-right">
+                                    <span>
                                         จำนวนผู้เข้าชม <span class="totalVisitor">{{ h.thai_gdc_get_stat_all_view() }}<!-- at {{ h.thai_gdc_get_last_update_tracking() }} --></span>
-                                    </div>
-
+                                    </span>
+                                </div>
                                     <div class="col-md-12 col-sm-12 col-xs-12 text-right mt-1">
                                         {{ h.render_markdown(g.site_policy_link) }}
                                     </div>
-                                {% endblock %}
+                                
                                 {% block footer_lang %}
                                     {% snippet "snippets/language_selector.html" %}
                                 {% endblock %}
-                                <div class="col-md-12 col-sm-12 col-xs-12 text-right">
-                                    <small>รุ่นโปรแกรม {{h.thai_gdc_get_extension_version()}}</small>
+                                <div class="col-md-12 col-sm-12 col-xs-12" style="display: flex;justify-content: space-between;padding-left: 0px;margin-top: 10px;">
+                                    <span><span style="font-weight: bold;vertical-align: bottom;margin-right: 5px;color:rgba(255,255,255,0.85);">Powered by:</span><a class="hide-text ckan-footer-logo" href="http://ckan.org" target="_blank" style="padding-right: 5px;"><img src="/base/images/ckan-logo-footer.png"></a>
+                                        <a href="https://gitlab.nectec.or.th/opend/installing-ckan/-/blob/master/README.md" target="_blank"><img src="/base/images/logo-opend.png" style="width: 50px;opacity: 0.8;"></a>
+                                    </span>
+                                <span>
+                                    <small style="vertical-align: sub;">รุ่นโปรแกรม
+                                        {{h.thai_gdc_get_extension_version()}}</small>
+                                </span>
                                 </div>
+                                {% endblock %}
                             </div>
                         </div>
                     </div>

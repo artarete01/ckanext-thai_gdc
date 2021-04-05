@@ -40,6 +40,8 @@ class BannerEditController(BaseController):
                 'field_url': 'ckan.promoted_banner', 'field_upload': 'promoted_banner_upload', 'field_clear': 'clear_promoted_banner_upload'},
             {'name': 'ckan.search_background', 'control': 'image_upload', 'label': _('Search background'), 'placeholder': '', 'upload_enabled':h.uploads_enabled(),
                 'field_url': 'ckan.search_background', 'field_upload': 'search_background_upload', 'field_clear': 'clear_search_background_upload'},
+            {'name': 'ckan.favicon', 'control': 'favicon_upload', 'label': _('Site favicon'), 'placeholder': '', 'upload_enabled':h.uploads_enabled(),
+                'field_url': 'ckan.favicon', 'field_upload': 'favicon_upload', 'field_clear': 'clear_favicon_upload'},
         ]
         data = request.POST
         if 'save' in data:
@@ -67,6 +69,11 @@ class BannerEditController(BaseController):
                                     'search_background_upload', 'clear_search_background_upload')
                 upload.upload(uploader.get_max_image_size())
 
+                upload = uploader.get_uploader('admin')
+                upload.update_data_dict(data_dict, 'ckan.favicon',
+                                    'favicon_upload', 'clear_favicon_upload')
+                upload.upload(uploader.get_max_image_size())
+
                 data, errors = _validate(data_dict, schema, context)
                 if errors:
                     model.Session.rollback()
@@ -81,6 +88,12 @@ class BannerEditController(BaseController):
                         value = h.url_for_static('{0}{1}'.format(image_path, value))
                     
                     if key == 'ckan.search_background' and value and not value.startswith('http')\
+                            and not value.startswith('/'):
+                        image_path = 'uploads/admin/'
+
+                        value = h.url_for_static('{0}{1}'.format(image_path, value))
+                    
+                    if key == 'ckan.favicon' and value and not value.startswith('http')\
                             and not value.startswith('/'):
                         image_path = 'uploads/admin/'
 

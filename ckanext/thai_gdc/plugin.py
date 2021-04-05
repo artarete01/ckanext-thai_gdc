@@ -32,6 +32,13 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
     plugins.implements(plugins.IValidators)
     plugins.implements(plugins.IRoutes, inherit=True)
     plugins.implements(plugins.IResourceController, inherit=True)
+    plugins.implements(plugins.IFacets, inherit=True)
+
+    def dataset_facets(self, facets_dict, package_type):
+
+        facets_dict['data_type'] = toolkit._('ประเภทชุดข้อมูล')
+        facets_dict['data_category'] = toolkit._('หมวดหมู่ตามธรรมาภิบาลข้อมูล')
+        return facets_dict
 
     # IResourceController
     def before_show(self, res_dict):
@@ -72,9 +79,9 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
         config_['ckan.locale_default'] = 'th'
         config_['ckan.locale_order'] = 'en th pt_BR ja it cs_CZ ca es fr el sv sr sr@latin no sk fi ru de pl nl bg ko_KR hu sa sl lv'
         config_['ckan.datapusher.formats'] = 'csv xls xlsx tsv application/csv application/vnd.ms-excel application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        config_['ckan.group_and_organization_list_all_fields_max'] = '200'
-        config_['ckan.group_and_organization_list_max'] = '200'
-        config_['ckan.datasets_per_page'] = '200'
+        config_['ckan.group_and_organization_list_all_fields_max'] = '50'
+        config_['ckan.group_and_organization_list_max'] = '50'
+        config_['ckan.datasets_per_page'] = '30'
     
     def before_map(self, map):
 
@@ -124,6 +131,9 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             'import_org': [ignore_missing, unicode_safe],
             'import_log': [ignore_missing, unicode_safe],
             'template_org': [ignore_missing, unicode_safe],
+            'ckan.favicon': [ignore_missing, unicode_safe],
+            'favicon_upload': [ignore_missing, unicode_safe],
+            'clear_favicon_upload': [ignore_missing, unicode_safe],
         })
 
         return schema
@@ -131,7 +141,8 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
     # IAuthFunctions
     def get_auth_functions(self):
         auth_functions = {
-            'member_create': self.member_create
+            'member_create': self.member_create,
+            'user_generate_apikey': self.user_generate_apikey
         }
         return auth_functions
 
@@ -169,6 +180,15 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
                            (str(user), group.id)}
         else:
             return {'success': True}
+        
+    def user_generate_apikey(self, context, data_dict):
+        user = context['user']
+        user_obj = logic_auth.get_user_object(context, data_dict)
+        # if user == user_obj.name:
+        #     # Allow users to update only their own user accounts.
+        #     return {'success': True}
+        return {'success': False, 'msg': _('User {0} not authorized to update user'
+                ' {1}'.format(user, user_obj.id))}
     
     def before_view(self, pkg_dict):
         context = {'ignore_auth': True}
@@ -194,6 +214,17 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
     
     def modify_package_before(self, package):
         package.state = 'active'
+
+        for extra in package.extras_list:
+            if extra.key == 'objective' and isinstance(extra.value, string_types):
+                extra.value = self.unicode_string_convert(extra.value)
+    
+    def unicode_string_convert(self, value):
+        values = value.strip('[]').split(',')
+        value_list = ""
+        for v in values:
+            value_list = value_list + v.strip(' ').encode('latin-1').decode('unicode-escape')
+        return "["+value_list.replace('""','","')+"]"
         
     def get_validators(self):
         return {
@@ -217,7 +248,9 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             'thai_gdc_get_all_groups': noh.get_all_groups,
             'thai_gdc_get_all_groups_all_type': noh.get_all_groups_all_type,
             'thai_gdc_get_action': noh.get_action,
-            'thai_gdc_get_extension_version': noh.get_extension_version
+            'thai_gdc_get_extension_version': noh.get_extension_version,
+            'thai_gdc_get_users_deleted': noh.get_users_deleted,
+            'thai_gdc_get_users_non_member': noh.get_users_non_member
         }
 
 def tag_name_validator(value, context):

@@ -20,6 +20,12 @@
     {% set is_url = data[field_url] and data[field_url].startswith('http') %}
     {{ form.image_upload(data, errors, is_upload_enabled=h.uploads_enabled(), is_url=is_url, is_upload=is_upload, upload_label = '', url_label='',  field_url=field_url, field_upload='search_background_upload', field_clear='clear_search_background_upload' )}}
 
+    <label class="control-label" for="field-image-url">Site favicon</label>
+    {% set field_url = 'ckan.favicon' %}
+    {% set is_upload = data[field_url] and not data[field_url].startswith('http') %}
+    {% set is_url = data[field_url] and data[field_url].startswith('http') %}
+    {{ form.image_upload(data, errors, is_upload_enabled=h.uploads_enabled(), is_url=is_url, is_upload=is_upload, upload_label = '', url_label= '',  field_url=field_url, field_upload='favicon_upload', field_clear='clear_favicon_upload' )}}
+
     {% endblock %}
       <div class="form-actions">
         <button type="submit" class="btn btn-primary" name="save">{{ _('Update Config') }}</button>
@@ -31,13 +37,14 @@
   <div class="module module-narrow module-shallow">
     <h2 class="module-heading">
       <i class="fa fa-info-circle"></i>
-      การปรับแต่ง Banner
+      การปรับแต่ง Banner และ Favicon
     </h2>
     <div class="module-content">
       {% block admin_form_help %}
         {% trans %}
           <p><strong>Promoted banner:</strong> ภาพในส่วนแนะนำเว็บไซต์</p>
           <p><strong>Search background:</strong> ภาพพื้นหลังส่วนค้นหาชุดข้อมูลในหน้าหลัก</p>
+          <p><strong>Favicon:</strong> ไอคอนประจำเว็บไซต์</p>
       {% endtrans %}
     {% endblock %}
     </div>

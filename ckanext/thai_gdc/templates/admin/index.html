@@ -1,0 +1,82 @@
+{% ckan_extends %}
+
+{% block primary_content_inner %}
+<div class="row">
+  <div class="col-md-8">
+    <!--<span class="badge" style="background-color:#ffff005e">&nbsp;</span>  ผู้ดูแลระบบ
+    <span class="badge" style="background-color:rgb(227,220,255)">&nbsp;</span>  บรรณาธิการ
+    <span class="badge" style="background-color:rgb(207,240,251)">&nbsp;</span>  สมาชิก
+    <br />-->
+    {% set top_nodes = h.group_tree(type_='organization') %}
+    {% set use_longnames = False %}
+    <ul class="hierarchy-tree-top" style="margin-top: 5px;">
+      {% for node in top_nodes recursive %}
+      {% set longname = h.group_tree_get_longname(node.name) %}
+      {% set display_text = node.title %}
+      {% if use_longnames and longname%}
+      {% set display_text = longname + " (" + display_text + ")" %}
+      {% endif %}
+      {% if node.highlighted %}
+      <li class="highlighted" id="node_{{ node.name }}">
+        {% else %}
+      <li id="node_{{ node.name }}">
+        {% endif %}
+        <a href="/organization/members/{{ node.name }}">{{ display_text }}</a><br />
+        {% set members = h.thai_gdc_get_action('member_list',{'id': node.name, 'object_type': 'user'}) %}
+        {% for user_id, user, role in members %}
+        {% if role == 'Admin' or role == 'ผู้ดูแลระบบ' %}
+        <span class="badge"
+          style="background-color:#ffff005e">{{ h.linked_user(user_id, maxlength=20, avatar=0) }}</span>&nbsp;
+        {% elif role == 'Editor' or role == 'บรรณาธิการ' %}
+        <span class="badge"
+          style="background-color:rgb(227,220,255)">{{ h.linked_user(user_id, maxlength=20, avatar=0) }}</span>&nbsp;
+        {% elif role == 'Member' or role == 'สมาชิก' %}
+        <span class="badge"
+          style="background-color:rgb(207,240,251)">{{ h.linked_user(user_id, maxlength=20, avatar=0) }}</span>&nbsp;
+        {% endif %}
+        {% endfor %}
+        {% if node.children %}
+        <ul class="hierarchy-tree" style="margin-top: 5px;"> {{ loop(node.children) }} </ul>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+
+  </div>
+  <div class="col-md-4">
+    <div class="col-md-12 card" style="background-color: #f6f6f6;margin-bottom: 20px;">
+      <h2>{{ _('Sysadmins') }}</h2>
+      <div class="card-body">
+        <ul class="user-list">
+          {% for user in sysadmins %}
+          <li>{{ h.linked_user(user) }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+    <br>
+    <div class="col-md-12 card" style="background-color: #f6f6f6;margin-bottom: 20px;">
+      <h2>ผู้ใช้ที่ลงทะเบียนใหม่</h2>
+      {% set users_non_member = h.thai_gdc_get_users_non_member() %}
+      <div class="card-body">
+        <ul class="user-list">
+          {% for user in users_non_member %}
+          <li>{{ h.linked_user(user) }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+    <br>
+    <div class="col-md-12 card" style="background-color: #f6f6f6">
+      <h2>ผู้ใช้ที่ถูกลบ</h2>
+      {% set users_deleted = h.thai_gdc_get_users_deleted() %}
+      <div class="card-body">
+        <ul class="user-list">
+          {% for user in users_deleted %}
+          <li>{{ h.linked_user(user) }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+  {% endblock %}

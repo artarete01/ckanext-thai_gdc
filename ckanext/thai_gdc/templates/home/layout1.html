@@ -1,0 +1,42 @@
+{% if g.search_background %}
+  {% set background = g.search_background %}
+{% else %}
+  {% set background = '/base/images/bg-banner.jpg' %}
+{% endif %}
+
+<style>
+  .homepage .stats ul li {
+    float: center;
+    width: 33%;
+}
+</style>
+<div role="main" class="hero" style="background-image: url('{{ background }}')">
+    <div class="container">
+        <div class="row row1">
+          <div class="col-md-6 col1">
+            {% block promoted %}
+              {% snippet 'home/snippets/promoted.html' %}
+            {% endblock %}
+          </div>
+          <div class="col-md-6 col2" style="position: unset;">
+            {% block search %}
+              {% snippet 'home/snippets/search.html' %}
+            {% endblock %}
+            <br />
+            {% block stats %}
+              {% snippet 'home/snippets/stats.html' %}
+            {% endblock %}
+          </div>
+        </div>
+      </div>
+</div>
+<div role="main">
+  <div class="container">
+    <div class="row row2">
+      {% block featured_group %}
+        {% set stats = h.get_site_statistics() %}
+        {% snippet 'home/snippets/groups.html', stats=stats %}
+      {% endblock %}
+    </div>
+  </div>
+</div>
