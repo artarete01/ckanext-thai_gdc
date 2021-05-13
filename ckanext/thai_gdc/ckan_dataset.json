@@ -94,6 +94,16 @@
         "form_data_type": ["ข้อมูลระเบียน","ข้อมูลสถิติ","ข้อมูลภูมิสารสนเทศเชิงพื้นที่","ข้อมูลหลากหลายประเภท","ข้อมูลประเภทอื่นๆ"]
       },
       {
+        "field_name": "reference_url_catalog",
+        "label": {
+          "en": "Reference URL Catalog",
+          "th": "อ้างอิง URL Catalog"
+        },
+        "form_placeholder": "URL ชุดข้อมูลของ Catalog ที่อ้างอิง",
+        "form_snippet": "reference_url_catalog.html",
+        "form_data_type": ["ข้อมูลระเบียน","ข้อมูลสถิติ","ข้อมูลภูมิสารสนเทศเชิงพื้นที่","ข้อมูลหลากหลายประเภท","ข้อมูลประเภทอื่นๆ"]
+      },
+      {
         "field_name": "maintainer",
         "label": {
           "en": "Contact Person",
@@ -1168,7 +1178,7 @@
             }
           }
         ],
-        "form_snippet": "select_admin_only.html",
+        "form_snippet": "select.html",
         "display_snippet": "select.html",
         "form_data_type": ["ข้อมูลระเบียน","ข้อมูลหลากหลายประเภท","ข้อมูลประเภทอื่นๆ"]
       },
@@ -1194,7 +1204,7 @@
             }
           }
         ],
-        "form_snippet": "select_admin_only.html",
+        "form_snippet": "select.html",
         "display_snippet": "select.html",
         "form_data_type": ["ข้อมูลระเบียน","ข้อมูลหลากหลายประเภท","ข้อมูลประเภทอื่นๆ"]
       },
@@ -1220,7 +1230,7 @@
             }
           }
         ],
-        "form_snippet": "select_admin_only.html",
+        "form_snippet": "select.html",
         "display_snippet": "select.html",
         "form_data_type": ["ข้อมูลสถิติ"]
       }

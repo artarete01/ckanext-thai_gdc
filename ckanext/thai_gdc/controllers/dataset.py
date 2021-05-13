@@ -32,6 +32,24 @@ log = logging.getLogger(__name__)
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
+class DatasetManageController(p.toolkit.BaseController):
+
+    def datatype_patch(self, package_id):
+        data = request.GET
+        if 'data_type' in data:
+            try:
+                data_dict = logic.clean_dict(
+                    dict_fns.unflatten(
+                        logic.tuplize_dict(
+                            logic.parse_params(
+                                request.GET, ignore_keys=CACHE_PARAMETERS))))
+                portal = LocalCKAN()
+                patch_meta = {'id':package_id,'data_type':data['data_type']}
+                package = portal.action.package_patch(**patch_meta)
+                h.redirect_to(controller='dataset', action='read', id=package_id)
+            except logic.ValidationError as e:
+                return e
+
 class DatasetImportController(p.toolkit.BaseController):
 
     logger_str = ''

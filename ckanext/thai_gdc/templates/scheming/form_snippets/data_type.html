@@ -33,11 +33,66 @@
     options=options,
     selected=data.get(field.field_name, field.get('default', 'notspecified')),
     error=errors[field.field_name],
-    classes=['control-medium'],
+    classes=['control-medium select-data_type'],
     is_required=h.scheming_field_required(field),
     attrs = {'class' : "form-control", 'onchange' : "sSelect_data_type();"}
     )
 %}
 {% endcall %}
 
+{% if request.endpoint == 'dataset.edit' %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<style>
+.select-data_type {
+  margin-bottom: 8px;
+}
+</style>
+<!-- Modal -->
+<div class="modal fade" id="dataTypeChangeModal" tabindex="-1" role="dialog" aria-labelledby="dataTypeChangeModalModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="dataTypeChangeModalLabel">แก้ไขประเภทชุดข้อมูล</h5>
+      </div>
+        <div class="modal-body">
+          <select id="field-data_type_change" name="data_type_change" class="form-control">
+            {% for option in options %}
+            {% if option.value == data['data_type'] %}
+            <option value="{{ option.value }}" id='option-{{option.value}}' selected="selected">{{ option.value }}</option>
+            {% else %}
+            <option value="{{ option.value }}" id='option-{{option.value}}'>{{ option.value }}</option>
+            {% endif %}
+            {% endfor %}
+          </select>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="">{{ _('Cancel')}}</button>
+          {% block save_button %}
+          <button class="btn btn-primary" type="button" id="save_data_type_change">{% block save_button_text %}{{ _('Save') }}{% endblock %}</button>
+          {% endblock %}
+        </div>
+    </div>
+  </div>
+</div>
+<div style="text-align: right;"><a href="#" style="font-size: smaller;" class="btn btn-primary" data-toggle="modal" data-target="#dataTypeChangeModal">แก้ไขประเภทชุดข้อมูล</a></div>
 
+<script>
+  $(document).ready(function(){
+    $("#save_data_type_change").click(function(){
+      var r = confirm("การแก้ไขนี้จะส่งผลต่อข้อมูลเมตาเฉพาะของประเภทชุดข้อมูลเดิม หลังจากบันทึกแล้วกรุณาตรวจสอบข้อมูลเมตาอีกครั้ง คุณต้องการที่จะบันทึกหรือไม่");
+      $(window).off('beforeunload');
+      if (r == true) {
+        var data_type_change = document.getElementById("field-data_type_change").value;
+        window.location.href = "/dataset/edit-datatype/{{ data.name }}?data_type="+data_type_change;
+      } else {
+        $('#dataTypeChangeModal').modal('hide');
+        location.reload();
+      } 
+    });
+    $("#dataTypeChangeModal").on('hide.bs.modal', function(){
+      $('#field-data_type_change').val("{{data['data_type']}}");
+    });
+  });
+</script>
+{% endif %}

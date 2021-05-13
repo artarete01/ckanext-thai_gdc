@@ -2,7 +2,7 @@
 
 {% block content_action %}
 
-  {{ super() }}
+{{ super() }}
 
   {% if h.check_access('package_update', {'id':pkg.id }) %}
     {% if h.ckan_version() > '2.9' %}
@@ -12,4 +12,7 @@
     {% endif %}
   {% endif %}
 
+{% endblock %}
+
+{% block package_license %}
 {% endblock %}

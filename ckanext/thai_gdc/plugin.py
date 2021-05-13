@@ -36,8 +36,8 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
 
     def dataset_facets(self, facets_dict, package_type):
 
-        facets_dict['data_type'] = toolkit._('ประเภทชุดข้อมูล')
-        facets_dict['data_category'] = toolkit._('หมวดหมู่ตามธรรมาภิบาลข้อมูล')
+        facets_dict['data_type'] = toolkit._('Dataset Type') #ประเภทชุดข้อมูล
+        facets_dict['data_category'] = toolkit._('Data Category') #หมวดหมู่ตามธรรมาภิบาลข้อมูล
         return facets_dict
 
     # IResourceController
@@ -79,10 +79,13 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
         config_['ckan.locale_default'] = 'th'
         config_['ckan.locale_order'] = 'en th pt_BR ja it cs_CZ ca es fr el sv sr sr@latin no sk fi ru de pl nl bg ko_KR hu sa sl lv'
         config_['ckan.datapusher.formats'] = 'csv xls xlsx tsv application/csv application/vnd.ms-excel application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        config_['ckan.group_and_organization_list_all_fields_max'] = '50'
-        config_['ckan.group_and_organization_list_max'] = '50'
+        config_['ckan.group_and_organization_list_all_fields_max'] = '200'
+        config_['ckan.group_and_organization_list_max'] = '200'
         config_['ckan.datasets_per_page'] = '30'
-    
+        config_['ckan.recline.dataproxy_url'] = 'https://dataproxy.gdcatalog.go.th'
+        config_['thai_gdc.opend_playground_url'] = 'https://opend-playground.gdcatalog.go.th'
+        config_['thai_gdc.gdcatalog_harvester_url'] = 'https://harvester.gdcatalog.go.th'
+
     def before_map(self, map):
 
         map.connect(
@@ -105,13 +108,18 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             action='clear_import_log',
             controller='ckanext.thai_gdc.controllers.dataset:DatasetImportController',
             )
+        map.connect(
+            'dataset_datatype_patch',
+            '/dataset/edit-datatype/{package_id}',
+            action='datatype_patch',
+            controller='ckanext.thai_gdc.controllers.dataset:DatasetManageController',
+            )
 
         return map
 
     def update_config_schema(self, schema):
 
         ignore_missing = toolkit.get_validator('ignore_missing')
-        remove_whitespace = toolkit.get_validator('remove_whitespace')
         unicode_safe = toolkit.get_validator('unicode_safe')
 
         schema.update({
@@ -250,7 +258,11 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             'thai_gdc_get_action': noh.get_action,
             'thai_gdc_get_extension_version': noh.get_extension_version,
             'thai_gdc_get_users_deleted': noh.get_users_deleted,
-            'thai_gdc_get_users_non_member': noh.get_users_non_member
+            'thai_gdc_get_users_non_member': noh.get_users_non_member,
+            'thai_gdc_get_gdcatalog_state': noh.get_gdcatalog_state,
+            'thai_gdc_get_opend_playground_url': noh.get_opend_playground_url,
+            'thai_gdc_get_catalog_org_type': noh.get_catalog_org_type,
+            'thai_gdc_get_gdcatalog_status_show': noh.get_gdcatalog_status_show
         }
 
 def tag_name_validator(value, context):

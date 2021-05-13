@@ -181,3 +181,36 @@ msgstr "ลบแล้ว"
 
 msgid "statistics"
 msgstr "สถิติ"
+
+msgid "Dataset Type"
+msgstr "ประเภทชุดข้อมูล"
+
+msgid "Data Category"
+msgstr "หมวดหมู่ตามธรรมาภิบาลข้อมูล"
+
+msgid "WAIT_VALIDATE"
+msgstr "แจ้งลงทะเบียน"
+
+msgid "VALIDATE"
+msgstr "อยู่ระหว่างการตรวจสอบ"
+
+msgid "WAIT_VALIDATE_MODIFIED"
+msgstr "แจ้งการปรับปรุง"
+
+msgid "VALIDATE_MODIFIED"
+msgstr "อยู่ระหว่างการตรวจสอบการปรับปรุง"
+
+msgid "APPROVAL"
+msgstr "อยู่ระหว่างการอนุมัติ"
+
+msgid "COMPLETED"
+msgstr "ลงทะเบียนแล้ว"
+
+msgid "WAIT"
+msgstr "พร้อมลงทะเบียน"
+
+msgid "REJECT"
+msgstr "ไม่ผ่านเกณฑ์"
+
+msgid "Reference URL Catalog"
+msgstr "อ้างอิง URL Catalog"
