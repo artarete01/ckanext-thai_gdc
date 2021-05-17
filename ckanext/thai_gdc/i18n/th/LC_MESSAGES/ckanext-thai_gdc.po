@@ -186,9 +186,6 @@ msgid "Dataset Type"
 msgstr "ประเภทชุดข้อมูล"
 
 msgid "Data Category"
-<<<<<<< HEAD
-msgstr "หมวดหมู่ตามธรรมาภิบาลข้อมูล"
-=======
 msgstr "หมวดหมู่ตามธรรมาภิบาลข้อมูล"
 
 msgid "WAIT_VALIDATE"
@@ -217,4 +214,3 @@ msgstr "ไม่ผ่านเกณฑ์"
 
 msgid "Reference URL Catalog"
 msgstr "อ้างอิง URL Catalog"
->>>>>>> 8c62578ddf91d8858cfd48eaf94139d154a8b267
