@@ -4,6 +4,7 @@
 import ckan.plugins.toolkit as toolkit
 import ckan.logic as logic
 import ckan.model as model
+from pylons import config
 from ckan.common import _, c
 import ckan.lib.helpers as h
 import ckan.lib.formatters as formatters
@@ -15,14 +16,43 @@ import logging
 from ckanapi import LocalCKAN, NotFound, NotAuthorized
 
 from ckanext.thai_gdc.model.opend import OpendModel
-
-
-#from ckanext.pages import db
+import requests
 
 get_action = logic.get_action
 opend_model = OpendModel()
 
 log = logging.getLogger(__name__)
+
+def get_opend_playground_url():
+    return config.get('thai_gdc.opend_playground_url')
+
+def get_catalog_org_type():
+    return config.get('thai_gdc.catalog_org_type', 'agency')
+
+def get_gdcatalog_status_show():
+    return config.get('thai_gdc.gdcatalog_status_show', 'true')
+
+def get_gdcatalog_state(zone, package_id):
+    state = []
+    gdcatalog_status_show = get_gdcatalog_status_show()
+    gdcatalog_harvester_url = config.get('thai_gdc.gdcatalog_harvester_url')
+
+    if gdcatalog_status_show == 'true':
+        with requests.Session() as s:
+            s.verify = False
+            if zone == 'publish':
+                url = gdcatalog_harvester_url+'/api/3/action/gdcatalog_publish_state'
+            elif zone == 'processing':
+                url = gdcatalog_harvester_url+'/api/3/action/gdcatalog_processing_state'
+            elif zone == 'harvesting':
+                url = gdcatalog_harvester_url+'/api/3/action/gdcatalog_harvesting_state'
+            myobj = {"packages": [package_id]}
+            myobj['packages'][0] = myobj['packages'][0].encode('ascii','ignore')
+            headers = {'Content-type': 'application/json', 'Authorization': ''}
+            res = s.post(url, data = json.dumps(myobj), headers = headers)
+            log.info(res.json())
+            state = res.json()
+    return state
 
 def get_users_non_member():
     users = opend_model.get_users_non_member()

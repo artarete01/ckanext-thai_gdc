@@ -186,4 +186,35 @@ msgid "Dataset Type"
 msgstr "ประเภทชุดข้อมูล"
 
 msgid "Data Category"
+<<<<<<< HEAD
 msgstr "หมวดหมู่ตามธรรมาภิบาลข้อมูล"
+=======
+msgstr "หมวดหมู่ตามธรรมาภิบาลข้อมูล"
+
+msgid "WAIT_VALIDATE"
+msgstr "แจ้งลงทะเบียน"
+
+msgid "VALIDATE"
+msgstr "อยู่ระหว่างการตรวจสอบ"
+
+msgid "WAIT_VALIDATE_MODIFIED"
+msgstr "แจ้งการปรับปรุง"
+
+msgid "VALIDATE_MODIFIED"
+msgstr "อยู่ระหว่างการตรวจสอบการปรับปรุง"
+
+msgid "APPROVAL"
+msgstr "อยู่ระหว่างการอนุมัติ"
+
+msgid "COMPLETED"
+msgstr "ลงทะเบียนแล้ว"
+
+msgid "WAIT"
+msgstr "พร้อมลงทะเบียน"
+
+msgid "REJECT"
+msgstr "ไม่ผ่านเกณฑ์"
+
+msgid "Reference URL Catalog"
+msgstr "อ้างอิง URL Catalog"
+>>>>>>> 8c62578ddf91d8858cfd48eaf94139d154a8b267

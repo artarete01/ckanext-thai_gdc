@@ -7,9 +7,20 @@
     'notes',
     'tag_string',
     'owner_org',
+    'reference_url_catalog',
     ] -%}
     
         {% block package_additional_info %}
+
+        {% set catalog_org_type = h.thai_gdc_get_catalog_org_type() %}
+        {% if catalog_org_type == 'area_based' %}
+        <tr>
+          <th scope="row" class="dataset-label">
+            {{ _('Reference URL Catalog') }}</th>
+          <td class="dataset-details">{{ pkg_dict.reference_url_catalog }}</td>
+        </tr>
+        {% endif %}
+
         {%- for field in schema.dataset_fields -%}
         {% set form_data_type = field.form_data_type %}
         {%- if field.field_name not in exclude_fields
