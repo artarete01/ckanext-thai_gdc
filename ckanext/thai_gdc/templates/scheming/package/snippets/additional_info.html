@@ -6,7 +6,6 @@
     'name',
     'notes',
     'tag_string',
-    'license_id',
     'owner_org',
     ] -%}
     
@@ -17,8 +16,9 @@
             and field.display_snippet is not none -%}
             {% if pkg_dict.data_type in form_data_type %}
           <tr>
-            <th scope="row" class="dataset-label">{{
-              h.scheming_language_text(field.label) }}</th>
+            <th scope="row" class="dataset-label">
+              {% if field.required %}* {% endif %}
+              {{ h.scheming_language_text(field.label) }}</th>
             <td class="dataset-details"{%
               if field.display_property %} property="{{ field.display_property
               }}"{% endif %}>{%- snippet 'scheming/snippets/display_field.html',

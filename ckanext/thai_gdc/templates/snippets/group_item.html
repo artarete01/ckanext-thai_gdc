@@ -2,7 +2,12 @@
         {% block group_item_header_description %}
 
           {% if group.package_count %}
-      <strong class="package_count">{{ ungettext('{num} Dataset', '{num} Datasets', group.package_count).format(num=group.package_count) }}</strong>
+            {% if group.package_count > 1 %}
+              {% set text_num = _('{num} Datasets') %}
+            {% else %}
+              {% set text_num = _('{num} Dataset') %}
+            {% endif %}
+      <strong class="package_count">{{ text_num.format(num=group.package_count) }}</strong>
     {% elif group.package_count == 0 %}
       <span class="package_count">{{ _('0 Datasets') }}</span>
     {% endif %}

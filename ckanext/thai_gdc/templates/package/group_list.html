@@ -12,7 +12,7 @@
   {% if groups %}
     <form class="add-to-group" method="post">
       <div class="form-group">
-        <select id="field-add_group" class="form-control" name="group_added">
+        <select id="field-add_group" name="group_added" data-module="autocomplete">
           {% for option in groups %}
             <option value="{{ option[0] }}"> {{ option[1] }}</option>
           {% endfor %}

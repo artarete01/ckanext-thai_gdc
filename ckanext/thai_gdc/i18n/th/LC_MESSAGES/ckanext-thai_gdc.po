@@ -181,3 +181,9 @@ msgstr "ลบแล้ว"
 
 msgid "statistics"
 msgstr "สถิติ"
+
+msgid "Dataset Type"
+msgstr "ประเภทชุดข้อมูล"
+
+msgid "Data Category"
+msgstr "หมวดหมู่ตามธรรมาภิบาลข้อมูล"
