@@ -2,8 +2,9 @@
 # encoding: utf-8
 
 import ckan.plugins as plugins
-import ckan.plugins.toolkit as toolkit
-from ckan.common import _, c
+import ckantoolkit as toolkit
+import ckan.lib.helpers as helpers
+from flask import Blueprint
 
 import ckan.authz as authz
 import ckan.logic.auth as logic_auth
@@ -15,9 +16,15 @@ from six import string_types
 from ckan.model import (MAX_TAG_LENGTH, MIN_TAG_LENGTH)
 from ckanext.thai_gdc import helpers as noh
 import ckan.lib.navl.dictization_functions as df
+from ckanext.thai_gdc.utils import (
+    BannerUtil
+    )
 
 import logging
 import os
+
+c = toolkit.c
+_ = toolkit._
 
 Invalid = df.Invalid
 
@@ -33,7 +40,9 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
     plugins.implements(plugins.IRoutes, inherit=True)
     plugins.implements(plugins.IResourceController, inherit=True)
     plugins.implements(plugins.IFacets, inherit=True)
+    plugins.implements(plugins.IBlueprint)
 
+    # IFacets
     def dataset_facets(self, facets_dict, package_type):
 
         facets_dict['data_type'] = toolkit._('Dataset Type') #ประเภทชุดข้อมูล
@@ -48,12 +57,13 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
 
     # IConfigurer
     def update_config(self, config_):
-        if toolkit.check_ckan_version(max_version='2.9'):
+        if toolkit.check_ckan_version(max_version='2.9.0'):
             toolkit.add_ckan_admin_tab(config_, 'banner_edit', 'Banner Editor')
             toolkit.add_ckan_admin_tab(config_, 'dataset_import', 'Dataset Importer')
-        else:
-            toolkit.add_ckan_admin_tab(config_, 'banner_edit', 'Banner Editor', icon='wrench')
-            toolkit.add_ckan_admin_tab(config_, 'dataset_import', 'Dataset Importer', icon='cloud-upload')
+        elif toolkit.check_ckan_version(min_version='2.9.0'):
+            toolkit.add_ckan_admin_tab(config_, 'thai_gdc.banner_edit', 'Banner Editor')
+            toolkit.add_ckan_admin_tab(config_, 'thai_gdc.dataset_import', 'Dataset Importer')
+
         toolkit.add_template_directory(config_, 'templates')
         toolkit.add_public_directory(config_, 'public')
         toolkit.add_public_directory(config_, 'fanstatic')
@@ -82,10 +92,33 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
         config_['ckan.group_and_organization_list_all_fields_max'] = '200'
         config_['ckan.group_and_organization_list_max'] = '200'
         config_['ckan.datasets_per_page'] = '30'
+<<<<<<< HEAD
+    
+    def get_blueprint(self):
+        blueprint = Blueprint(self.name, self.__module__)
+        blueprint.add_url_rule('/ckan-admin/banner-edit', 'banner_edit', self.banner_edit, methods=['GET', 'POST'])
+        blueprint.add_url_rule('/ckan-admin/dataset-import', 'dataset_import', self.dataset_import, methods=['GET', 'POST'])
+        # rules = [
+        #     ('/ckan-admin/banner-edit', 'banner_edit', self.banner_edit),
+        #     ('/ckan-admin/dataset-import', 'dataset_import', self.dataset_import),
+        # ]
+        # for rule in rules:
+        #     blueprint.add_url_rule(*rule)
+
+        return blueprint
+    
+    def banner_edit(self):
+        return BannerUtil.edit_banner()
+    
+    def dataset_import(self):
+        return ''
+    
+=======
         config_['ckan.recline.dataproxy_url'] = 'https://dataproxy.gdcatalog.go.th'
         config_['thai_gdc.opend_playground_url'] = 'https://opend-playground.gdcatalog.go.th'
         config_['thai_gdc.gdcatalog_harvester_url'] = 'https://harvester.gdcatalog.go.th'
 
+>>>>>>> 8c62578ddf91d8858cfd48eaf94139d154a8b267
     def before_map(self, map):
 
         map.connect(
