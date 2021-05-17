@@ -66,11 +66,11 @@ def get_users_deleted():
         users_list.append(user[0])
     return users_list
 
-def get_extension_version():
+def get_extension_version(attr):
     dirname, filename = os.path.split(os.path.abspath(__file__))
     f = open(dirname+'/public/base/admin/thai-gdc-update.json',) 
     data = json.load(f)
-    return data['ckanext-thai-gdc'].replace('-','.')
+    return data[attr]
 
 def get_action(action_name, data_dict=None):
     '''Calls an action function from a template. Deprecated in CKAN 2.3.'''

@@ -19,7 +19,6 @@
       margin-left: 8px;
     }
     </style>
-    
       {% set return_state = h.thai_gdc_get_gdcatalog_state('publish', pkg.id) %}
       {% set metadata_modified = return_state.get('result')[0]['metadata_modified'] %}
       {% if metadata_modified != '' %}
@@ -61,7 +60,7 @@
       {% if state == '' %}
         {% set return_state = h.thai_gdc_get_gdcatalog_state('harvesting', pkg.id) %}
         {% set state = return_state.get('result')[0]['governance_state'] %}
-        {% if state == 'WAIT' %}
+        {% if state == 'WAIT' and pkg.allow_harvest != 'False' %}
           <span class="label label-inverse gdcatalog-warning" style="margin-left: 10px;margin-right: 0px;">
             <i class="fa fa-lock"></i>
             GD-Catalog: {{ _('WAIT') }}
