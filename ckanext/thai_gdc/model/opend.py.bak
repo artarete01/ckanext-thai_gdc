@@ -13,7 +13,7 @@ class OpendModel:
 
         data = []
         for rowproxy in resultproxy:
-            my_dict = {column: value for column, value in list(rowproxy.items())}
+            my_dict = {column: value for column, value in rowproxy.items()}
             data.append(my_dict)
 
         return data
@@ -28,7 +28,7 @@ class OpendModel:
             model.Session.commit()
             return row['page_view'] is not None and row['page_view'] or 0
         except SQLAlchemyError as e:
-            print((str(e)))
+            print(str(e))
             model.Session.rollback()
             return 0
 
@@ -42,7 +42,7 @@ class OpendModel:
             model.Session.commit()
             return row['last_tracking'] is not None and row['last_tracking'] or 0
         except SQLAlchemyError as e:
-            print((str(e)))
+            print(str(e))
             model.Session.rollback()
             return 0
 
@@ -63,7 +63,7 @@ class OpendModel:
 
         data = []
         for rowproxy in resultproxy:
-            my_dict = {column: value for column, value in list(rowproxy.items())}
+            my_dict = {column: value for column, value in rowproxy.items()}
             data.append(my_dict)
 
         return data
@@ -94,7 +94,7 @@ class OpendModel:
 
         data = []
         for rowproxy in resultproxy:
-            my_dict = {column: value for column, value in list(rowproxy.items())}
+            my_dict = {column: value for column, value in rowproxy.items()}
             data.append(my_dict)
 
         return data
@@ -110,7 +110,7 @@ class OpendModel:
 
         data = []
         for rowproxy in resultproxy:
-            my_dict = {column: value for column, value in list(rowproxy.items())}
+            my_dict = {column: value for column, value in rowproxy.items()}
             data.append(my_dict)
 
         return data
@@ -128,7 +128,7 @@ class OpendModel:
 
         data = []
         for rowproxy in resultproxy:
-            my_dict = {column: value for column, value in list(rowproxy.items())}
+            my_dict = {column: value for column, value in rowproxy.items()}
             data.append(my_dict)
 
         return data

@@ -120,9 +120,9 @@ def day_thai(t):
     m_key = int(tmp[1]) - 1
 
     if h.lang() == 'th':
-        dt = "{} {} {}".format(int(tmp[2]), month[m_key], int(tmp[0]) + 543)
+        dt = u"{} {} {}".format(int(tmp[2]), month[m_key], int(tmp[0]) + 543)
     else:
-        dt = "{} {}, {}".format(month[m_key], int(tmp[2]), int(tmp[0]))
+        dt = u"{} {}, {}".format(month[m_key], int(tmp[2]), int(tmp[0]))
 
     return dt
 
@@ -132,7 +132,7 @@ def facet_chart(type, limit):
     data = []
     context = {'model': model}
     for item in items:
-        my_dict = {column: value for column, value in list(item.items())}
+        my_dict = {column: value for column, value in item.items()}
         item['rownum'] = i
         if type == 'groups':
             group_dict = logic.get_action('group_show')(context, {'id': item['name']})
