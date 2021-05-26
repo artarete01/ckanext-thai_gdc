@@ -4,8 +4,8 @@
 import ckan.plugins.toolkit as toolkit
 import ckan.logic as logic
 import ckan.model as model
-from pylons import config
-from ckan.common import _, c
+# from pylons import config
+from ckan.common import _, c, config
 import ckan.lib.helpers as h
 import ckan.lib.formatters as formatters
 import json

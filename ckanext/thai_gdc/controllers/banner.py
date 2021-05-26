@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import ckan.plugins as p
 import ckan.lib.helpers as helpers
-from pylons import config
+# from pylons import config
 import ckan.logic as logic
 import ckan.lib.navl.dictization_functions as dict_fns
 import ckan.model as model
@@ -12,7 +12,7 @@ import logging
 
 from ckan.plugins.toolkit import (
     _, c, h, BaseController, check_access, NotAuthorized, abort, render,
-    redirect_to, request,
+    redirect_to, request, config
     )
 
 from ckan.controllers.home import CACHE_PARAMETERS
