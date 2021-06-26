@@ -1,10 +1,3 @@
-<div align="center">
-  <img src="https://gdcatalog.go.th/assets/images/opend_ckan/logo_ckan_opend.jpg">
-</div>
-
-[![Python](https://img.shields.io/badge/python-2.7-blue)](#)
-[![CKAN](https://img.shields.io/badge/ckan-2.9-red)](https://ckan.org/)
-
 =============
 ckanext-thai_gdc
 =============
