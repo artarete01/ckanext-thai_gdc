@@ -39,7 +39,7 @@ Requirements
 - `วิธีการ update ckanext-thai_gdc <https://gitlab.nectec.or.th/opend/installing-ckan/-/blob/master/ckan-extension.md#update-ckanext-thai_gdc>`_
 
 ------------
-# ข้อมูลเพิ่มเติม
+ข้อมูลเพิ่มเติม
 ------------
 
 - `ระบบบัญชีข้อมูลภาครัฐ - Government Data Catalog (GD Catalog) <https://gdhelppage.nso.go.th>`_
