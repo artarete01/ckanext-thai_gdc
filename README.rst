@@ -1,7 +1,3 @@
-<div align="center">
-  <img src="http://164.115.20.163/base/images/logo_ckan_opend.jpg">
-</div>
-
 =============
 ckanext-thai_gdc
 =============
