@@ -29,7 +29,7 @@ Requirements
 การติดตั้ง (Installation)
 ------------
 
-- `ckanext-thai_gdc <ckan-extension.md#5-ckanext-thai_gdc>`_
+- `ckanext-thai_gdc <https://gitlab.nectec.or.th/opend/installing-ckan/-/blob/master/ckan-extension.md#5-ckanext-thai_gdc>`_
 
 ------------
 การปรับปรุง (Update)
