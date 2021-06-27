@@ -16,6 +16,10 @@ from ckan.model import (MAX_TAG_LENGTH, MIN_TAG_LENGTH)
 from ckanext.thai_gdc import helpers as noh
 import ckan.lib.navl.dictization_functions as df
 
+from ckanext.thai_gdc.logic import (
+    bulk_update_public, dataset_bulk_import
+)
+
 import logging
 import os
 
@@ -33,6 +37,7 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
     plugins.implements(plugins.IRoutes, inherit=True)
     plugins.implements(plugins.IResourceController, inherit=True)
     plugins.implements(plugins.IFacets, inherit=True)
+    plugins.implements(plugins.IActions)
 
     def dataset_facets(self, facets_dict, package_type):
 
@@ -85,6 +90,7 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
         config_['ckan.recline.dataproxy_url'] = 'https://dataproxy.gdcatalog.go.th'
         config_['thai_gdc.opend_playground_url'] = 'https://opend-playground.gdcatalog.go.th'
         config_['thai_gdc.gdcatalog_harvester_url'] = 'https://harvester.gdcatalog.go.th'
+        config_['ckan.jobs.timeout'] = '3600'
 
     def before_map(self, map):
 
@@ -114,6 +120,12 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             action='datatype_patch',
             controller='ckanext.thai_gdc.controllers.dataset:DatasetManageController',
             )
+        map.connect(
+            'user_active',
+            '/user/edit/user_active',
+            action='user_active',
+            controller='ckanext.thai_gdc.controllers.user:UserManageController',
+            )
 
         return map
 
@@ -142,6 +154,9 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             'ckan.favicon': [ignore_missing, unicode_safe],
             'favicon_upload': [ignore_missing, unicode_safe],
             'clear_favicon_upload': [ignore_missing, unicode_safe],
+            'ckan.import_uuid': [ignore_missing, unicode_safe],
+            'ckan.import_row': [ignore_missing, unicode_safe],
+            'ckan.import_params': [ignore_missing, unicode_safe],
         })
 
         return schema
@@ -153,6 +168,14 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             'user_generate_apikey': self.user_generate_apikey
         }
         return auth_functions
+    
+    # IActionFunctions
+    def get_actions(self):
+        action_functions = {
+            'bulk_update_public': bulk_update_public,
+            'dataset_bulk_import': dataset_bulk_import
+        }
+        return action_functions
 
     def member_create(self, context, data_dict):
         """
@@ -199,11 +222,14 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
                 ' {1}'.format(user, user_obj.id))}
     
     def before_view(self, pkg_dict):
-        context = {'ignore_auth': True}
-        pkg_dict = logic.get_action("package_show")(context, {
-            'include_tracking': True,
-            'id': pkg_dict['id']
-        })
+        try:
+            context = {'ignore_auth': True}
+            pkg_dict = logic.get_action("package_show")(context, {
+                'include_tracking': True,
+                'id': pkg_dict['id']
+            })
+        except:
+            log.info('before_view error')
         return pkg_dict
     
     def before_search(self, search_params):
@@ -262,7 +288,12 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             'thai_gdc_get_gdcatalog_state': noh.get_gdcatalog_state,
             'thai_gdc_get_opend_playground_url': noh.get_opend_playground_url,
             'thai_gdc_get_catalog_org_type': noh.get_catalog_org_type,
-            'thai_gdc_get_gdcatalog_status_show': noh.get_gdcatalog_status_show
+            'thai_gdc_get_gdcatalog_status_show': noh.get_gdcatalog_status_show,
+            'thai_gdc_convert_string_todate': noh.convert_string_todate,
+            'thai_gdc_get_group_color': noh.get_group_color,
+            'thai_gdc_dataset_bulk_import_status': noh.dataset_bulk_import_status,
+            'thai_gdc_dataset_bulk_import_log': noh.dataset_bulk_import_log,
+            'get_site_statistics': noh.get_site_statistics
         }
 
 def tag_name_validator(value, context):

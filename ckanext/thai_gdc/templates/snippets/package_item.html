@@ -35,11 +35,21 @@
               {% endblock %}
             </h2>
           {% endblock %}
-          {% block banner %}
-            {% if banner %}
-              <span class="banner">{{ _('Popular') }}</span>
+          <div class="text-right">
+            {% if package.groups %}
+            <div class="blockTagSearch">
+            {% for data_groups in package.groups %}
+            {% if data_groups %}
+            {% set item_color = h.thai_gdc_get_group_color(data_groups.id) %}
+                <a class="aNoBUnder btn" href="{{h.url_for(controller='group', action='read', id=data_groups.name)}}"
+                   style="white-space: nowrap;background-color: {{item_color}};color: white;margin:0 5px 5px 0;padding: 3px;font-size:.7em;">
+                    {{data_groups.title}}
+                </a>
             {% endif %}
-          {% endblock %}
+            {% endfor %}
+            </div>
+            {% endif %}
+          </div>
           {% block notes %}
             {% if notes %}
               <div>{{ notes|urlize }}</div>

@@ -1,0 +1,16 @@
+{% ckan_extends %}
+
+{% block secondary_content %}
+  <div class="filters">
+    <div>
+      {{ h.snippet('snippets/facet_list.html', title=facet_titles['organization'], name='organization', search_facets=search_facets) }}
+      {{ h.snippet('snippets/facet_list.html', title=facet_titles['groups'], name='groups', search_facets=search_facets) }}
+      {{ h.snippet('snippets/facet_list.html', title=facet_titles['tags'], name='tags', search_facets=search_facets) }}
+      {{ h.snippet('snippets/facet_list.html', title=facet_titles['data_type'], name='data_type', search_facets=search_facets) }}
+      {{ h.snippet('snippets/facet_list.html', title=facet_titles['data_category'], name='data_category', search_facets=search_facets) }}
+      {{ h.snippet('snippets/facet_list.html', title=facet_titles['res_format'], name='res_format', search_facets=search_facets) }}
+      {{ h.snippet('snippets/facet_list.html', title=facet_titles['license_id'], name='license_id', search_facets=search_facets) }}
+    </div>
+    <a class="close no-text hide-filters"><i class="fa fa-times-circle"></i><span class="text">close</span></a>
+  </div>
+{% endblock %}
