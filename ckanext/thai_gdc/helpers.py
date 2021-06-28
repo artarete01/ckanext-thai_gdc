@@ -14,14 +14,95 @@ import collections
 from ckan.lib.search import make_connection
 import logging
 from ckanapi import LocalCKAN, NotFound, NotAuthorized
+import ckan.lib.dictization.model_dictize as model_dictize
 
 from ckanext.thai_gdc.model.opend import OpendModel
 import requests
+from datetime import datetime as dt
 
 get_action = logic.get_action
 opend_model = OpendModel()
 
 log = logging.getLogger(__name__)
+
+def dataset_bulk_import_log(import_id):
+    logs = opend_model.get_dataset_bulk_import_log(import_id)
+    return logs
+
+def dataset_bulk_import_status(import_id):
+    try:
+        from ckan import model
+        context = {'model': model,
+                    'user': c.user, 'auth_user_obj': c.userobj}
+
+        like_q1 = u'%' + import_id + u'%'
+        like_q2 = u'%Finished%'
+
+        q = model.Session.query(model.Activity).filter(model.Activity.activity_type == 'changed user').filter(model.Activity.data.ilike(like_q1)).filter(model.Activity.data.ilike(like_q2))
+        activities = q.all()
+    except:
+        return []
+
+    return model_dictize.activity_list_dictize(
+        activities, context,
+        include_data=True)
+
+def get_group_color(group_id):
+
+    first_char = group_id[0]
+
+    color = {
+        '0': 'firebrick',
+        '1': 'darkorange',
+        '2': 'darkkhaki',
+        '3': 'olivedrab',
+        '4': 'teal',
+        '5': 'royalblue',
+        '6': 'slateblue',
+        '7': 'purple',
+        '8': 'mediumvioletred',
+        '9': 'darkslategray',
+        'a': 'saddlebrown',
+        'b': 'green',
+        'c': 'firebrick',
+        'd': 'darkorange',
+        'e': 'darkkhaki',
+        'f': 'olivedrab',
+        'g': 'teal',
+        'h': 'royalblue',
+        'i': 'slateblue',
+        'j': 'purple',
+        'k': 'mediumvioletred',
+        'l': 'darkslategray',
+        'm': 'saddlebrown',
+        'n': 'green',
+        'o': 'firebrick',
+        'p': 'darkorange',
+        'q': 'darkkhaki',
+        'r': 'olivedrab',
+        's': 'teal',
+        't': 'royalblue',
+        'u': 'slateblue',
+        'v': 'purple',
+        'w': 'mediumvioletred',
+        'x': 'darkslategray',
+        'y': 'saddlebrown',
+        'z': 'green'
+    }
+
+    return first_char in color and color[first_char] or 'gray'
+
+def get_site_statistics():
+    stats = {}
+    stats['dataset_count'] = logic.get_action('package_search')(
+        {}, {"rows": 1,"include_private":True})['count']
+    stats['group_count'] = len(logic.get_action('group_list')({}, {}))
+    stats['organization_count'] = len(
+        logic.get_action('organization_list')({}, {}))
+    return stats
+
+def convert_string_todate(str_date, format):
+    return dt.strptime(str_date, format)
 
 def get_opend_playground_url():
     return config.get('thai_gdc.opend_playground_url')

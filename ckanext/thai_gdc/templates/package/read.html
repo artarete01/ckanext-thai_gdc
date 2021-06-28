@@ -2,118 +2,138 @@
 
 {% block package_description %}
 {% set gdcatalog_status_show = h.thai_gdc_get_gdcatalog_status_show() %}
-{% if h.check_access('package_update', {'id':pkg.id }) and gdcatalog_status_show == 'true' %}
+{% if gdcatalog_status_show == 'true' %}
 <div class="text-right" style="margin-bottom: 20px;">
-    
-    <style>
-      .label {
+
+  <style>
+    .label {
       color: white;
       padding: 8px;
     }
+
     .gdcatalog-warning {
       background-color: #e56100;
       margin-left: 8px;
     }
+
     .gdcatalog-success {
       background-color: #2a612a;
       margin-left: 8px;
     }
-    </style>
-      {% set return_state = h.thai_gdc_get_gdcatalog_state('publish', pkg.id) %}
-      {% set metadata_modified = return_state.get('result')[0]['metadata_modified'] %}
-      {% if metadata_modified != '' %}
-      <span class="label label-inverse gdcatalog-success" style="margin-left: 10px;margin-right: 0px;">
-        <i class="fa fa-check"></i>
-        GD-Catalog: {{ _('COMPLETED') }} เมื่อ {{ h.thai_gdc_day_thai(h.date_str_to_datetime(metadata_modified)) }}
-      </span>
-      {% endif %}
-    
-      {% set return_state = h.thai_gdc_get_gdcatalog_state('processing', pkg.id) %}
-      {% set state = return_state.get('result')[0]['governance_state'] %}
-      {% set validate_time = return_state.get('result')[0]['validate_time'] %}
-      {% if state == 'VALIDATE' and validate_time == '' %}
-        <span class="label label-inverse gdcatalog-warning" style="margin-left: 10px;margin-right: 0px;">
-          <i class="fa fa-lock"></i>
-          GD-Catalog: {{ _('WAIT_VALIDATE') }}
-        </span>
-      {% elif state == 'VALIDATE' and validate_time != '' %}
-        <span class="label label-inverse gdcatalog-warning" style="margin-left: 10px;margin-right: 0px;">
-          <i class="fa fa-lock"></i>
-          GD-Catalog: {{ _('VALIDATE') }}
-        </span>
-      {% elif state == 'VALIDATE_MODIFIED' and validate_time == '' %}
-        <span class="label label-inverse gdcatalog-warning" style="margin-left: 10px;margin-right: 0px;">
-          <i class="fa fa-lock"></i>
-          GD-Catalog: {{ _('WAIT_VALIDATE_MODIFIED') }}
-        </span>
-      {% elif state == 'VALIDATE_MODIFIED' and validate_time != '' %}
-        <span class="label label-inverse gdcatalog-warning" style="margin-left: 10px;margin-right: 0px;">
-          <i class="fa fa-lock"></i>
-          GD-Catalog: {{ _('VALIDATE_MODIFIED') }}
-        </span>
-      {% elif state == 'APPROVAL' %}
-        <span class="label label-inverse gdcatalog-warning" style="margin-left: 10px;margin-right: 0px;">
-          <i class="fa fa-lock"></i>
-          GD-Catalog: {{ _('APPROVAL') }}
-        </span>
-      {% endif %}
-      {% if state == '' %}
-        {% set return_state = h.thai_gdc_get_gdcatalog_state('harvesting', pkg.id) %}
-        {% set state = return_state.get('result')[0]['governance_state'] %}
-        {% if state == 'WAIT' and pkg.allow_harvest != 'False' %}
-          <span class="label label-inverse gdcatalog-warning" style="margin-left: 10px;margin-right: 0px;">
-            <i class="fa fa-lock"></i>
-            GD-Catalog: {{ _('WAIT') }}
-          </span>
-        {% elif state == 'REJECT' %}
-          <span class="label label-inverse gdcatalog-warning" style="margin-left: 10px;margin-right: 0px;">
-            <i class="fa fa-lock"></i>
-            GD-Catalog: {{ _('REJECT') }}
-          </span>
-        {% endif %}
-    
-      {% endif %}
-    </div>
+  </style>
+  {% set return_state = h.thai_gdc_get_gdcatalog_state('publish', pkg.id) %}
+  {% set metadata_modified = return_state.get('result')[0]['metadata_modified'] %}
+  {% if metadata_modified != '' %}
+  <span class="label label-inverse gdcatalog-success" style="margin-left: 10px;margin-right: 0px;">
+    <i class="fa fa-check"></i>
+    GD-Catalog: {{ _('COMPLETED') }} เมื่อ {{ h.thai_gdc_day_thai(h.date_str_to_datetime(metadata_modified)) }}
+  </span>
+  {% endif %}
+
+  {% if h.check_access('package_update', {'id':pkg.id }) %}
+  {% set return_state = h.thai_gdc_get_gdcatalog_state('processing', pkg.id) %}
+  {% set state = return_state.get('result')[0]['governance_state'] %}
+  {% set validate_time = return_state.get('result')[0]['validate_time'] %}
+  {% if state == 'VALIDATE' and validate_time == '' %}
+  <span class="label label-inverse gdcatalog-warning" style="margin-left: 10px;margin-right: 0px;">
+    <i class="fa fa-lock"></i>
+    GD-Catalog: {{ _('WAIT_VALIDATE') }}
+  </span>
+  {% elif state == 'VALIDATE' and validate_time != '' %}
+  <span class="label label-inverse gdcatalog-warning" style="margin-left: 10px;margin-right: 0px;">
+    <i class="fa fa-lock"></i>
+    GD-Catalog: {{ _('VALIDATE') }}
+  </span>
+  {% elif state == 'VALIDATE_MODIFIED' and validate_time == '' %}
+  <span class="label label-inverse gdcatalog-warning" style="margin-left: 10px;margin-right: 0px;">
+    <i class="fa fa-lock"></i>
+    GD-Catalog: {{ _('WAIT_VALIDATE_MODIFIED') }}
+  </span>
+  {% elif state == 'VALIDATE_MODIFIED' and validate_time != '' %}
+  <span class="label label-inverse gdcatalog-warning" style="margin-left: 10px;margin-right: 0px;">
+    <i class="fa fa-lock"></i>
+    GD-Catalog: {{ _('VALIDATE_MODIFIED') }}
+  </span>
+  {% elif state == 'APPROVAL' %}
+  <span class="label label-inverse gdcatalog-warning" style="margin-left: 10px;margin-right: 0px;">
+    <i class="fa fa-lock"></i>
+    GD-Catalog: {{ _('APPROVAL') }}
+  </span>
+  {% elif state == 'WAIT_REVOKE' and validate_time == '' %}
+  <span class="label label-inverse gdcatalog-warning" style="margin-left: 10px;margin-right: 0px;">
+    <i class="fa fa-lock"></i>
+    GD-Catalog: {{ _('WAIT_REVOKE') }}
+  </span>
+  {% elif state == 'WAIT_REVOKE' and validate_time != '' %}
+  <span class="label label-inverse gdcatalog-warning" style="margin-left: 10px;margin-right: 0px;">
+    <i class="fa fa-lock"></i>
+    GD-Catalog: {{ _('VALIDATE_REVOKE') }}
+  </span>
+  {% elif state == 'REVOKE' %}
+  <span class="label label-inverse gdcatalog-warning" style="margin-left: 10px;margin-right: 0px;">
+    <i class="fa fa-lock"></i>
+    GD-Catalog: {{ _('REVOKE') }}
+  </span>
+  {% endif %}
+  {% if state == '' %}
+  {% set return_state = h.thai_gdc_get_gdcatalog_state('harvesting', pkg.id) %}
+  {% set state = return_state.get('result')[0]['governance_state'] %}
+  {% set modified_at = return_state.get('result')[0]['metadata_modified'] %}
+  {% if state == 'WAIT' and pkg.allow_harvest != 'False' %}
+  <span class="label label-inverse gdcatalog-warning" style="margin-left: 10px;margin-right: 0px;">
+    <i class="fa fa-lock"></i>
+    GD-Catalog: {{ _('WAIT') }}
+  </span>
+  {% elif state == 'REJECT' %}
+  <span class="label label-inverse gdcatalog-warning" style="margin-left: 10px;margin-right: 0px;">
+    <i class="fa fa-lock"></i>
+    {% if h.thai_gdc_convert_string_todate(pkg.metadata_modified, "%Y-%m-%dT%H:%M:%S.%f") > h.thai_gdc_convert_string_todate(modified_at, "%Y-%m-%dT%H:%M:%S.%f") %}
+    GD-Catalog: {{ _('REJECT') }} (ปรับปรุงแล้ว)
+    {% else %}
+    GD-Catalog: {{ _('REJECT') }}
     {% endif %}
-    
-    {% if pkg.private %}
-      <span class="dataset-private label label-inverse pull-right">
-        <i class="fa fa-lock"></i>
-        {{ _('Private') }}
-      </span>
-    {% endif %}
-    {% block package_archive_notice %}
-      {% if is_activity_archive %}
-        <div class="alert alert-danger">
-          {% trans url=h.url_for(pkg.type ~ '.read', id=pkg.id) %}
-          You're currently viewing an old version of this dataset. To see the
-          current version, click <a href="{{ url }}">here</a>.
-          {% endtrans %}
-        </div>
-      {% endif %}
-    {% endblock %}
-    <h1>
-      {% block page_heading %}
-        {{ h.dataset_display_name(pkg) }}
-        {% if pkg.state.startswith('draft') %}
-          [{{ _('Draft') }}]
-        {% endif %}
-        {% if pkg.state == 'deleted' %}
-          [{{ _('Deleted') }}]
-        {% endif %}
-      {% endblock %}
-    </h1>
-    {% block package_notes %}
-      {% if pkg.notes %}
-        <div class="notes embedded-content">
-          {{ h.render_markdown(h.get_translated(pkg, 'notes')) }}
-        </div>
-      {% endif %}
-    {% endblock %}
-    {# FIXME why is this here? seems wrong #}
-    <span class="insert-comment-thread"></span>
+  </span>
+  {% endif %}
+
+  {% endif %}
+  {% endif %}
+</div>
+{% endif %}
+
+{% if pkg.private %}
+<span class="dataset-private label label-inverse pull-right">
+  <i class="fa fa-lock"></i>
+  {{ _('Private') }}
+</span>
+{% endif %}
+{% block package_archive_notice %}
+{% if is_activity_archive %}
+<div class="alert alert-danger">
+  {% trans url=h.url_for(pkg.type ~ '.read', id=pkg.id) %}
+  You're currently viewing an old version of this dataset. To see the
+  current version, click <a href="{{ url }}">here</a>.
+  {% endtrans %}
+</div>
+{% endif %}
+{% endblock %}
+<h1>
+  {% block page_heading %}
+  {{ h.dataset_display_name(pkg) }}
+  {% if pkg.state.startswith('draft') %}
+  [{{ _('Draft') }}]
+  {% endif %}
+  {% if pkg.state == 'deleted' %}
+  [{{ _('Deleted') }}]
+  {% endif %}
   {% endblock %}
-
-
-
-      
+</h1>
+{% block package_notes %}
+{% if pkg.notes %}
+<div class="notes embedded-content">
+  {{ h.render_markdown(h.get_translated(pkg, 'notes')) }}
+</div>
+{% endif %}
+{% endblock %}
+{# FIXME why is this here? seems wrong #}
+<span class="insert-comment-thread"></span>
+{% endblock %}

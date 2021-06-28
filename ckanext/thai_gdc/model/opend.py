@@ -2,8 +2,23 @@
 import ckan.model as model
 import ckan.plugins.toolkit as toolkit
 from sqlalchemy.exc import SQLAlchemyError
+import logging
+
+log = logging.getLogger(__name__)
 
 class OpendModel:
+    def get_dataset_bulk_import_log(self, import_id):
+        sql = "select split_part(split_part(\"data\",'\"import_log\": \"',2),'\\n\"}',1) as log_content from activity a where \"data\" like '%\"import_id\": \""+import_id+"\", \"import_status\": \"Running\"%'"
+
+        resultproxy = model.Session.execute(sql)
+
+        data = []
+        for rowproxy in resultproxy:
+            my_dict = {column: value for column, value in rowproxy.items()}
+            data.append(my_dict)
+
+        return data
+
     def get_users_non_member(self):
         sql = '''
             select u.id from "user" u where u.sysadmin is false and u.state = 'active' and u.id not in  (select distinct m.table_id from "member" m where m.table_name = 'user' and m.state = 'active')

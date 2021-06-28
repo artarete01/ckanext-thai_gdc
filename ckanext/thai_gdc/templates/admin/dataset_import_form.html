@@ -49,10 +49,15 @@
     {{ form.image_upload(data, errors, is_upload_enabled=h.uploads_enabled(), is_url=is_url, is_upload=is_upload, upload_label = 'ไฟล์', url_label='URL ของไฟล์',  field_url=field_url, field_upload='template_file_upload', field_clear='clear_template_file_upload' )}}
 
     {% endblock %}
+    {% set import_id = data['ckan.import_uuid'] %}
+    {% set import_row = data['ckan.import_row'] %}
+    {% set import_finished = h.thai_gdc_dataset_bulk_import_status(import_id) | length %}
+    {% if import_id == '' or import_finished == 1 %}
       <div class="form-actions">
         <a href="/ckan-admin/clear-import-log" class="btn btn-danger pull-left">ล้างค่า</a>
         <button type="submit" class="btn btn-primary" name="save">ประมวลผล</button>
       </div>
+    {% endif %}
   </form>
   <script>
     const queryString = window.location.search;
@@ -62,22 +67,50 @@
       element.value = res[1];
     }
   </script>
-  {% if data["import_log"] %}
-  <h3>{{ _('Process Log') }}</h3>
+  
+  {% if import_id != '' %}
+  <table class="table table-bordered" style="margin-top: 20px;">
+    <colgroup>
+      <col width="150">
+      <col>
+    </colgroup>
+    <tbody><tr>
+      <th>สถานะ</th>
+      {% if import_finished == 0 %}
+        <td>อยู่ระหว่างประมวลผล</td>
+      {% else %}
+        <td>สำเร็จ</td>
+      {% endif %}
+    </tr>
+    <tr>
+      <th>จำนวนชุดข้อมูลทั้งหมด</th>
+        <td>{{ import_row }}</td>
+    </tr>
+  </tbody></table>
+  {% if import_finished == 1 %}
+  <div style="text-align: right;">
+    <a onclick="this.href='data:text/html;charset=UTF-8,'+encodeURIComponent(document.getElementById('process-log').innerHTML)" href="#" download="import_process_logs.html">Download</a>
+    </div>{% endif %}
+  <div id="process-log">
+  <h3>{{ _('Process Log') }}</h3>  
+  {% set import_log_running = h.thai_gdc_dataset_bulk_import_log(import_id) %}
   <ul class="activity">
-    {% for item in data["import_log"].strip().split('\n') %}
+    {% for item in import_log_running %}
       <li class="item no-avatar{{ class }}">
         <i class="fa icon fa-info"></i>
         <p>
-          {{item}}
+          {{ item['log_content'] }}
         </p>
       </li>
     {% endfor %}
+    {% if import_finished == 1 %}
     <li class="item no-avatar">
       <i class="fa icon fa-info"></i>
       <p class="muted">{{ _('End of log') }}</p>
     </li>
+    {% endif %}
   </ul>
+</div>
   {% endif %}
 {% endblock %}
 
