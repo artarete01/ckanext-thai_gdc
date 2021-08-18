@@ -127,7 +127,14 @@ def get_gdcatalog_state(zone, package_id):
     gdcatalog_status_show = get_gdcatalog_status_show()
     gdcatalog_harvester_url = config.get('thai_gdc.gdcatalog_harvester_url')
     site_url = config.get('ckan.site_url')
-    
+    request_proxy = config.get('thai_gdc.proxy_request', None)
+    if request_proxy:
+        proxies = {
+            'http': config.get('thai_gdc.proxy_url', None),
+            'https': config.get('thai_gdc.proxy_url', None)
+        }
+    else:
+        proxies = None
     if gdcatalog_status_show == 'true':
         try:
             with requests.Session() as s:
@@ -141,7 +148,7 @@ def get_gdcatalog_state(zone, package_id):
                 myobj['package'] = myobj['package'].encode('ascii','ignore')
                 log.info(json.dumps(myobj))
                 headers = {'Content-type': 'application/json', 'Authorization': ''}
-                res = s.post(url, data = json.dumps(myobj), headers = headers)
+                res = s.post(url, data = json.dumps(myobj), headers = headers, proxies=proxies)
                 log.info(res.json())
                 state = res.json()
         except:
