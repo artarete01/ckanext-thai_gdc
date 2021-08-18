@@ -16,6 +16,35 @@ _get_or_bust = logic.get_or_bust
 
 log = logging.getLogger(__name__)
 
+@logic.side_effect_free
+def tag_list(context, data_dict):
+
+    model = context['model']
+
+    vocab_id_or_name = data_dict.get('vocabulary_id')
+    query = data_dict.get('query') or data_dict.get('q')
+    if query:
+        query = query.strip()
+    all_fields = data_dict.get('all_fields', None)
+
+    _check_access('tag_list', context, data_dict)
+
+    if query:
+        tags, count = _tag_search(context, data_dict)
+    else:
+        #tags = model.Tag.all(vocab_id_or_name)
+        tags = None
+
+    if tags:
+        if all_fields:
+            tag_list = model_dictize.tag_list_dictize(tags, context)
+        else:
+            tag_list = [tag.name for tag in tags]
+    else:
+        tag_list = []
+
+    return tag_list
+
 def bulk_update_public(context, data_dict):
     from ckan.lib.search import rebuild
 

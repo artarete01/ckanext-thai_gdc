@@ -16,7 +16,6 @@ import re
 from ckanapi import LocalCKAN
 import datetime
 
-
 import uuid
 import ckan.plugins.toolkit as toolkit
 
@@ -903,19 +902,34 @@ class DatasetImportController(p.toolkit.BaseController):
                 row_count = 0
 
                 record_df = pd.read_excel(filename, header=[3], sheet_name='Temp2_Meta_Record', dtype=str)
-                row_count += (len(record_df.index)-1)
+                if template_org != 'all':
+                    row_count += record_df.iloc[:, 3].tolist().count(template_org)
+                else:
+                    row_count += (len(record_df.index)-1)
                 
                 stat_df = pd.read_excel(filename, header=[3], sheet_name='Temp2_Meta_Stat', dtype=str)
-                row_count += (len(stat_df.index)-1)
+                if template_org != 'all':
+                    row_count += stat_df.iloc[:, 3].tolist().count(template_org)
+                else:
+                    row_count += (len(stat_df.index)-1)
 
                 gis_df = pd.read_excel(filename, header=[3], sheet_name='Temp2_Meta_GIS', dtype=str)
-                row_count += (len(gis_df.index)-1)
+                if template_org != 'all':
+                    row_count += gis_df.iloc[:, 3].tolist().count(template_org)
+                else:
+                    row_count += (len(gis_df.index)-1)
 
                 multi_df = pd.read_excel(filename, header=[3], sheet_name='Temp2_Meta_Multi', dtype=str)
-                row_count += (len(multi_df.index)-1)
+                if template_org != 'all':
+                    row_count += multi_df.iloc[:, 3].tolist().count(template_org)
+                else:
+                    row_count += (len(multi_df.index)-1)
 
                 other_df = pd.read_excel(filename, header=[3], sheet_name='Temp2_Meta_Other', dtype=str)
-                row_count += (len(other_df.index)-1)
+                if template_org != 'all':
+                    row_count += other_df.iloc[:, 3].tolist().count(template_org)
+                else:
+                    row_count += (len(other_df.index)-1)
  
                 toolkit.get_action('dataset_bulk_import')(context, data_dict)
 

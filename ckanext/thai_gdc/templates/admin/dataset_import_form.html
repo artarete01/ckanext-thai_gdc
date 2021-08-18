@@ -79,12 +79,13 @@
       {% if import_finished == 0 %}
         <td>อยู่ระหว่างประมวลผล</td>
       {% else %}
-        <td>สำเร็จ</td>
+        <td>เสร็จสิ้นการประมวลผล</td>
       {% endif %}
     </tr>
     <tr>
-      <th>จำนวนชุดข้อมูลทั้งหมด</th>
-        <td>{{ import_row }}</td>
+      <th>จำนวนชุดข้อมูล</th>
+      {% set import_log_running = h.thai_gdc_dataset_bulk_import_log(import_id) %}
+        <td>สร้างชุดข้อมูลสำเร็จ {{ h.thai_gdc_dataset_bulk_import_count(import_log_running) }} จาก {{ import_row }}</td>
     </tr>
   </tbody></table>
   {% if import_finished == 1 %}
@@ -93,7 +94,6 @@
     </div>{% endif %}
   <div id="process-log">
   <h3>{{ _('Process Log') }}</h3>  
-  {% set import_log_running = h.thai_gdc_dataset_bulk_import_log(import_id) %}
   <ul class="activity">
     {% for item in import_log_running %}
       <li class="item no-avatar{{ class }}">

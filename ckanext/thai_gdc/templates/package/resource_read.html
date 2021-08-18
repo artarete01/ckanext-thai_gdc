@@ -12,9 +12,10 @@
   {{ super() }}
   {% if res.datastore_active %}
   {% set site_url_list = g.site_url.split('//') %}
-    {% if pkg.private == False %}
+  {% set opend_playground_url = h.thai_gdc_get_opend_playground_url() %}
+    {% if pkg.private == False and opend_playground_url %}
     <li>
-      <a class="btn btn-warning resource-url-analytics resource-type-{{ res.format }}" href="{{ h.thai_gdc_get_opend_playground_url() }}/{{site_url_list[1]}}/ckan/{{res.id}}">
+      <a class="btn btn-warning resource-url-analytics resource-type-{{ res.format }}" href="{{ opend_playground_url }}/{{site_url_list[1]}}/ckan/{{res.id}}">
       <i class="fa fa-bar-chart"></i> Visualization
       </a>
     </li>
