@@ -319,6 +319,7 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             'thai_gdc_dataset_bulk_import_status': noh.dataset_bulk_import_status,
             'thai_gdc_dataset_bulk_import_count': noh.dataset_bulk_import_count,
             'thai_gdc_dataset_bulk_import_log': noh.dataset_bulk_import_log,
+            'thai_gdc_get_is_as_a_service': noh.get_is_as_a_service,
             'get_site_statistics': noh.get_site_statistics
         }
 

@@ -116,6 +116,9 @@ def get_opend_playground_url():
 def get_catalog_org_type():
     return config.get('thai_gdc.catalog_org_type', 'agency')
 
+def get_is_as_a_service():
+    return config.get('thai_gdc.is_as_a_service', 'false')
+
 def get_gdcatalog_status_show():
     return config.get('thai_gdc.gdcatalog_status_show')
 
