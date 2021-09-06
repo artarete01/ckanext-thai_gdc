@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# encoding: utf-8
 import ckan.model as model
 import ckan.plugins.toolkit as toolkit
 from sqlalchemy.exc import SQLAlchemyError
@@ -14,7 +14,7 @@ class OpendModel:
 
         data = []
         for rowproxy in resultproxy:
-            my_dict = {column: value for column, value in rowproxy.items()}
+            my_dict = {column: value for column, value in list(rowproxy.items())}
             data.append(my_dict)
 
         return data

@@ -21,11 +21,20 @@ import uuid
 import ckan.plugins.toolkit as toolkit
 
 from ckan.plugins.toolkit import (
-    _, c, h, BaseController, check_access, NotAuthorized, abort, render,
+    _, c, h, check_access, NotAuthorized, abort, render,
     redirect_to, request, config
     )
+if toolkit.check_ckan_version('2.9'):
+    # pass
+    from ckan.views.dataset import EditView as BaseController
+    from ckan.views.home import CACHE_PARAMETERS
 
-from ckan.controllers.home import CACHE_PARAMETERS
+else:
+    from ckan.plugin.toolkit import BaseController
+    from ckan.controllers.home import CACHE_PARAMETERS
+
+    importlib.reload(sys)
+    sys.setdefaultencoding("utf-8")
 import ckan.logic.schema as schema_
 import importlib
 
@@ -34,10 +43,8 @@ ValidationError = logic.ValidationError
 
 log = logging.getLogger(__name__)
 
-importlib.reload(sys)
-sys.setdefaultencoding("utf-8")
 
-class DatasetManageController(p.toolkit.BaseController):
+class DatasetManageController(BaseController):
 
     def datatype_patch(self, package_id):
         data = request.GET
@@ -55,7 +62,7 @@ class DatasetManageController(p.toolkit.BaseController):
             except logic.ValidationError as e:
                 return e
 
-class DatasetImportController(p.toolkit.BaseController):
+class DatasetImportController(BaseController):
 
     def _record_type_process(self, data_dict):
         try:
@@ -844,7 +851,7 @@ class DatasetImportController(p.toolkit.BaseController):
         portal.action.activity_create(**activity_dict)
         log.info(log_str)
 
-    def import_dataset(self):
+    def _import_dataset(self):
 
         context = {'model': model, 'user': c.user, 'auth_user_obj': c.userobj}
         try:
@@ -935,8 +942,14 @@ class DatasetImportController(p.toolkit.BaseController):
                 vars = {'data': data, 'errors': errors,
                         'error_summary': error_summary, 'form_items': items}
                 return render('admin/dataset_import_form.html', extra_vars=vars)
+            # log.info(h.url_for('thai_gdc.import_dataset'))
+            # if toolkit.check_ckan_version('2.9'):
+            #     h.redirect_to(
+            #         h.url_for('thai_gdc.import_dataset')
+            #     )
+            # else:
+            #     h.redirect_to(controller='ckanext.thai_gdc.controllers.dataset:DatasetImportController', action='import_dataset')
 
-            h.redirect_to(controller='ckanext.thai_gdc.controllers.dataset:DatasetImportController', action='import_dataset')
 
         schema = logic.schema.update_configuration_schema()
         data = {}

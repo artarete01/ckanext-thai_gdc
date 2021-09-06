@@ -9,13 +9,15 @@ import ckan.authz as authz
 import ckan.logic.auth as logic_auth
 from ckan.lib.plugins import DefaultTranslation
 from ckan import logic
-import re
+import re, six
 from itertools import count
 from six import string_types
 from ckan.model import (MAX_TAG_LENGTH, MIN_TAG_LENGTH)
 from ckanext.thai_gdc import helpers as noh
+import ckan.lib.helpers as ch
 import ckan.lib.navl.dictization_functions as df
 
+# if toolkit.check_ckan_version('2.9'):
 from ckanext.thai_gdc.logic import (
     bulk_update_public, dataset_bulk_import
 )
@@ -34,10 +36,55 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
     plugins.implements(plugins.ITemplateHelpers)
     plugins.implements(plugins.IPackageController, inherit=True)
     plugins.implements(plugins.IValidators)
-    plugins.implements(plugins.IRoutes, inherit=True)
     plugins.implements(plugins.IResourceController, inherit=True)
     plugins.implements(plugins.IFacets, inherit=True)
     plugins.implements(plugins.IActions)
+
+    if six.PY2:
+        plugins.implements(plugins.IRoutes, inherit=True)
+
+        def before_map(self, map):
+
+            map.connect(
+                'banner_edit',
+                '/ckan-admin/banner-edit',
+                action='edit_banner',
+                ckan_icon='wrench',
+                controller='ckanext.thai_gdc.controllers.banner:BannerEditController',
+                )
+            map.connect(
+                'dataset_import',
+                '/ckan-admin/dataset-import',
+                action='import_dataset',
+                ckan_icon='cloud-upload',
+                controller='ckanext.thai_gdc.controllers.dataset:DatasetImportController',
+                )
+            map.connect(
+                'clear_import_log',
+                '/ckan-admin/clear-import-log',
+                action='clear_import_log',
+                controller='ckanext.thai_gdc.controllers.dataset:DatasetImportController',
+                )
+            map.connect(
+                'dataset_datatype_patch',
+                '/dataset/edit-datatype/{package_id}',
+                action='datatype_patch',
+                controller='ckanext.thai_gdc.controllers.dataset:DatasetManageController',
+                )
+            map.connect(
+                'user_active',
+                '/user/edit/user_active',
+                action='user_active',
+                controller='ckanext.thai_gdc.controllers.user:UserManageController',
+                )
+
+            return map
+    else:
+        plugins.implements(plugins.IBlueprint)
+        # IBlueprint
+        def get_blueprint(self):
+            from ckanext.thai_gdc.views import get_blueprints
+            return get_blueprints()
 
     def dataset_facets(self, facets_dict, package_type):
 
@@ -54,15 +101,20 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
     # IConfigurer
     def update_config(self, config_):
         if toolkit.check_ckan_version(max_version='2.9'):
+        # if toolkit.check_ckan_version(min_version='2.8'):
+        # if six.PY2:
             toolkit.add_ckan_admin_tab(config_, 'banner_edit', 'Banner Editor')
             toolkit.add_ckan_admin_tab(config_, 'dataset_import', 'Dataset Importer')
-        else:
-            toolkit.add_ckan_admin_tab(config_, 'banner_edit', 'Banner Editor', icon='wrench')
-            toolkit.add_ckan_admin_tab(config_, 'dataset_import', 'Dataset Importer', icon='cloud-upload')
+        # else:
+        elif toolkit.check_ckan_version(min_version='2.9.0'):
+            # toolkit.add_ckan_admin_tab(config_, 'thai_gdc.edit_banner', 'Banner Editor', icon='wrench')
+            toolkit.add_ckan_admin_tab(config_, 'thai_gdc._import_dataset', 'Dataset Importer', icon='cloud-upload')
         toolkit.add_template_directory(config_, 'templates')
         toolkit.add_public_directory(config_, 'public')
         toolkit.add_public_directory(config_, 'fanstatic')
         toolkit.add_resource('fanstatic', 'thai_gdc')
+
+        log.info(ch.ckan_version())
 
         try:
             from ckan.lib.webassets_tools import add_public_path
@@ -92,42 +144,42 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
         config_['thai_gdc.gdcatalog_harvester_url'] = 'https://harvester.gdcatalog.go.th'
         config_['ckan.jobs.timeout'] = '3600'
 
-    def before_map(self, map):
+    # def before_map(self, map):
 
-        map.connect(
-            'banner_edit',
-            '/ckan-admin/banner-edit',
-            action='edit_banner',
-            ckan_icon='wrench',
-            controller='ckanext.thai_gdc.controllers.banner:BannerEditController',
-            )
-        map.connect(
-            'dataset_import',
-            '/ckan-admin/dataset-import',
-            action='import_dataset',
-            ckan_icon='cloud-upload',
-            controller='ckanext.thai_gdc.controllers.dataset:DatasetImportController',
-            )
-        map.connect(
-            'clear_import_log',
-            '/ckan-admin/clear-import-log',
-            action='clear_import_log',
-            controller='ckanext.thai_gdc.controllers.dataset:DatasetImportController',
-            )
-        map.connect(
-            'dataset_datatype_patch',
-            '/dataset/edit-datatype/{package_id}',
-            action='datatype_patch',
-            controller='ckanext.thai_gdc.controllers.dataset:DatasetManageController',
-            )
-        map.connect(
-            'user_active',
-            '/user/edit/user_active',
-            action='user_active',
-            controller='ckanext.thai_gdc.controllers.user:UserManageController',
-            )
+    #     map.connect(
+    #         'banner_edit',
+    #         '/ckan-admin/banner-edit',
+    #         action='edit_banner',
+    #         ckan_icon='wrench',
+    #         controller='ckanext.thai_gdc.controllers.banner:BannerEditController',
+    #         )
+    #     map.connect(
+    #         'dataset_import',
+    #         '/ckan-admin/dataset-import',
+    #         action='import_dataset',
+    #         ckan_icon='cloud-upload',
+    #         controller='ckanext.thai_gdc.controllers.dataset:DatasetImportController',
+    #         )
+    #     map.connect(
+    #         'clear_import_log',
+    #         '/ckan-admin/clear-import-log',
+    #         action='clear_import_log',
+    #         controller='ckanext.thai_gdc.controllers.dataset:DatasetImportController',
+    #         )
+    #     map.connect(
+    #         'dataset_datatype_patch',
+    #         '/dataset/edit-datatype/{package_id}',
+    #         action='datatype_patch',
+    #         controller='ckanext.thai_gdc.controllers.dataset:DatasetManageController',
+    #         )
+    #     map.connect(
+    #         'user_active',
+    #         '/user/edit/user_active',
+    #         action='user_active',
+    #         controller='ckanext.thai_gdc.controllers.user:UserManageController',
+    #         )
 
-        return map
+    #     return map
 
     def update_config_schema(self, schema):
 

@@ -35,8 +35,8 @@ def dataset_bulk_import_status(import_id):
         context = {'model': model,
                     'user': c.user, 'auth_user_obj': c.userobj}
 
-        like_q1 = u'%' + import_id + u'%'
-        like_q2 = u'%Finished%'
+        like_q1 = '%' + import_id + '%'
+        like_q2 = '%Finished%'
 
         q = model.Session.query(model.Activity).filter(model.Activity.activity_type == 'changed user').filter(model.Activity.data.ilike(like_q1)).filter(model.Activity.data.ilike(like_q2))
         activities = q.all()

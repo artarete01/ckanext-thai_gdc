@@ -6,22 +6,28 @@ import ckan.lib.navl.dictization_functions as dict_fns
 import ckan.model as model
 import logging
 from ckan.common import g
-
+import ckantoolkit as tk
 from ckan.plugins.toolkit import (
-    _, c, h, BaseController, check_access, NotAuthorized, abort, render,
-    redirect_to, request,
-    )
+        _, c, h, check_access, NotAuthorized, abort, render,
+        redirect_to, request,
+        )
+if tk.check_ckan_version('2.9'):
+    from ckan.views.user import EditView as BaseController
+    from ckan.views.home import CACHE_PARAMETERS
+else:
+    from ckan.plugins.toolkit import BaseController
 
-from ckan.controllers.home import CACHE_PARAMETERS
+    from ckan.controllers.home import CACHE_PARAMETERS
 
 _validate = dict_fns.validate
 ValidationError = logic.ValidationError
 
 log = logging.getLogger(__name__)
 
-class UserManageController(plugins.toolkit.BaseController):
+class UserManageController(BaseController):
 
     def user_active(self):
+        log.info("kjkdfjljsafljalkdfjlj")
         data = request.GET
         if 'id' in data:
             try:

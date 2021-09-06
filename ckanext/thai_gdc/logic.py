@@ -8,7 +8,8 @@ import ckan.model as model
 import logging
 import ckan.plugins.toolkit as toolkit
 import ckan.lib.search as search
-from ckanext.thai_gdc.controllers.dataset import DatasetImportController
+if not toolkit.check_ckan_version('2.9'):
+    from ckanext.thai_gdc.controllers.dataset import DatasetImportController
 from ckan.lib.jobs import DEFAULT_QUEUE_NAME
 
 _check_access = logic.check_access
@@ -32,15 +33,15 @@ def dataset_bulk_import(context, data_dict):
     queue = DEFAULT_QUEUE_NAME
     dataset_import = DatasetImportController()
     
-    toolkit.enqueue_job(dataset_import._record_type_process, [data_dict], title=u'import record package import_id:{}'.format(import_uuid), queue=queue)
+    toolkit.enqueue_job(dataset_import._record_type_process, [data_dict], title='import record package import_id:{}'.format(import_uuid), queue=queue)
                 
-    toolkit.enqueue_job(dataset_import._stat_type_process, [data_dict], title=u'import stat package import_id:{}'.format(import_uuid), queue=queue)
+    toolkit.enqueue_job(dataset_import._stat_type_process, [data_dict], title='import stat package import_id:{}'.format(import_uuid), queue=queue)
 
-    toolkit.enqueue_job(dataset_import._gis_type_process, [data_dict], title=u'import gis package import_id:{}'.format(import_uuid), queue=queue)
+    toolkit.enqueue_job(dataset_import._gis_type_process, [data_dict], title='import gis package import_id:{}'.format(import_uuid), queue=queue)
 
-    toolkit.enqueue_job(dataset_import._multi_type_process, [data_dict], title=u'import multi package import_id:{}'.format(import_uuid), queue=queue)
+    toolkit.enqueue_job(dataset_import._multi_type_process, [data_dict], title='import multi package import_id:{}'.format(import_uuid), queue=queue)
 
-    toolkit.enqueue_job(dataset_import._other_type_process, [data_dict], title=u'import other package import_id:{}'.format(import_uuid), queue=queue)
+    toolkit.enqueue_job(dataset_import._other_type_process, [data_dict], title='import other package import_id:{}'.format(import_uuid), queue=queue)
 
-    toolkit.enqueue_job(dataset_import._finished_process, [data_dict], title=u'import finished import_id:{}'.format(import_uuid), queue=queue)
+    toolkit.enqueue_job(dataset_import._finished_process, [data_dict], title='import finished import_id:{}'.format(import_uuid), queue=queue)
     
