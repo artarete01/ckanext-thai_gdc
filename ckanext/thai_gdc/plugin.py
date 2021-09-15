@@ -352,7 +352,8 @@ def tag_name_validator(value, context):
     tagname_match = re.compile('[ก-๙\w \-.]*', re.UNICODE)
     #if not tagname_match.match(value):
     if isinstance(value, str):
-        value = value.decode('utf8')
+        if six.PY2:
+            value = value.decode('utf8')
     if not tagname_match.match(value, re.U):
         raise Invalid(_('Tag "%s" must be alphanumeric '
                         'characters or symbols: -_.') % (value))
@@ -360,7 +361,8 @@ def tag_name_validator(value, context):
 
 def tag_length_validator(value, context):
     if isinstance(value, str):
-        value = value.decode('utf8')
+        if six.PY2:
+            value = value.decode('utf8')
     if len(value) < MIN_TAG_LENGTH:
         raise Invalid(
             _('Tag "%s" length is less than minimum %s') % (value, MIN_TAG_LENGTH)
