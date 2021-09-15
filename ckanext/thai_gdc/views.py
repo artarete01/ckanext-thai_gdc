@@ -176,10 +176,47 @@ class BannerConfig(MethodView):
             return render(u'admin/banner_form.html', extra_vars=vars)
         return h.redirect_to(u'thai_gdc.edit_banner')
 
+## controler DatasetManageController #method datatype_patch
+def datatype_patch(package_id):
+    data = request.args
+    if 'data_type' in data:
+        try:
+            try:
+                # check data owner access
+                context = { 'model': model, 'user': g.user, 'auth_user_obj': g.userobj }
+                check_access(u'package_patch', context)
+            except logic.NotAuthorized:
+                abort(403, _('Need to be Data Owner'))
+
+            data_dict = logic.clean_dict(
+                dict_fns.unflatten(
+                    logic.tuplize_dict(
+                        logic.parse_params(
+                            data, ignore_keys=CACHE_PARAMETERS))))
+            portal = LocalCKAN()
+            patch_meta = {'id':package_id,'data_type':data['data_type']}
+            package = portal.action.package_patch(**patch_meta)
+            url = h.url_for(u'dataset.read', id=package_id)
+            return h.redirect_to(url)
+        except logic.ValidationError as e:
+            return e
+
+def clear_import_log():
+        
+    config["import_log"] = ''
+    config['template_file'] = ''
+    config['import_org'] = ''
+    config['template_org'] = ''
+    config['ckan.import_params'] = ''
+    config['ckan.import_uuid'] = ''
+    config['ckan.import_row'] = ''
+
+    return render('admin/clear_import_log.html')
+
 thai_gdc.add_url_rule('/ckan-admin/banner-edit', view_func=BannerConfig.as_view(str(u'edit_banner')))
 # thai_gdc.add_url_rule('/ckan-admin/dataset-import', view_func=DatasetImportController._import_dataset)
-# thai_gdc.add_url_rule('/ckan-admin/clear-import-log', view_func=DatasetImportController.clear_import_log)
-# thai_gdc.add_url_rule('/dataset/edit-datatype/<package_id>', view_func=DatasetManageController.datatype_patch, methods=[u'GET', u'POST'])
+# thai_gdc.add_url_rule('/ckan-admin/clear-import-log', view_func=clear_import_log)
+thai_gdc.add_url_rule('/dataset/edit-datatype/<package_id>', view_func=datatype_patch, methods=[u'GET', u'POST'])
 thai_gdc.add_url_rule('/user/edit/user_active', view_func=user_active, methods=[u'POST',])
 thai_gdc.add_url_rule('/user/edit/user_active/<id>', view_func=user_active, methods=[u'POST',])
 
