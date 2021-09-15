@@ -8,7 +8,7 @@ import ckan.model as model
 from ckan.common import _, c, config
 import ckan.lib.helpers as h
 import ckan.lib.formatters as formatters
-import json
+import json, six
 import os
 import collections
 from ckan.lib.search import make_connection
@@ -128,7 +128,8 @@ def get_gdcatalog_state(zone, package_id):
             elif zone == 'harvesting':
                 url = gdcatalog_harvester_url+'/api/3/action/gdcatalog_harvesting_state'
             myobj = {"packages": [package_id]}
-            myobj['packages'][0] = myobj['packages'][0].encode('ascii','ignore')
+            if six.PY2:
+                myobj['packages'][0] = myobj['packages'][0].encode('ascii','ignore')
             headers = {'Content-type': 'application/json', 'Authorization': ''}
             res = s.post(url, data = json.dumps(myobj), headers = headers)
             log.info(res.json())
