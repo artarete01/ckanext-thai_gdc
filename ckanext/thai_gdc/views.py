@@ -1,4 +1,4 @@
-import six
+import six, uuid
 import time
 from flask import Blueprint
 from flask.views import MethodView
@@ -14,6 +14,8 @@ import ckan.model as model
 from ckanapi import LocalCKAN
 
 import logging
+import pandas as pd
+import numpy as np
 
 from ckan.plugins.toolkit import (
         _, c, h, check_access, NotAuthorized, abort, render,
@@ -57,6 +59,12 @@ def _check_sysadmin():
         abort(403, _('Need to be system administrator to administer'))
     
     return context
+
+def _import_items():
+    return [
+        {'name': 'template_file', 'label': _('Template File'), 'placeholder': '', 'upload_enabled':h.uploads_enabled(),
+            'field_url': 'template_file', 'field_upload': 'template_file_upload', 'field_clear': 'clear_template_file_upload'},
+    ]
 
 @thai_gdc.before_request
 def user_active(id=None):
@@ -201,6 +209,104 @@ def datatype_patch(package_id):
         except logic.ValidationError as e:
             return e
 
+class DatasetImport(MethodView):
+    def get(self):
+        _check_sysadmin()
+        schema = schema_.update_configuration_schema()
+        data = {}
+        items = _import_items()
+        for key in schema:
+            data[key] = config.get(key)
+
+        vars = {'data': data, 'errors': {}, 'form_items': items}
+        return render('admin/dataset_import_form.html', extra_vars=vars)
+    
+    def post(self):
+        context = _check_sysadmin()
+        items = _import_items()
+        # data = request.args
+        # if 'save' in data:
+        try:
+            # really?
+            req = request.form.copy()
+            req.update(request.files.to_dict())
+            data_dict = logic.clean_dict(
+                dict_fns.unflatten(
+                    logic.tuplize_dict(
+                        logic.parse_params(
+                            req, ignore_keys=CACHE_PARAMETERS))))
+
+            del data_dict['save']
+
+            schema = schema_.update_configuration_schema()
+
+            upload = uploader.get_uploader('admin')
+            upload.update_data_dict(data_dict, 'template_file',
+                                'template_file_upload', 'clear_template_file_upload')
+            upload.upload(uploader.get_max_image_size())
+
+            data, errors = _validate(data_dict, schema, context)
+            if errors:
+                model.Session.rollback()
+                raise ValidationError(errors)
+
+            for key, value in six.iteritems(data):
+            
+                if key == 'template_file' and value and not value.startswith('http')\
+                        and not value.startswith('/'):
+                    image_path = 'uploads/admin/'
+
+                    value = h.url_for_static('{0}{1}'.format(image_path, value))
+
+                # Update CKAN's `config` object
+                config[key] = value
+
+            log.info('Import Dataset: {0}'.format(data))
+            
+            import_uuid = str(uuid.uuid4())
+            filename = str(config['ckan.storage_path'])+'/storage/uploads/admin/'+data['template_file']
+            template_org = data['template_org'] or 'all'
+            owner_org = data['import_org']
+            importer = c.user
+            data_dict = {"import_uuid":import_uuid, "template_org":template_org, "owner_org":owner_org, "filename":filename, "importer":importer}
+            log.info('Prepare to import data import_id:%r file:%r org:%r to_org:%r user:%r',import_uuid, filename, template_org, owner_org, importer)
+
+            row_count = 0
+
+            record_df = pd.read_excel(filename, header=[3], sheet_name='Temp2_Meta_Record', dtype=str)
+            row_count += (len(record_df.index)-1)
+            
+            stat_df = pd.read_excel(filename, header=[3], sheet_name='Temp2_Meta_Stat', dtype=str)
+            row_count += (len(stat_df.index)-1)
+
+            gis_df = pd.read_excel(filename, header=[3], sheet_name='Temp2_Meta_GIS', dtype=str)
+            row_count += (len(gis_df.index)-1)
+
+            multi_df = pd.read_excel(filename, header=[3], sheet_name='Temp2_Meta_Multi', dtype=str)
+            row_count += (len(multi_df.index)-1)
+
+            other_df = pd.read_excel(filename, header=[3], sheet_name='Temp2_Meta_Other', dtype=str)
+            row_count += (len(other_df.index)-1)
+
+            tk.get_action('dataset_bulk_import')(context, data_dict)
+
+            data_dict['row'] = row_count
+            config["import_log"] = ''
+            config['ckan.import_params'] = data_dict
+            config['ckan.import_uuid'] = import_uuid
+            config['ckan.import_row'] = row_count
+
+            model.set_system_info('ckan.import_params', data_dict)
+            model.set_system_info('ckan.import_uuid', import_uuid)
+            model.set_system_info('ckan.import_row', row_count)
+        except logic.ValidationError as e:
+            errors = e.error_dict
+            error_summary = e.error_summary
+            vars = {'data': data, 'errors': errors,
+                    'error_summary': error_summary, 'form_items': items}
+            return render('admin/dataset_import_form.html', extra_vars=vars)
+        return h.redirect_to('thai_gdc._import_dataset')
+
 def clear_import_log():
         
     config["import_log"] = ''
@@ -214,8 +320,9 @@ def clear_import_log():
     return render('admin/clear_import_log.html')
 
 thai_gdc.add_url_rule('/ckan-admin/banner-edit', view_func=BannerConfig.as_view(str(u'edit_banner')))
-# thai_gdc.add_url_rule('/ckan-admin/dataset-import', view_func=DatasetImportController._import_dataset)
-# thai_gdc.add_url_rule('/ckan-admin/clear-import-log', view_func=clear_import_log)
+thai_gdc.add_url_rule('/ckan-admin/dataset-import', view_func=DatasetImport.as_view(str(u'_import_dataset')), methods=[u'GET', u'POST'])
+# thai_gdc.add_url_rule('/ckan-admin/dataset-import', view_func=_import_dataset, methods=[u'GET', u'POST'])
+thai_gdc.add_url_rule('/ckan-admin/clear-import-log', view_func=clear_import_log)
 thai_gdc.add_url_rule('/dataset/edit-datatype/<package_id>', view_func=datatype_patch, methods=[u'GET', u'POST'])
 thai_gdc.add_url_rule('/user/edit/user_active', view_func=user_active, methods=[u'POST',])
 thai_gdc.add_url_rule('/user/edit/user_active/<id>', view_func=user_active, methods=[u'POST',])

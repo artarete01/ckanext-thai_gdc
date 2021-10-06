@@ -108,7 +108,7 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
         # else:
         elif toolkit.check_ckan_version(min_version='2.9.0'):
             toolkit.add_ckan_admin_tab(config_, 'thai_gdc.edit_banner', 'Banner Editor', icon='wrench')
-            # toolkit.add_ckan_admin_tab(config_, 'thai_gdc._import_dataset', 'Dataset Importer', icon='cloud-upload')
+            toolkit.add_ckan_admin_tab(config_, 'thai_gdc._import_dataset', 'Dataset Importer', icon='cloud-upload')
         toolkit.add_template_directory(config_, 'templates')
         toolkit.add_public_directory(config_, 'public')
         toolkit.add_public_directory(config_, 'fanstatic')
