@@ -47,6 +47,12 @@ def dataset_bulk_import_status(import_id):
         activities, context,
         include_data=True)
 
+def dataset_bulk_import_count(log_contents):
+    complete = 0
+    for log_item in log_contents:
+        complete = complete + log_item['log_content'].count('package_create')
+    return complete
+
 def get_group_color(group_id):
 
     first_char = group_id[0]
@@ -110,30 +116,47 @@ def get_opend_playground_url():
 def get_catalog_org_type():
     return config.get('thai_gdc.catalog_org_type', 'agency')
 
+def get_is_as_a_service():
+    return config.get('thai_gdc.is_as_a_service', 'false')
+
 def get_gdcatalog_status_show():
-    return config.get('thai_gdc.gdcatalog_status_show', 'true')
+    return config.get('thai_gdc.gdcatalog_status_show')
+
+def get_gdcatalog_portal_url():
+    return config.get('thai_gdc.gdcatalog_portal_url')
 
 def get_gdcatalog_state(zone, package_id):
     state = []
     gdcatalog_status_show = get_gdcatalog_status_show()
     gdcatalog_harvester_url = config.get('thai_gdc.gdcatalog_harvester_url')
-
+    site_url = config.get('ckan.site_url')
+    request_proxy = config.get('thai_gdc.proxy_request', None)
+    if request_proxy:
+        proxies = {
+            'http': config.get('thai_gdc.proxy_url', None),
+            'https': config.get('thai_gdc.proxy_url', None)
+        }
+    else:
+        proxies = None
     if gdcatalog_status_show == 'true':
-        with requests.Session() as s:
-            s.verify = False
-            if zone == 'publish':
-                url = gdcatalog_harvester_url+'/api/3/action/gdcatalog_publish_state'
-            elif zone == 'processing':
-                url = gdcatalog_harvester_url+'/api/3/action/gdcatalog_processing_state'
-            elif zone == 'harvesting':
-                url = gdcatalog_harvester_url+'/api/3/action/gdcatalog_harvesting_state'
-            myobj = {"packages": [package_id]}
-            if six.PY2:
-                myobj['packages'][0] = myobj['packages'][0].encode('ascii','ignore')
-            headers = {'Content-type': 'application/json', 'Authorization': ''}
-            res = s.post(url, data = json.dumps(myobj), headers = headers)
-            log.info(res.json())
-            state = res.json()
+        try:
+            with requests.Session() as s:
+                s.verify = False
+                if zone == 'published':
+                    url = gdcatalog_harvester_url+'/api/3/action/gdcatalog_published_state'
+                elif zone == 'nonpublish':
+                    url = gdcatalog_harvester_url+'/api/3/action/gdcatalog_nonpublish_state'
+                myobj = {"site_url": site_url.split("//")[1].split("/")[0], "package": package_id}
+                myobj['site_url'] = myobj['site_url'].encode('ascii','ignore')
+                if six.PY2:
+                    myobj['package'] = myobj['package'].encode('ascii','ignore')
+                log.info(json.dumps(myobj))
+                headers = {'Content-type': 'application/json', 'Authorization': ''}
+                res = s.post(url, data = json.dumps(myobj), headers = headers, proxies=proxies)
+                log.info(res.json())
+                state = res.json()
+        except:
+            return state
     return state
 
 def get_users_non_member():
