@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-import ckan.logic as logic
+import ckan.logic as logic, six
 import ckan.logic.action.update as logic_action_update
 import ckan.plugins as plugins
 import ckan.model as model
