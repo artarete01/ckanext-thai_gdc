@@ -2,4 +2,4 @@ pandas
 Unidecode
 six
 xlrd
-
+openpylx

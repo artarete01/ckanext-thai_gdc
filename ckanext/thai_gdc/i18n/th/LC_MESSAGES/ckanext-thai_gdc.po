@@ -189,19 +189,19 @@ msgid "Data Category"
 msgstr "หมวดหมู่ตามธรรมาภิบาลข้อมูล"
 
 msgid "WAIT_VALIDATE"
-msgstr "แจ้งลงทะเบียน"
+msgstr "อยู่ระหว่างกระบวนการอนุมัติ ควรหลีกเลี่ยงการแก้ไข"
 
 msgid "VALIDATE"
-msgstr "อยู่ระหว่างการตรวจสอบ"
+msgstr "อยู่ระหว่างกระบวนการอนุมัติ ควรหลีกเลี่ยงการแก้ไข"
 
 msgid "WAIT_VALIDATE_MODIFIED"
-msgstr "แจ้งการปรับปรุง"
+msgstr "อยู่ระหว่างกระบวนการอนุมัติ ควรหลีกเลี่ยงการแก้ไข"
 
 msgid "VALIDATE_MODIFIED"
-msgstr "อยู่ระหว่างการตรวจสอบการปรับปรุง"
+msgstr "อยู่ระหว่างกระบวนการอนุมัติ ควรหลีกเลี่ยงการแก้ไข"
 
 msgid "APPROVAL"
-msgstr "อยู่ระหว่างการอนุมัติ"
+msgstr "อยู่ระหว่างกระบวนการอนุมัติ ควรหลีกเลี่ยงการแก้ไข"
 
 msgid "COMPLETED"
 msgstr "ลงทะเบียนแล้ว"
@@ -213,16 +213,19 @@ msgid "REJECT"
 msgstr "ไม่ผ่านเกณฑ์"
 
 msgid "WAIT_REVOKE"
-msgstr "แจ้งการเพิกถอน"
+msgstr "อยู่ระหว่างกระบวนการเพิกถอน"
 
 msgid "VALIDATE_REVOKE"
-msgstr "อยู่ระหว่างการตรวจสอบเพิกถอน"
+msgstr "อยู่ระหว่างกระบวนการเพิกถอน"
 
 msgid "REVOKE"
-msgstr "อยู่ระหว่างการอนุมัติเพิกถอน"
+msgstr "อยู่ระหว่างกระบวนการเพิกถอน"
 
 msgid "Reference URL Catalog"
 msgstr "อ้างอิง URL Catalog"
 
 msgid "Your browser does not support object tags."
-msgstr "ไม่สามารถแสดงผลได้ กรุณาคลิกที่ URL เพื่อดูไฟล์"
+msgstr "ไม่สามารถแสดงผล (preview) ไฟล์ข้อมูลนี้ได้ กรุณาคลิกที่ URL เพื่อเปิดไฟล์"
+
+msgid "This resource view is not available at the moment."
+msgstr "ไม่สามารถแสดงผล (preview) ไฟล์ข้อมูลนี้ได้"

@@ -12,20 +12,22 @@ from ckan import logic
 import re, six
 from itertools import count
 from six import string_types
-from ckan.model import (MAX_TAG_LENGTH, MIN_TAG_LENGTH)
+from ckan.model import (MAX_TAG_LENGTH, MIN_TAG_LENGTH, PACKAGE_NAME_MIN_LENGTH)
 from ckanext.thai_gdc import helpers as noh
 import ckan.lib.helpers as ch
 import ckan.lib.navl.dictization_functions as df
+from ckan.model.core import State
 
 # if toolkit.check_ckan_version('2.9'):
 from ckanext.thai_gdc.logic import (
-    bulk_update_public, dataset_bulk_import
+    bulk_update_public, dataset_bulk_import, tag_list
 )
 
 import logging
 import os
 
 Invalid = df.Invalid
+missing = df.missing
 
 log = logging.getLogger(__name__)
 
@@ -128,6 +130,7 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
         
         config_['ckan.tracking_enabled'] = 'true'
         config_['scheming.dataset_schemas'] = 'ckanext.thai_gdc:ckan_dataset.json'
+        config_['scheming.presets'] = 'ckanext.thai_gdc:presets.json'
         config_['ckan.activity_streams_enabled'] = 'true'
         config_['ckan.auth.user_delete_groups'] = 'false'
         config_['ckan.auth.user_delete_organizations'] = 'false'
@@ -139,10 +142,12 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
         config_['ckan.group_and_organization_list_all_fields_max'] = '200'
         config_['ckan.group_and_organization_list_max'] = '200'
         config_['ckan.datasets_per_page'] = '30'
+        config_['ckan.jobs.timeout'] = '3600'
         config_['ckan.recline.dataproxy_url'] = 'https://dataproxy.gdcatalog.go.th'
         config_['thai_gdc.opend_playground_url'] = 'https://opend-playground.gdcatalog.go.th'
         config_['thai_gdc.gdcatalog_harvester_url'] = 'https://harvester.gdcatalog.go.th'
-        config_['ckan.jobs.timeout'] = '3600'
+        config_['thai_gdc.gdcatalog_status_show'] = 'true'
+        config_['thai_gdc.gdcatalog_portal_url'] = 'https://gdcatalog.go.th'
 
     # def before_map(self, map):
 
@@ -225,7 +230,8 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
     def get_actions(self):
         action_functions = {
             'bulk_update_public': bulk_update_public,
-            'dataset_bulk_import': dataset_bulk_import
+            'dataset_bulk_import': dataset_bulk_import,
+            'tag_list': tag_list
         }
         return action_functions
 
@@ -284,11 +290,27 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             log.info('before_view error')
         return pkg_dict
     
+    def _isEnglish(self, s):
+        try:
+            s.encode(encoding='utf-8').decode('ascii')
+        except UnicodeDecodeError:
+            return False
+        else:
+            return True
+    
     def before_search(self, search_params):
+        import shlex
         if 'q' in search_params:
             q = search_params['q']
-            if ":" not in q:
-                q = 'text:*'+q+'*'
+            lelist = ["+","-","&&","||","!","(",")","{","}","[","]","^","~","*","?",":","/"]
+            if len(q) > 0 and len([e for e in lelist if e in q]) == 0:
+                q_list = shlex.split(search_params['q'])
+                q_list_result = []
+                for q_item in q_list:
+                    if q_item not in ['AND','OR','NOT'] and not self._isEnglish(q_item):
+                        q_item = 'text:*'+q_item+'*'
+                    q_list_result.append(q_item)
+                q = ' '.join(q_list_result)
             search_params['q'] = q
         return search_params
     
@@ -317,6 +339,8 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             'tag_name_validator': tag_name_validator,
             'tag_length_validator': tag_length_validator,
             'tag_string_convert': tag_string_convert,
+            'package_name_validator': package_name_validator,
+            'package_title_validator': package_title_validator,
         }
     
     def get_helpers(self):
@@ -341,14 +365,18 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             'thai_gdc_get_opend_playground_url': noh.get_opend_playground_url,
             'thai_gdc_get_catalog_org_type': noh.get_catalog_org_type,
             'thai_gdc_get_gdcatalog_status_show': noh.get_gdcatalog_status_show,
+            'thai_gdc_get_gdcatalog_portal_url': noh.get_gdcatalog_portal_url,
             'thai_gdc_convert_string_todate': noh.convert_string_todate,
             'thai_gdc_get_group_color': noh.get_group_color,
             'thai_gdc_dataset_bulk_import_status': noh.dataset_bulk_import_status,
+            'thai_gdc_dataset_bulk_import_count': noh.dataset_bulk_import_count,
             'thai_gdc_dataset_bulk_import_log': noh.dataset_bulk_import_log,
+            'thai_gdc_get_is_as_a_service': noh.get_is_as_a_service,
             'get_site_statistics': noh.get_site_statistics
         }
 
 def tag_name_validator(value, context):
+
     tagname_match = re.compile('[ก-๙\w \-.]*', re.UNICODE)
     #if not tagname_match.match(value):
     if isinstance(value, str):
@@ -384,6 +412,10 @@ def tag_string_convert(key, data, errors, context):
                 if tag.strip()]
     else:
         tags = data[key]
+    
+    if not len(tags):
+        raise Invalid(_('Tag "%s" must be alphanumeric '
+                        'characters or symbols: -_.') % (''))
 
     current_index = max( [int(k[1]) for k in list(data.keys()) if len(k) == 3 and k[0] == 'tags'] + [-1] )
 
@@ -393,3 +425,45 @@ def tag_string_convert(key, data, errors, context):
     for tag in tags:
         tag_length_validator(tag, context)
         tag_name_validator(tag, context)
+    
+def package_name_validator(key, data, errors, context):
+    model = context['model']
+    session = context['session']
+    package = context.get('package')
+
+    query = session.query(model.Package.state).filter_by(name=data[key])
+    if package:
+        package_id = package.id
+    else:
+        package_id = data.get(key[:-1] + ('id',))
+    if package_id and package_id is not missing:
+        query = query.filter(model.Package.id != package_id)
+    result = query.first()
+    if result and result.state != State.DELETED:
+        errors[key].append(_('That URL is already in use.'))
+
+    value = data[key]
+    if len(value) < PACKAGE_NAME_MIN_LENGTH:
+        raise Invalid(
+            _('Name "%s" length is less than minimum %s') % (value, PACKAGE_NAME_MIN_LENGTH)
+        )
+    if len(value) > 70:
+        raise Invalid(
+            _('Name "%s" length is more than maximum %s') % (value, 70)
+        )
+    
+def package_title_validator(key, data, errors, context):
+    model = context['model']
+    session = context['session']
+    package = context.get('package')
+
+    query = session.query(model.Package.state).filter_by(title=data[key])
+    if package:
+        package_id = package.id
+    else:
+        package_id = data.get(key[:-1] + ('id',))
+    if package_id and package_id is not missing:
+        query = query.filter(model.Package.id != package_id)
+    result = query.first()
+    if result and result.state != State.DELETED:
+        errors[key].append(_('That title is already in use.'))
