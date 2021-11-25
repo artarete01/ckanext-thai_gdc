@@ -131,6 +131,12 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             action='user_active',
             controller='ckanext.thai_gdc.controllers.user:UserManageController',
             )
+        map.connect(
+            'dataset_gdcatalog_state',
+            '/dataset/gdcatalog-state/{package_id}',
+            action='gdcatalog_state',
+            controller='ckanext.thai_gdc.controllers.dataset:DatasetManageController',
+            )
 
         return map
 
@@ -403,7 +409,7 @@ def package_title_validator(key, data, errors, context):
     session = context['session']
     package = context.get('package')
 
-    query = session.query(model.Package.state).filter_by(title=data[key])
+    query = session.query(model.Package.state).filter_by(title=data[key]).filter_by(type='dataset')
     if package:
         package_id = package.id
     else:
