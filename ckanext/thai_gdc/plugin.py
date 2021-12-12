@@ -137,6 +137,7 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             action='gdcatalog_state',
             controller='ckanext.thai_gdc.controllers.dataset:DatasetManageController',
             )
+        map.redirect('/uploads/user/', '/')
 
         return map
 
