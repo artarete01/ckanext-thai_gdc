@@ -137,6 +137,19 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             action='gdcatalog_state',
             controller='ckanext.thai_gdc.controllers.dataset:DatasetManageController',
             )
+        map.connect(
+            'organizations_index',
+            '/organization/',
+            action='index',
+            controller='ckanext.thai_gdc.controllers.organization:OrganizationCustomController'
+        )
+
+        map.connect(
+            'organizations_index',
+            '/organization',
+            action='index',
+            controller='ckanext.thai_gdc.controllers.organization:OrganizationCustomController'
+        )
 
         return map
 
