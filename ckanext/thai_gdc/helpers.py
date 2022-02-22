@@ -7,13 +7,9 @@ import ckan.model as model
 from pylons import config
 from ckan.common import _, c
 import ckan.lib.helpers as h
-import ckan.lib.formatters as formatters
 import json
 import os
-import collections
-from ckan.lib.search import make_connection
 import logging
-from ckanapi import LocalCKAN, NotFound, NotAuthorized
 import ckan.lib.dictization.model_dictize as model_dictize
 
 from ckanext.thai_gdc.model.opend import OpendModel
@@ -31,7 +27,6 @@ def dataset_bulk_import_log(import_id):
 
 def dataset_bulk_import_status(import_id):
     try:
-        from ckan import model
         context = {'model': model,
                     'user': c.user, 'auth_user_obj': c.userobj}
 
@@ -124,6 +119,39 @@ def get_gdcatalog_status_show():
 
 def get_gdcatalog_portal_url():
     return config.get('thai_gdc.gdcatalog_portal_url')
+
+def get_gdcatalog_version_update():
+    gdcatalog_harvester_url = config.get('thai_gdc.gdcatalog_harvester_url')
+    site_url = config.get('ckan.site_url')
+    request_proxy = config.get('thai_gdc.proxy_request', None)
+    if request_proxy:
+        proxies = {
+            'http': config.get('thai_gdc.proxy_url', None),
+            'https': config.get('thai_gdc.proxy_url', None)
+        }
+    else:
+        proxies = None
+
+    state = 'connection error'
+    gdcatalog_version = 'gdcatalog'
+    local_version = 'local'
+    try:
+        with requests.Session() as s:
+            s.verify = False
+            url = 'https://gitlab.nectec.or.th/opend/ckanext-thai_gdc/-/raw/master/ckanext/thai_gdc/public/base/admin/thai-gdc-update.json'
+            headers = {'Content-type': 'application/json', 'Authorization': ''}
+            res = s.get(url, headers = headers, proxies=proxies)
+            log.info(res.text)
+            gdcatalog_version = json.loads(res.text)['version']
+            local_version = get_extension_version('version')
+        if gdcatalog_version != local_version:
+            state = gdcatalog_version
+        else:
+            state = 'updated'
+    except:
+        return state
+    
+    return state
 
 def get_gdcatalog_state(zone, package_id):
     state = []

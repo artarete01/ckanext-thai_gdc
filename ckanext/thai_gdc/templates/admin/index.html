@@ -3,36 +3,31 @@
 {% block primary_content_inner %}
 <div class="row">
   <div class="col-md-8">
-    <!--<span class="badge" style="background-color:#ffff005e">&nbsp;</span>  ผู้ดูแลระบบ
-    <span class="badge" style="background-color:rgb(227,220,255)">&nbsp;</span>  บรรณาธิการ
-    <span class="badge" style="background-color:rgb(207,240,251)">&nbsp;</span>  สมาชิก
-    <br />-->
     {% set top_nodes = h.group_tree(type_='organization') %}
     {% set use_longnames = False %}
     <ul class="hierarchy-tree-top" style="margin-top: 5px;">
       {% for node in top_nodes recursive %}
-      {% set longname = h.group_tree_get_longname(node.name) %}
+      {#% set longname = h.group_tree_get_longname(node.name) %#}
       {% set display_text = node.title %}
-      {% if use_longnames and longname%}
-      {% set display_text = longname + " (" + display_text + ")" %}
-      {% endif %}
+      {#% if use_longnames and longname%#}
+      {#% set display_text = longname + " (" + display_text + ")" %#}
+      {#% endif %#}
       {% if node.highlighted %}
       <li class="highlighted" id="node_{{ node.name }}">
         {% else %}
       <li id="node_{{ node.name }}">
         {% endif %}
         <a href="/organization/members/{{ node.name }}">{{ display_text }}</a><br />
-        {% set members = h.thai_gdc_get_action('member_list',{'id': node.name, 'object_type': 'user'}) %}
-        {% for user_id, user, role in members %}
-        {% if role == 'Admin' or role == 'ผู้ดูแลระบบ' %}
+        {% for user_id, user_displayname, role in node.users %}
+        {% if role == 'admin' %}
         <span class="badge"
-          style="background-color:#ffff005e">{{ h.linked_user(user_id, maxlength=20, avatar=0) }}</span>&nbsp;
-        {% elif role == 'Editor' or role == 'บรรณาธิการ' %}
+          style="background-color:#ffff005e"><a href="/user/{{ user_id }}">{{ user_displayname }}</a></span>&nbsp;
+        {% elif role == 'editor' %}
         <span class="badge"
-          style="background-color:rgb(227,220,255)">{{ h.linked_user(user_id, maxlength=20, avatar=0) }}</span>&nbsp;
-        {% elif role == 'Member' or role == 'สมาชิก' %}
+          style="background-color:rgb(227,220,255)"><a href="/user/{{ user_id }}">{{ user_displayname }}</a></span>&nbsp;
+        {% elif role == 'member' %}
         <span class="badge"
-          style="background-color:rgb(207,240,251)">{{ h.linked_user(user_id, maxlength=20, avatar=0) }}</span>&nbsp;
+          style="background-color:rgb(207,240,251)"><a href="/user/{{ user_id }}">{{ user_displayname }}</a></span>&nbsp;
         {% endif %}
         {% endfor %}
         {% if node.children %}
