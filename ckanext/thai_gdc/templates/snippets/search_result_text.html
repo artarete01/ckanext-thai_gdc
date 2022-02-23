@@ -49,8 +49,9 @@
     {% endif %}
     {% set text_query_none = _('No organizations found for "{query}"') %}
     {% set text_no_query_none = _('No organizations found') %}
-    {% if not query %}
-      {% set count = h.get_site_statistics().organization_count %}
+    {% set count_temp = h.get_site_statistics().organization_count %}
+    {% if not query and count_temp %}
+      {% set count = count_temp %}
       {% set text_no_query_none = _('{number} organizations found') %}
     {% endif %}
   
