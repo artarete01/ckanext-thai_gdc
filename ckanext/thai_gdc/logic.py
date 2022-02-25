@@ -3,18 +3,69 @@
 
 import ckan.logic as logic
 import ckan.logic.action.update as logic_action_update
-import ckan.plugins as plugins
 import ckan.model as model
 import logging
 import ckan.plugins.toolkit as toolkit
-import ckan.lib.search as search
 from ckanext.thai_gdc.controllers.dataset import DatasetImportController
 from ckan.lib.jobs import DEFAULT_QUEUE_NAME
+import ckan.lib.dictization.model_dictize as model_dictize
+from six import string_types
+import ckan.model.misc as misc
 
 _check_access = logic.check_access
 _get_or_bust = logic.get_or_bust
+NotFound = logic.NotFound
 
 log = logging.getLogger(__name__)
+
+def _tag_search(context, data_dict):
+    model = context['model']
+
+    terms = data_dict.get('query') or data_dict.get('q') or []
+    if isinstance(terms, string_types):
+        terms = [terms]
+    terms = [t.strip() for t in terms if t.strip()]
+
+    if 'fields' in data_dict:
+        log.warning('"fields" parameter is deprecated.  '
+                    'Use the "query" parameter instead')
+
+    fields = data_dict.get('fields', {})
+    offset = data_dict.get('offset')
+    limit = data_dict.get('limit')
+
+    # TODO: should we check for user authentication first?
+    q = model.Session.query(model.Tag)
+
+    if 'vocabulary_id' in data_dict:
+        # Filter by vocabulary.
+        vocab = model.Vocabulary.get(_get_or_bust(data_dict, 'vocabulary_id'))
+        if not vocab:
+            raise NotFound
+        q = q.filter(model.Tag.vocabulary_id == vocab.id)
+    else:
+        # If no vocabulary_name in data dict then show free tags only.
+        q = q.filter(model.Tag.vocabulary_id == None)
+        # If we're searching free tags, limit results to tags that are
+        # currently applied to a package.
+        q = q.distinct().join(model.Tag.package_tags)
+
+    for field, value in fields.items():
+        if field in ('tag', 'tags'):
+            terms.append(value)
+
+    if not len(terms):
+        return [], 0
+
+    for term in terms:
+        escaped_term = misc.escape_sql_like_special_characters(
+            term, escape='\\')
+        q = q.filter(model.Tag.name.ilike('%' + escaped_term + '%'))
+
+    count = q.count()
+    q = q.offset(offset)
+    q = q.limit(limit)
+    return q.all(), count
 
 @logic.side_effect_free
 def tag_list(context, data_dict):

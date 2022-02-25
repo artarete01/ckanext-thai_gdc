@@ -73,7 +73,7 @@ class OrganizationCustomController(plugins.toolkit.BaseController):
             base.abort(403, _(u'Not authorized to see this page'))
 
         q = request.params.get(u'q', u'')
-        if q=='': #Patipat add
+        if q=='':
             extra_vars["page"] = h.Page([], 0)
             extra_vars["group_type"] = group_type
             return base.render(
