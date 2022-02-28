@@ -77,8 +77,8 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             add_public_path(asset_path, '/')
         
         config_['ckan.tracking_enabled'] = 'true'
-        # config_['scheming.dataset_schemas'] = 'ckanext.thai_gdc:ckan_dataset.json'
-        # config_['scheming.presets'] = 'ckanext.thai_gdc:presets.json'
+        config_['scheming.dataset_schemas'] = config_.get('scheming.dataset_schemas','ckanext.thai_gdc:ckan_dataset.json')
+        config_['scheming.presets'] = config_.get('scheming.presets','ckanext.thai_gdc:presets.json')
         config_['ckan.activity_streams_enabled'] = 'true'
         config_['ckan.auth.user_delete_groups'] = 'false'
         config_['ckan.auth.user_delete_organizations'] = 'false'
@@ -137,6 +137,7 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             action='gdcatalog_state',
             controller='ckanext.thai_gdc.controllers.dataset:DatasetManageController',
             )
+        
         map.connect(
             'organizations_index',
             '/organization/',
@@ -281,11 +282,13 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             search_params['q'] = q
         return search_params
     
-    # def create(self, package):
-    #     self.modify_package_before(package)
+    def create(self, package):
+        if package.type == 'dataset':
+            self.modify_package_before(package)
     
-    # def edit(self, package):
-    #     self.modify_package_before(package)
+    def edit(self, package):
+        if package.type == 'dataset':
+            self.modify_package_before(package)
     
     # def modify_package_before(self, package):
     #     package.state = 'active'
@@ -339,6 +342,7 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             'thai_gdc_dataset_bulk_import_count': noh.dataset_bulk_import_count,
             'thai_gdc_dataset_bulk_import_log': noh.dataset_bulk_import_log,
             'thai_gdc_get_is_as_a_service': noh.get_is_as_a_service,
+            'thai_gdc_get_gdcatalog_version_update': noh.get_gdcatalog_version_update,
             'get_site_statistics': noh.get_site_statistics
         }
 

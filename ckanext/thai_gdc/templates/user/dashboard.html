@@ -1,0 +1,42 @@
+{% ckan_extends %}
+
+{% block primary %}
+{% if c.userobj.sysadmin %}
+<style>
+  .alert {
+    padding: 20px;
+    background-color: #f44336;
+    color: white;
+  }
+  
+  .closebtn {
+    margin-left: 15px;
+    color: white;
+    font-weight: bold;
+    float: right;
+    font-size: 22px;
+    line-height: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  
+  .closebtn:hover {
+    color: black;
+  }
+  </style>
+
+{% set state = h.thai_gdc_get_gdcatalog_version_update() %}
+{% if state=='connection error' %}
+  <div class="alert">
+    <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+    ไม่สามารถติดต่อกับ harvester.gdcatalog.go.th ได้
+  </div>
+{% elif state!='updated' %}
+<div class="alert">
+  <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+  CKAN extension Thai-GDC มีการปรับปรุงใหม่ ในรุ่นโปรแกรม <a href="https://gitlab.nectec.or.th/opend/installing-ckan/-/blob/master/ckan-extension.md#update-ckanext-thai_gdc" target="_blank">{{ state }}</a> กรุณาแจ้งผู้ดูแลระบบเพื่อทำการ Update
+</div>
+{% endif %}
+{% endif %}
+{{ super() }}
+{% endblock %}
