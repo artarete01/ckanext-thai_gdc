@@ -94,7 +94,7 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
         config_['ckan.recline.dataproxy_url'] = 'https://dataproxy.gdcatalog.go.th'
         config_['thai_gdc.opend_playground_url'] = 'https://opend-playground.gdcatalog.go.th'
         config_['thai_gdc.gdcatalog_harvester_url'] = 'https://harvester.gdcatalog.go.th'
-        config_['thai_gdc.gdcatalog_status_show'] = 'true'
+        config_['thai_gdc.gdcatalog_status_show'] = 'flase'
         config_['thai_gdc.gdcatalog_portal_url'] = 'https://gdcatalog.go.th'
 
     def before_map(self, map):
@@ -290,19 +290,19 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
         if package.type == 'dataset':
             self.modify_package_before(package)
     
-    def modify_package_before(self, package):
-        package.state = 'active'
+    # def modify_package_before(self, package):
+    #     package.state = 'active'
 
-        for extra in package.extras_list:
-            if extra.key == 'objective' and isinstance(extra.value, string_types):
-                extra.value = self.unicode_string_convert(extra.value)
+    #     for extra in package.extras_list:
+    #         if extra.key == 'objective' and isinstance(extra.value, string_types):
+    #             extra.value = self.unicode_string_convert(extra.value)
     
-    def unicode_string_convert(self, value):
-        values = value.strip('[]').split(',')
-        value_list = ""
-        for v in values:
-            value_list = value_list + v.strip(' ').encode('latin-1').decode('unicode-escape')
-        return "["+value_list.replace('""','","')+"]"
+    # def unicode_string_convert(self, value):
+    #     values = value.strip('[]').split(',')
+    #     value_list = ""
+    #     for v in values:
+    #         value_list = value_list + v.strip(' ').encode('latin-1').decode('unicode-escape')
+    #     return "["+value_list.replace('""','","')+"]"
         
     def get_validators(self):
         return {

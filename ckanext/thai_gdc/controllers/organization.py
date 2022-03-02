@@ -14,7 +14,6 @@ from ckan.plugins.toolkit import (
     redirect_to, request,
     )
 from ckan.common import g, config, _
-
 NotAuthorized = logic.NotAuthorized
 ValidationError = logic.ValidationError
 check_access = logic.check_access
