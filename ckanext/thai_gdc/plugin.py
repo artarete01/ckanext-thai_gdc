@@ -94,7 +94,7 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
         config_['ckan.recline.dataproxy_url'] = 'https://dataproxy.gdcatalog.go.th'
         config_['thai_gdc.opend_playground_url'] = 'https://opend-playground.gdcatalog.go.th'
         config_['thai_gdc.gdcatalog_harvester_url'] = 'https://harvester.gdcatalog.go.th'
-        config_['thai_gdc.gdcatalog_status_show'] = 'flase'
+        config_['thai_gdc.gdcatalog_status_show'] = 'true'
         config_['thai_gdc.gdcatalog_portal_url'] = 'https://gdcatalog.go.th'
 
     def before_map(self, map):
