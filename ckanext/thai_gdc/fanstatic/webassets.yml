@@ -1,11 +1,3 @@
-thai_gdc_js:
-  filter: rjsmin
-  output: ckanext-thai-gdc/%(version)s_thai_gdc.js
-  extra:
-    preload:
-      - base/main
-  contents:
-    - js/cookie_consent.js
 thai_gdc_css:
   filters: cssrewrite
   output: ckanext-thai-gdc/%(version)s_thai_gdc.css
