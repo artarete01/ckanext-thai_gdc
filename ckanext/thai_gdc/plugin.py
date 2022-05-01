@@ -270,13 +270,15 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
         import shlex
         if 'q' in search_params:
             q = search_params['q']
-            lelist = ["+","-","&&","||","!","(",")","{","}","[","]","^","~","*","?",":","/"]
+            lelist = ["+","&&","||","!","(",")","{","}","[","]","^","~","*","?",":","/"]
             if len(q) > 0 and len([e for e in lelist if e in q]) == 0:
                 q_list = shlex.split(search_params['q'])
                 q_list_result = []
                 for q_item in q_list:
                     if q_item not in ['AND','OR','NOT'] and not self._isEnglish(q_item):
                         q_item = 'text:*'+q_item+'*'
+                    elif q_item not in ['AND','OR','NOT'] and self._isEnglish(q_item):
+                        q_item = 'text:'+q_item
                     q_list_result.append(q_item)
                 q = ' '.join(q_list_result)
             search_params['q'] = q
