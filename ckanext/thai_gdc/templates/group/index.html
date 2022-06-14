@@ -1,0 +1,98 @@
+{% ckan_extends %}
+
+{% set catalog_org_type = h.thai_gdc_get_catalog_org_type() %}
+{% set category_dict = h.scheming_group_schemas() %}
+
+{% if request.url[-1] == '/' %}
+ {% set request_url = request.url[:-1] %}
+{% else %}
+ {% set request_url = request.url %}
+{% endif %}
+
+{% block breadcrumb_content %}
+{% if catalog_org_type == 'area_based' %}
+  {% if request_url.split('/')[-1] != 'group' %}
+    <li class="active"><a href="/group">{{ _('Groups') }}</a></li><li class="active">{{category_dict[group_type]['group_title']}}</li>
+  {% else %}
+    <li class="active">{% link_for _('Groups'), named_route=group_type+'.index' %}</li>
+  {% endif %}
+{% else %}
+  {{ super() }}
+{% endif %}
+{% endblock %}
+
+{% block page_primary_action %}
+{% if catalog_org_type == 'area_based' %}
+  {% if request_url.split('/')[-1] != 'group' %}
+  {% if h.check_access('group_create') %}
+    {% link_for _('Add Group'), named_route=group_type+'.new', class_='btn btn-primary', icon='plus-square' %}
+  {% endif %}
+  {% endif %}
+{% else %}
+  {{ super() }}
+{% endif %}
+{% endblock %}
+
+{% block primary_content_inner %}
+<h1 class="hide-heading">{{ _('Groups') }}</h1>
+{% block groups_search_form %}
+{% if catalog_org_type == 'area_based' %}
+  {% if request_url.split('/')[-1] != 'group' %}
+    {% snippet 'snippets/search_form.html', form_id='group-search-form', type='group', query=q, sorting_selected=sort_by_selected, count=page.item_count, placeholder=_('Search groups...'), show_empty=request.params, no_bottom_border=true if page.items, sorting = [(_('Name Ascending'), 'title asc'), (_('Name Descending'), 'title desc')] %}
+  {% endif %}
+{% else %}
+  {{ super() }}
+{% endif %}
+{% endblock %}
+
+{% block groups_list %}
+{% if catalog_org_type == 'area_based' %}
+  {% if request_url.split('/')[-1] != 'group' %}
+    {% if page.items or request.params %}
+      {% if page.items %}
+        {% snippet "group/snippets/group_list.html", groups=page.items %}
+      {% endif %}
+    {% else %}
+      <p class="empty">
+        {{ _('There are currently no groups for this site') }}.
+        {% if h.check_access('group_create') %}
+          {% link_for _('How about creating one?'), named_route=group_type+'.new' %}</a>.
+        {% endif %}
+      </p>
+    {% endif %}
+  {% else %}
+  <style>
+      .imgCategory {
+      width: 72px;
+      padding-top: 13px;
+      vertical-align: middle;
+  }
+  </style>
+  <h1>กลุ่มชุดข้อมูล (Categories)</h1>
+  <div class="col-md-12 col-xs-12 col-sm-12 block_group mrT15">
+      {% for category in category_dict.keys()|sort %}
+      <div class="col-md-2 col-sm-2 col-xs-12 contentCategoryType">
+        <div class="text-center">
+            <div style="height: 90px;">
+                <a href="/{{category}}">
+                    <img class="imgCategory" src="{{category_dict[category]['group_image_url']}}" alt="{{category_dict[category]['group_title']}}">
+                </a>
+            </div>
+            <div class="mrT15">
+                <a href="/{{category}}" title="{{category_dict[category]['group_title']}}">
+                  {{category_dict[category]['group_title']}}
+                </a>
+            </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% else %}
+  {{ super() }}
+{% endif %}
+{% endblock %}
+{% block page_pagination %}
+  {{ page.pager(q=q or '', sort=sort_by_selected or '') }}
+{% endblock %}
+{% endblock %}
