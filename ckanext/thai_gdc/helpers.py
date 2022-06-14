@@ -97,7 +97,17 @@ def get_site_statistics():
     stats = {}
     stats['dataset_count'] = logic.get_action('package_search')(
         {}, {"rows": 1,"include_private":True})['count']
-    stats['group_count'] = len(logic.get_action('group_list')({}, {}))
+    org_type = get_catalog_org_type()
+    if org_type == 'agency':
+        stats['group_count'] = len(logic.get_action('group_list')({}, {}))
+    elif org_type == 'area_based':
+        query = model.Session.query(model.Group) \
+            .filter(model.Group.state == 'active') \
+            .filter(model.Group.type != 'organization') \
+            .filter(model.Group.type != 'group')
+    
+        resultproxy = model.Session.execute(query).fetchall()
+        stats['group_count'] = len(resultproxy)
     stats['organization_count'] = len(
         logic.get_action('organization_list')({}, {}))
     return stats

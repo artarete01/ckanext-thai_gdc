@@ -11,7 +11,7 @@
 
 {% block breadcrumb_content %}
 {% if catalog_org_type == 'area_based' %}
-  {% if request_url.split('/')[-1] != 'group' %}
+  {% if not request.path.startswith('/group') %}
     <li class="active"><a href="/group">{{ _('Groups') }}</a></li><li class="active">{{category_dict[group_type]['group_title']}}</li>
   {% else %}
     <li class="active">{% link_for _('Groups'), named_route=group_type+'.index' %}</li>
@@ -23,7 +23,7 @@
 
 {% block page_primary_action %}
 {% if catalog_org_type == 'area_based' %}
-  {% if request_url.split('/')[-1] != 'group' %}
+  {% if not request.path.startswith('/group') %}
   {% if h.check_access('group_create') %}
     {% link_for _('Add Group'), named_route=group_type+'.new', class_='btn btn-primary', icon='plus-square' %}
   {% endif %}
@@ -37,7 +37,7 @@
 <h1 class="hide-heading">{{ _('Groups') }}</h1>
 {% block groups_search_form %}
 {% if catalog_org_type == 'area_based' %}
-  {% if request_url.split('/')[-1] != 'group' %}
+  {% if not request.path.startswith('/group') %}
     {% snippet 'snippets/search_form.html', form_id='group-search-form', type='group', query=q, sorting_selected=sort_by_selected, count=page.item_count, placeholder=_('Search groups...'), show_empty=request.params, no_bottom_border=true if page.items, sorting = [(_('Name Ascending'), 'title asc'), (_('Name Descending'), 'title desc')] %}
   {% endif %}
 {% else %}
@@ -47,7 +47,7 @@
 
 {% block groups_list %}
 {% if catalog_org_type == 'area_based' %}
-  {% if request_url.split('/')[-1] != 'group' %}
+  {% if not request.path.startswith('/group') %}
     {% if page.items or request.params %}
       {% if page.items %}
         {% snippet "group/snippets/group_list.html", groups=page.items %}
