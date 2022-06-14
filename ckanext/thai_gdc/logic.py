@@ -11,12 +11,24 @@ from ckan.lib.jobs import DEFAULT_QUEUE_NAME
 import ckan.lib.dictization.model_dictize as model_dictize
 from six import string_types
 import ckan.model.misc as misc
+from ckan.common import config
 
 _check_access = logic.check_access
 _get_or_bust = logic.get_or_bust
 NotFound = logic.NotFound
 
 log = logging.getLogger(__name__)
+
+def group_type_patch(context, data_dict):
+    _check_access('sysadmin', context, data_dict)
+    group_id = _get_or_bust(data_dict, 'name')
+    group_type = _get_or_bust(data_dict, 'type')
+    catalog_org_type = config.get('thai_gdc.catalog_org_type', 'agency')
+    if catalog_org_type == 'area_based':
+        model.Session.query(model.Group).filter(model.Group.name == group_id).filter(model.Group.state == 'active').filter(model.Group.is_organization == False).update({"type": group_type})
+        model.Session.commit()
+        return 'success'
+    return
 
 def _tag_search(context, data_dict):
     model = context['model']

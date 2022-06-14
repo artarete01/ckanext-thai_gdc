@@ -18,7 +18,7 @@ import ckan.lib.navl.dictization_functions as df
 from ckan.model.core import State
 
 from ckanext.thai_gdc.logic import (
-    bulk_update_public, dataset_bulk_import, tag_list
+    bulk_update_public, dataset_bulk_import, tag_list, group_type_patch
 )
 
 import logging
@@ -199,7 +199,8 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
         action_functions = {
             'bulk_update_public': bulk_update_public,
             'dataset_bulk_import': dataset_bulk_import,
-            'tag_list': tag_list
+            'tag_list': tag_list,
+            'group_type_patch': group_type_patch,
         }
         return action_functions
 
