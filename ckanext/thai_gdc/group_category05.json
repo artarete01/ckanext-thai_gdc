@@ -1,8 +1,8 @@
 {
   "scheming_version": 1,
   "group_type": "category05",
-  "group_title": "ด้านทรัพยากรธรรมชาติและสิ่งแวดล้อม",
-  "group_image_url": "/base/admin/area_group_logo/gr_environment.png",
+  "group_title": "ด้านสังคมและความมั่นคง",
+  "group_image_url": "/base/admin/area_group_logo/gr_security.png",
   "about_url": "http://github.com/ckan/ckanext-scheming",
   "fields": [
     {

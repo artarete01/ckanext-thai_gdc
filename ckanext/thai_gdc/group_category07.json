@@ -1,8 +1,8 @@
 {
   "scheming_version": 1,
-  "group_type": "category04",
-  "group_title": "ด้านเศรษฐกิจ",
-  "group_image_url": "/base/admin/area_group_logo/gr_economics.png",
+  "group_type": "category07",
+  "group_title": "อื่น ๆ",
+  "group_image_url": "/base/admin/area_group_logo/gr_other.png",
   "about_url": "http://github.com/ckan/ckanext-scheming",
   "fields": [
     {

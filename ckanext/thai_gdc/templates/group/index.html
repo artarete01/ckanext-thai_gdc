@@ -63,7 +63,7 @@
   {% else %}
   <style>
       .imgCategory {
-      width: 72px;
+      width: 90px;
       padding-top: 13px;
       vertical-align: middle;
   }
@@ -73,7 +73,7 @@
       {% for category in category_dict.keys()|sort %}
       <div class="col-md-2 col-sm-2 col-xs-12 contentCategoryType">
         <div class="text-center">
-            <div style="height: 90px;">
+            <div style="height: 110px;">
                 <a href="/{{category}}">
                     <img class="imgCategory" src="{{category_dict[category]['group_image_url']}}" alt="{{category_dict[category]['group_title']}}">
                 </a>
