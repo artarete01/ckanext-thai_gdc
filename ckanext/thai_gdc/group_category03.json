@@ -1,7 +1,7 @@
 {
   "scheming_version": 1,
   "group_type": "category03",
-  "group_title": "ข้อมูลพื้นฐานทางกายภาพ",
+  "group_title": "ด้านกายภาพ",
   "group_image_url": "/base/admin/area_group_logo/gr_location.png",
   "about_url": "http://github.com/ckan/ckanext-scheming",
   "fields": [
