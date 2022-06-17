@@ -61,32 +61,7 @@
       </p>
     {% endif %}
   {% else %}
-  <style>
-      .imgCategory {
-      width: 90px;
-      padding-top: 13px;
-      vertical-align: middle;
-  }
-  </style>
-  <h1>กลุ่มชุดข้อมูล (Categories)</h1>
-  <div class="col-md-12 col-xs-12 col-sm-12 block_group mrT15">
-      {% for category in category_dict.keys()|sort %}
-      <div class="col-md-2 col-sm-2 col-xs-12 contentCategoryType">
-        <div class="text-center">
-            <div style="height: 110px;">
-                <a href="/{{category}}">
-                    <img class="imgCategory" src="{{category_dict[category]['group_image_url']}}" alt="{{category_dict[category]['group_title']}}">
-                </a>
-            </div>
-            <div class="mrT15">
-                <a href="/{{category}}" title="{{category_dict[category]['group_title']}}">
-                  {{category_dict[category]['group_title']}}
-                </a>
-            </div>
-        </div>
-      </div>
-      {% endfor %}
-    </div>
+    {% snippet 'home/snippets/area_based_groups.html', category_dict=category_dict %}
   {% endif %}
 {% else %}
   {{ super() }}

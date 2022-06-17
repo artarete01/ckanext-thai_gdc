@@ -1,0 +1,50 @@
+<style>
+.imgCategory {
+    width: 90px;
+    padding-top: 13px;
+    vertical-align: middle;
+}
+@media (min-width: 768px){
+.seven-cols .col-md-1,
+.seven-cols .col-sm-1,
+.seven-cols .col-lg-1  {
+    width: 100%;
+    *width: 100%;
+}
+}
+@media (min-width: 992px) {
+.seven-cols .col-md-1,
+.seven-cols .col-sm-1,
+.seven-cols .col-lg-1 {
+    width: 14.285714285714285714285714285714%;
+    *width: 14.285714285714285714285714285714%;
+}
+}
+@media (min-width: 1200px) {
+.seven-cols .col-md-1,
+.seven-cols .col-sm-1,
+.seven-cols .col-lg-1 {
+    width: 14.285714285714285714285714285714%;
+    *width: 14.285714285714285714285714285714%;
+}
+}
+</style>
+<h1>กลุ่มชุดข้อมูล (Categories)</h1>
+<div class="row seven-cols">
+    {% for category in category_dict.keys()|sort %}
+    <div class="col-md-1">
+      <div class="text-center">
+          <div style="height: 110px;">
+              <a href="/{{category}}">
+                  <img class="imgCategory" src="{{category_dict[category]['group_image_url']}}" alt="{{category_dict[category]['group_title']}}">
+              </a>
+          </div>
+          <div class="mrT15">
+              <a href="/{{category}}" title="{{category_dict[category]['group_title']}}">
+                {{category_dict[category]['group_title']}}
+              </a>
+          </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
