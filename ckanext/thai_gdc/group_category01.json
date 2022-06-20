@@ -2,7 +2,7 @@
   "scheming_version": 1,
   "group_type": "category01",
   "group_title": "ยุทธศาสตร์ชาติ",
-  "group_image_url": "/base/admin/area_group_logo/gr_develop.png",
+  "group_image_url": "/base/admin/area_group_logo/gr_strategy.png",
   "about_url": "http://github.com/ckan/ckanext-scheming",
   "fields": [
     {
