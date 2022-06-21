@@ -1,6 +1,5 @@
 {% ckan_extends %}
 
-{% set catalog_org_type = h.thai_gdc_get_catalog_org_type() %}
 {% set category_dict = h.scheming_group_schemas() %}
 
 {% block primary_content_inner %}
@@ -44,7 +43,7 @@
   {% endif %}
 
   {% if groups %}
-  {% if catalog_org_type == 'area_based' %}
+  {% if category_dict.keys()|length %}
     <div style="margin-top: 20px;">กลุ่มหลัก :</div>
     <select id="field-add_group-category" name="group_added" style="width:100%">
         {% for category in category_dict.keys()|sort %}
