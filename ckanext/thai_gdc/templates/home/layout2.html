@@ -26,10 +26,9 @@
     <div class="container">
       <div class="row row2">
         {% block featured_group %}
-        {% set catalog_org_type = h.thai_gdc_get_catalog_org_type() %}
         {% set category_dict = h.scheming_group_schemas() %}
-        {% if catalog_org_type == 'area_based' %}
-          {% snippet 'home/snippets/area_based_groups.html', category_dict=category_dict %}
+        {% if category_dict.keys()|length %}
+          {% snippet 'home/snippets/multi_groups.html', category_dict=category_dict %}
         {% else %}
           {% set stats = h.get_site_statistics() %}
           {% snippet 'home/snippets/groups.html', stats=stats %}

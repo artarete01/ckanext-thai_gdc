@@ -23,8 +23,7 @@ def group_type_patch(context, data_dict):
     _check_access('sysadmin', context, data_dict)
     group_id = _get_or_bust(data_dict, 'name')
     group_type = _get_or_bust(data_dict, 'type')
-    catalog_org_type = config.get('thai_gdc.catalog_org_type', 'agency')
-    if catalog_org_type == 'area_based':
+    if config.get('scheming.group_schemas', '') != '':
         model.Session.query(model.Group).filter(model.Group.name == group_id).filter(model.Group.state == 'active').filter(model.Group.is_organization == False).update({"type": group_type})
         model.Session.commit()
         return 'success'
