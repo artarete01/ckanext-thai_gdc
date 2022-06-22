@@ -21,13 +21,16 @@ log = logging.getLogger(__name__)
 
 def group_type_patch(context, data_dict):
     _check_access('sysadmin', context, data_dict)
-    group_id = _get_or_bust(data_dict, 'name')
-    group_type = _get_or_bust(data_dict, 'type')
-    if config.get('scheming.group_schemas', '') != '':
-        model.Session.query(model.Group).filter(model.Group.name == group_id).filter(model.Group.state == 'active').filter(model.Group.is_organization == False).update({"type": group_type})
-        model.Session.commit()
+    try:
+        for patch_dict in data_dict.get('patch_list'):
+            group_id = _get_or_bust(patch_dict, 'name')
+            group_type = _get_or_bust(patch_dict, 'type')
+            if config.get('scheming.group_schemas', '') != '':
+                model.Session.query(model.Group).filter(model.Group.name == group_id).filter(model.Group.state == 'active').filter(model.Group.is_organization == False).update({"type": group_type})
+                model.Session.commit()
         return 'success'
-    return
+    except:
+        return 'fail'
 
 def _tag_search(context, data_dict):
     model = context['model']
