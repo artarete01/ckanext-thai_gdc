@@ -27,7 +27,7 @@
       <div class="row row2">
         {% block featured_group %}
         {% set category_dict = h.scheming_group_schemas() %}
-        {% if category_dict.keys()|length %}
+        {% if category_dict and category_dict.keys()|length %}
           {% snippet 'home/snippets/multi_groups.html', category_dict=category_dict %}
         {% else %}
           {% set stats = h.get_site_statistics() %}
