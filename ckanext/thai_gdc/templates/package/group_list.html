@@ -6,6 +6,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
 <script>
         $(document).ready(function() {
+            {% if category_dict %}
             {% for category in category_dict.keys()|sort %}
                 $('#field-add_group-{{category_dict[category]["group_type"]}}').prop('disabled', 'disabled');
                 $('#field-add_group-{{category_dict[category]["group_type"]}}').hide();
@@ -16,10 +17,12 @@
                 $('#field-add_group-{{category_dict[category]["group_type"]}}').show();
             }
             {% endfor %}
+            {% endif %}
             //$('#field-add_group-category01').prop('disabled', false);
             //$('#field-add_group-category01').show();
             
             $('#field-add_group-category').change(function() {
+            {% if category_dict %}
             {% for category in category_dict.keys()|sort %}
             $('#field-add_group-{{category_dict[category]["group_type"]}}').prop('disabled', 'disabled');
             $('#field-add_group-{{category_dict[category]["group_type"]}}').hide();
@@ -30,6 +33,7 @@
                 $('#field-add_group-{{category_dict[category]["group_type"]}}').show();
             }
             {% endfor %}
+            {% endif %}
         });
         });
         
@@ -43,7 +47,7 @@
   {% endif %}
 
   {% if groups %}
-  {% if category_dict.keys()|length %}
+  {% if category_dict and category_dict.keys()|length %}
     <div style="margin-top: 20px;">กลุ่มหลัก :</div>
     <select id="field-add_group-category" name="group_added" style="width:100%">
         {% for category in category_dict.keys()|sort %}
@@ -54,6 +58,7 @@
     </select>
     <div style="margin-top: 20px;">กลุ่มย่อย :</div>
     <form class="add-to-group" method="post">
+    {% if category_dict %}
       {% for category in category_dict.keys()|sort %}
           {% set groups = h.thai_gdc_get_all_groups_all_type(category_dict[category]['group_type']) %}
           {% if groups %}
@@ -64,6 +69,7 @@
               </select>
           {% endif %}
       {% endfor %}
+    {% endif %}
     <button style="margin-top: 20px;" type="submit" class="btn btn-primary" title="{{ _('Associate this group with this dataset') }}">{{ _('Add to group') }}</button>
     </form>
   {% else %}

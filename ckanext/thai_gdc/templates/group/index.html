@@ -9,7 +9,7 @@
 {% endif %}
 
 {% block breadcrumb_content %}
-{% if category_dict.keys()|length %}
+{% if category_dict and category_dict.keys()|length %}
   {% if not request.path.startswith('/group') %}
     <li class="active"><a href="/group">{{ _('Groups') }}</a></li><li class="active">{{category_dict[group_type]['group_title']}}</li>
   {% else %}
@@ -21,7 +21,7 @@
 {% endblock %}
 
 {% block page_primary_action %}
-{% if category_dict.keys()|length %}
+{% if category_dict and category_dict.keys()|length %}
   {% if not request.path.startswith('/group') %}
   {% if h.check_access('group_create') %}
     {% link_for _('Add Group'), named_route=group_type+'.new', class_='btn btn-primary', icon='plus-square' %}
@@ -35,7 +35,7 @@
 {% block primary_content_inner %}
 <h1 class="hide-heading">{{ _('Groups') }}</h1>
 {% block groups_search_form %}
-{% if category_dict.keys()|length %}
+{% if category_dict and category_dict.keys()|length %}
   {% if not request.path.startswith('/group') %}
     {% snippet 'snippets/search_form.html', form_id='group-search-form', type='group', query=q, sorting_selected=sort_by_selected, count=page.item_count, placeholder=_('Search groups...'), show_empty=request.params, no_bottom_border=true if page.items, sorting = [(_('Name Ascending'), 'title asc'), (_('Name Descending'), 'title desc')] %}
   {% endif %}
@@ -45,7 +45,7 @@
 {% endblock %}
 
 {% block groups_list %}
-{% if category_dict.keys()|length %}
+{% if category_dict and category_dict.keys()|length %}
   {% if not request.path.startswith('/group') %}
     {% if page.items or request.params %}
       {% if page.items %}
