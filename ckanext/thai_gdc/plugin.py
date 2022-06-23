@@ -190,7 +190,8 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
     def get_auth_functions(self):
         auth_functions = {
             'member_create': self.member_create,
-            'user_generate_apikey': self.user_generate_apikey
+            'user_generate_apikey': self.user_generate_apikey,
+            'user_show': self.user_show,
         }
         return auth_functions
     
@@ -203,6 +204,26 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             'group_type_patch': group_type_patch,
         }
         return action_functions
+
+    def user_show(self, context, data_dict):
+        user = context['user']
+
+        # FIXME: We shouldn't have to do a try ... except here, validation should
+        # have ensured that the data_dict contains a valid user id before we get to
+        # authorization.
+        try:
+            user_obj = logic_auth.get_user_object(context, data_dict)
+        except logic.NotFound:
+            return {'success': False, 'msg': _('User not found')}
+            
+        if user == user_obj.name:
+            # Allow users to update their own user accounts.
+            return {'success': True}
+        else:
+            # Don't allow users to update other users' accounts.
+            return {'success': False,
+                    'msg': _('User %s not authorized to edit user %s') %
+                            (user, user_obj.id)}
 
     def member_create(self, context, data_dict):
         """
