@@ -132,7 +132,6 @@ def get_gdcatalog_portal_url():
 
 def get_gdcatalog_version_update():
     gdcatalog_harvester_url = config.get('thai_gdc.gdcatalog_harvester_url')
-    site_url = config.get('ckan.site_url')
     request_proxy = config.get('thai_gdc.proxy_request', None)
     if request_proxy:
         proxies = {
@@ -148,7 +147,7 @@ def get_gdcatalog_version_update():
     try:
         with requests.Session() as s:
             s.verify = False
-            url = 'https://gitlab.nectec.or.th/opend/ckanext-thai_gdc/-/raw/master/ckanext/thai_gdc/public/base/admin/thai-gdc-update.json'
+            url = gdcatalog_harvester_url+'/base/admin/thai-gdc-update.json'
             headers = {'Content-type': 'application/json', 'Authorization': ''}
             res = s.get(url, headers = headers, proxies=proxies)
             log.info(res.text)
