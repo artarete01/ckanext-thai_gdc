@@ -304,7 +304,10 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
         values = value.strip('[]').split(',')
         value_list = ""
         for v in values:
-            value_list = value_list + v.strip(' ').encode('latin-1').decode('unicode-escape')
+            try:
+                value_list = value_list + v.strip(' ').encode('latin-1').decode('unicode-escape')
+            except:
+                value_list = value_list + v
         return "["+value_list.replace('""','","')+"]"
         
     def get_validators(self):
