@@ -235,3 +235,9 @@ msgstr "ยินดีต้อนรับสู่ระบบ Thai-GDC"
 
 msgid "Upload"
 msgstr "อัปโหลด"
+
+msgid "Create by"
+msgstr "สร้างโดย"
+
+msgid "That title is already in use."
+msgstr "ชื่อชุดข้อมูลนี้ถูกใช้แล้ว"
