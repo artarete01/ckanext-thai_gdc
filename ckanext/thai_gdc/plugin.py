@@ -20,7 +20,7 @@ from ckan.model.core import State
 
 # if toolkit.check_ckan_version('2.9'):
 from ckanext.thai_gdc.logic import (
-    bulk_update_public, dataset_bulk_import, tag_list
+    bulk_update_public, dataset_bulk_import, tag_list, group_type_patch
 )
 
 import logging
@@ -79,7 +79,24 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
                 action='user_active',
                 controller='ckanext.thai_gdc.controllers.user:UserManageController',
                 )
-
+            map.connect(
+                'dataset_gdcatalog_state',
+                '/dataset/gdcatalog-state/{package_id}',
+                action='gdcatalog_state',
+                controller='ckanext.thai_gdc.controllers.dataset:DatasetManageController',
+                )
+            map.connect(
+                'organizations_index',
+                '/organization/',
+                action='index',
+                controller='ckanext.thai_gdc.controllers.organization:OrganizationCustomController'
+            )
+            map.connect(
+                'organizations_index',
+                '/organization',
+                action='index',
+                controller='ckanext.thai_gdc.controllers.organization:OrganizationCustomController'
+            )
             return map
     else:
         plugins.implements(plugins.IBlueprint)
@@ -129,8 +146,8 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             add_public_path(asset_path, '/')
         
         config_['ckan.tracking_enabled'] = 'true'
-        config_['scheming.dataset_schemas'] = 'ckanext.thai_gdc:ckan_dataset.json'
-        config_['scheming.presets'] = 'ckanext.thai_gdc:presets.json'
+        config_['scheming.dataset_schemas'] = config_.get('scheming.dataset_schemas','ckanext.thai_gdc:ckan_dataset.json')
+        config_['scheming.presets'] = config_.get('scheming.presets','ckanext.thai_gdc:presets.json')
         config_['ckan.activity_streams_enabled'] = 'true'
         config_['ckan.auth.user_delete_groups'] = 'false'
         config_['ckan.auth.user_delete_organizations'] = 'false'
@@ -148,43 +165,6 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
         config_['thai_gdc.gdcatalog_harvester_url'] = 'https://harvester.gdcatalog.go.th'
         config_['thai_gdc.gdcatalog_status_show'] = 'true'
         config_['thai_gdc.gdcatalog_portal_url'] = 'https://gdcatalog.go.th'
-
-    # def before_map(self, map):
-
-    #     map.connect(
-    #         'banner_edit',
-    #         '/ckan-admin/banner-edit',
-    #         action='edit_banner',
-    #         ckan_icon='wrench',
-    #         controller='ckanext.thai_gdc.controllers.banner:BannerEditController',
-    #         )
-    #     map.connect(
-    #         'dataset_import',
-    #         '/ckan-admin/dataset-import',
-    #         action='import_dataset',
-    #         ckan_icon='cloud-upload',
-    #         controller='ckanext.thai_gdc.controllers.dataset:DatasetImportController',
-    #         )
-    #     map.connect(
-    #         'clear_import_log',
-    #         '/ckan-admin/clear-import-log',
-    #         action='clear_import_log',
-    #         controller='ckanext.thai_gdc.controllers.dataset:DatasetImportController',
-    #         )
-    #     map.connect(
-    #         'dataset_datatype_patch',
-    #         '/dataset/edit-datatype/{package_id}',
-    #         action='datatype_patch',
-    #         controller='ckanext.thai_gdc.controllers.dataset:DatasetManageController',
-    #         )
-    #     map.connect(
-    #         'user_active',
-    #         '/user/edit/user_active',
-    #         action='user_active',
-    #         controller='ckanext.thai_gdc.controllers.user:UserManageController',
-    #         )
-
-    #     return map
 
     def update_config_schema(self, schema):
 
@@ -222,7 +202,7 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
     def get_auth_functions(self):
         auth_functions = {
             'member_create': self.member_create,
-            'user_generate_apikey': self.user_generate_apikey
+            'user_generate_apikey': self.user_generate_apikey,
         }
         return auth_functions
     
@@ -231,7 +211,8 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
         action_functions = {
             'bulk_update_public': bulk_update_public,
             'dataset_bulk_import': dataset_bulk_import,
-            'tag_list': tag_list
+            'tag_list': tag_list,
+            'group_type_patch': group_type_patch,
         }
         return action_functions
 
@@ -302,23 +283,27 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
         import shlex
         if 'q' in search_params:
             q = search_params['q']
-            lelist = ["+","-","&&","||","!","(",")","{","}","[","]","^","~","*","?",":","/"]
+            lelist = ["+","&&","||","!","(",")","{","}","[","]","^","~","*","?",":","/"]
             if len(q) > 0 and len([e for e in lelist if e in q]) == 0:
                 q_list = shlex.split(search_params['q'])
                 q_list_result = []
                 for q_item in q_list:
                     if q_item not in ['AND','OR','NOT'] and not self._isEnglish(q_item):
                         q_item = 'text:*'+q_item+'*'
+                    elif q_item not in ['AND','OR','NOT'] and self._isEnglish(q_item):
+                        q_item = 'text:'+q_item
                     q_list_result.append(q_item)
                 q = ' '.join(q_list_result)
             search_params['q'] = q
         return search_params
     
     def create(self, package):
-        self.modify_package_before(package)
+        if package.type == 'dataset':
+            self.modify_package_before(package)
     
     def edit(self, package):
-        self.modify_package_before(package)
+        if package.type == 'dataset':
+            self.modify_package_before(package)
     
     def modify_package_before(self, package):
         package.state = 'active'
@@ -331,7 +316,10 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
         values = value.strip('[]').split(',')
         value_list = ""
         for v in values:
-            value_list = value_list + v.strip(' ').encode('latin-1').decode('unicode-escape')
+            try:
+                value_list = value_list + v.strip(' ').encode('latin-1').decode('unicode-escape')
+            except:
+                value_list = value_list + v
         return "["+value_list.replace('""','","')+"]"
         
     def get_validators(self):
@@ -372,6 +360,7 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             'thai_gdc_dataset_bulk_import_count': noh.dataset_bulk_import_count,
             'thai_gdc_dataset_bulk_import_log': noh.dataset_bulk_import_log,
             'thai_gdc_get_is_as_a_service': noh.get_is_as_a_service,
+            'thai_gdc_get_gdcatalog_version_update': noh.get_gdcatalog_version_update,
             'get_site_statistics': noh.get_site_statistics
         }
 
@@ -457,7 +446,7 @@ def package_title_validator(key, data, errors, context):
     session = context['session']
     package = context.get('package')
 
-    query = session.query(model.Package.state).filter_by(title=data[key])
+    query = session.query(model.Package.state).filter_by(title=data[key]).filter_by(type='dataset')
     if package:
         package_id = package.id
     else:

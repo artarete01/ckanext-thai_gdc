@@ -229,3 +229,15 @@ msgstr "ไม่สามารถแสดงผล (preview) ไฟล์ข�
 
 msgid "This resource view is not available at the moment."
 msgstr "ไม่สามารถแสดงผล (preview) ไฟล์ข้อมูลนี้ได้"
+
+msgid "Welcome to CKAN"
+msgstr "ยินดีต้อนรับสู่ระบบ Thai-GDC"
+
+msgid "Upload"
+msgstr "อัปโหลด"
+
+msgid "Create by"
+msgstr "สร้างโดย"
+
+msgid "That title is already in use."
+msgstr "ชื่อชุดข้อมูลนี้ถูกใช้แล้ว"

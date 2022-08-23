@@ -1,0 +1,96 @@
+<style>
+    .label {
+      color: white;
+      padding: 8px;
+    }
+    .gdcatalog-warning {
+      background-color: #e56100;
+      margin-left: 10px;
+      margin-right: 0px;
+    }
+    .gdcatalog-success {
+      background-color: #2a612a;
+      margin-right: 0px;
+    }
+  </style>
+  {% set gdcatalog_status_show = h.thai_gdc_get_gdcatalog_status_show() %}
+  {% if gdcatalog_status_show == 'true' and pkg.allow_harvest != 'False' and (not pkg.reference_url_catalog or pkg.reference_url_catalog == '') %}
+  
+    {% set return_state = h.thai_gdc_get_gdcatalog_state('published', pkg.id) %}
+    {% if return_state | length > 0 and 'result' in return_state %}
+      {% set metadata_modified = return_state.get('result')[0]['metadata_modified'] %}
+      {% if metadata_modified != '' %}
+      {% set gdcatalog_portal_url = h.thai_gdc_get_gdcatalog_portal_url() %}
+      <span class="label label-inverse gdcatalog-success">
+        <a href="{{ gdcatalog_portal_url }}/dataset/gdpublish-{{ return_state.get('result')[0]['name'] }}" target="_blank" style="color: white;">
+          <i class="fa fa-check"></i>
+          GD-Catalog: {{ _('COMPLETED') }} เมื่อ {{ h.thai_gdc_day_thai(h.date_str_to_datetime(metadata_modified)) }}
+        </a>
+      </span>
+      {% endif %}
+  
+      {% if h.check_access('package_update', {'id':pkg.id }) %}
+        {% set return_state = h.thai_gdc_get_gdcatalog_state('nonpublish', pkg.id) %}
+        {% set state = return_state.get('result')[0]['governance_state'] %}
+        {% if state != '' %}
+          {% set validate_time = return_state.get('result')[0]['validate_time'] %}
+          {% if state == 'VALIDATE' and validate_time == '' %}
+          <span class="label label-inverse gdcatalog-warning">
+            <i class="fa fa-lock"></i>
+            GD-Catalog: {{ _('WAIT_VALIDATE') }}
+          </span>
+          {% elif state == 'VALIDATE' and validate_time != '' %}
+          <span class="label label-inverse gdcatalog-warning">
+            <i class="fa fa-lock"></i>
+            GD-Catalog: {{ _('VALIDATE') }}
+          </span>
+          {% elif state == 'VALIDATE_MODIFIED' and validate_time == '' %}
+          <span class="label label-inverse gdcatalog-warning">
+            <i class="fa fa-lock"></i>
+            GD-Catalog: {{ _('WAIT_VALIDATE_MODIFIED') }}
+          </span>
+          {% elif state == 'VALIDATE_MODIFIED' and validate_time != '' %}
+          <span class="label label-inverse gdcatalog-warning">
+            <i class="fa fa-lock"></i>
+            GD-Catalog: {{ _('VALIDATE_MODIFIED') }}
+          </span>
+          {% elif state == 'APPROVAL' %}
+          <span class="label label-inverse gdcatalog-warning">
+            <i class="fa fa-lock"></i>
+            GD-Catalog: {{ _('APPROVAL') }}
+          </span>
+          {% elif state == 'WAIT_REVOKE' and validate_time == '' %}
+          <span class="label label-inverse gdcatalog-warning">
+            <i class="fa fa-lock"></i>
+            GD-Catalog: {{ _('WAIT_REVOKE') }}
+          </span>
+          {% elif state == 'WAIT_REVOKE' and validate_time != '' %}
+          <span class="label label-inverse gdcatalog-warning">
+            <i class="fa fa-lock"></i>
+            GD-Catalog: {{ _('VALIDATE_REVOKE') }}
+          </span>
+          {% elif state == 'REVOKE' %}
+          <span class="label label-inverse gdcatalog-warning">
+            <i class="fa fa-lock"></i>
+            GD-Catalog: {{ _('REVOKE') }}
+          </span>
+          {% elif state == 'WAIT' %}
+          <span class="label label-inverse gdcatalog-warning">
+            <i class="fa fa-lock"></i>
+            GD-Catalog: {{ _('WAIT') }}
+          </span>
+          {% elif state == 'REJECT' %}
+          {% set modified_at = return_state.get('result')[0]['metadata_modified'] %}
+          <span class="label label-inverse gdcatalog-warning">
+            <i class="fa fa-lock"></i>
+            {% if h.thai_gdc_convert_string_todate(pkg.metadata_modified, "%Y-%m-%dT%H:%M:%S.%f") > h.thai_gdc_convert_string_todate(modified_at, "%Y-%m-%dT%H:%M:%S.%f") %}
+            GD-Catalog: {{ _('REJECT') }} (ปรับปรุงแล้ว)
+            {% else %}
+            GD-Catalog: {{ _('REJECT') }}
+            {% endif %}
+          </span>
+          {% endif %}
+        {% endif %}
+      {% endif %}
+    {% endif %}
+  {% endif %}

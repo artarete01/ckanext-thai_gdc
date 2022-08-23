@@ -44,6 +44,14 @@
           <td class="dataset-details">{{ _(pkg_dict.state) }}</td>
         </tr>
       {% endif %}
+        {% if pkg_dict.creator_user_id %}
+          <tr>
+            <th scope="row" class="dataset-label">{{ _("Create by") }}</th>
+            <td class="dataset-details">
+              {{ h.linked_user(pkg_dict.creator_user_id,0,0) }}
+            </td>
+          </tr>
+        {% endif %}
         {% if pkg_dict.metadata_created %}
           <tr>
             <th scope="row" class="dataset-label">{{ _("Created") }}</th>

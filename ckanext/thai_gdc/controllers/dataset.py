@@ -15,6 +15,7 @@ import numpy as np
 import re
 from ckanapi import LocalCKAN
 import datetime
+import ckan.lib.base as base
 
 import uuid
 import ckan.plugins.toolkit as toolkit
@@ -39,6 +40,8 @@ import importlib
 
 _validate = dict_fns.validate
 ValidationError = logic.ValidationError
+NotFound = logic.NotFound
+NotAuthorized = logic.NotAuthorized
 
 log = logging.getLogger(__name__)
 
@@ -60,6 +63,12 @@ class DatasetManageController(BaseController):
                 h.redirect_to(controller='dataset', action='read', id=package_id)
             except logic.ValidationError as e:
                 return e
+                
+    def gdcatalog_state(self, package_id):
+        try:
+            pkg_dict = p.toolkit.get_action('package_show')(None, {'id':package_id})
+        except (NotFound, NotAuthorized):
+            return base.abort(404, _(u'Dataset not found'))
 
 class DatasetImportController(BaseController):
 

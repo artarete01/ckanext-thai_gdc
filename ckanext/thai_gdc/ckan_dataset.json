@@ -125,6 +125,7 @@
         "form_placeholder": "department@org.go.th",
         "display_snippet": "email.html",
         "form_data_type": ["ข้อมูลระเบียน","ข้อมูลสถิติ","ข้อมูลภูมิสารสนเทศเชิงพื้นที่","ข้อมูลหลากหลายประเภท","ข้อมูลประเภทอื่นๆ"],
+        "validators": "not_empty email_validator unicode",
         "required": true
       },
       {
