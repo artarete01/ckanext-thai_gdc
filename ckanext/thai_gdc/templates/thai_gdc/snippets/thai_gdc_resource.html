@@ -1,16 +1,34 @@
 {% resource 'thai_gdc/css/thai_gdc.css' %}
-{% if 'fuchsia.css' in g.main_css %}
-    {% resource 'thai_gdc/css/thai_gdc_fuchsia.css' %}
-{% endif %}
-{% if 'green.css' in g.main_css %}
-    {% resource 'thai_gdc/css/thai_gdc_green.css' %}
-{% endif %}
-{% if 'main.css' in g.main_css %}
-    {% resource 'thai_gdc/css/thai_gdc_main.css' %}
-{% endif %}
-{% if 'maroon.css' in g.main_css %}
-    {% resource 'thai_gdc/css/thai_gdc_maroon.css' %}
-{% endif %}
-{% if 'red.css' in g.main_css %}
-    {% resource 'thai_gdc/css/thai_gdc_red.css' %}
+{% if h.ckan_version().split('.')[1] | int <= 9 and h.ckan_version().split('.')[2] | int < 6 %}
+    {% if 'fuchsia.css' in g.main_css %}
+        {% resource 'thai_gdc/css/thai_gdc_fuchsia.css' %}
+    {% endif %}
+    {% if 'green.css' in g.main_css %}
+        {% resource 'thai_gdc/css/thai_gdc_green.css' %}
+    {% endif %}
+    {% if 'main.css' in g.main_css %}
+        {% resource 'thai_gdc/css/thai_gdc_main.css' %}
+    {% endif %}
+    {% if 'maroon.css' in g.main_css %}
+        {% resource 'thai_gdc/css/thai_gdc_maroon.css' %}
+    {% endif %}
+    {% if 'red.css' in g.main_css %}
+        {% resource 'thai_gdc/css/thai_gdc_red.css' %}
+    {% endif %}
+{% else %}
+    {% if 'fuchsia.css' in g.theme %}
+        {% resource 'thai_gdc/css/thai_gdc_fuchsia.css' %}
+    {% endif %}
+    {% if 'green.css' in g.theme %}
+        {% resource 'thai_gdc/css/thai_gdc_green.css' %}
+    {% endif %}
+    {% if 'main.css' in g.theme %}
+        {% resource 'thai_gdc/css/thai_gdc_main.css' %}
+    {% endif %}
+    {% if 'maroon.css' in g.theme %}
+        {% resource 'thai_gdc/css/thai_gdc_maroon.css' %}
+    {% endif %}
+    {% if 'red.css' in g.theme %}
+        {% resource 'thai_gdc/css/thai_gdc_red.css' %}
+    {% endif %}
 {% endif %}
