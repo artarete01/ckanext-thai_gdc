@@ -4,7 +4,7 @@
 
 {{ super() }}
 
-  {% if h.check_access('resource_create', {'id':pkg.id }) %}
+  {% if h.check_access('package_update', {'id':pkg.id }) %}
     {% if h.ckan_version() > '2.9' %}
       {% link_for _('Add new resource'), named_route=c.pkg_dict.type ~ '_resource.new', id=c.pkg_dict.name, class_='btn btn-default', icon='plus' %}
     {% else %}
