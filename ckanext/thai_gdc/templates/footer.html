@@ -9,29 +9,23 @@
                         <div class="col-md-7 col-sm-7 col-xs-12">
                             <div class="row">
                                 <div class="col-md-12 col-sm-12 col-xs-12">
-                                    <table>
-                                        <tr>
-                                            <td style="vertical-align:top"><i class="fa fa-map-marker iconFooter" aria-hidden="true"></i></td>
-                                            <td style="vertical-align:top">{{ h.render_markdown(g.site_org_address) }}</td>
-                                        </tr>
-                                    </table>
+                                    <div class="row" style="display: flex;">
+                                            <div style="vertical-align:top" class="column"><em class="fa fa-map-marker iconFooter"></em></div>
+                                            <div style="vertical-align:top" class="column">{{ h.render_markdown(g.site_org_address) }}</div>
+                                    </div>
                                 </div>
 
                                 <div class="col-md-12 col-sm-12 col-xs-12 mt-1">
-                                    <table>
-                                        <tr>
-                                            <td style="vertical-align:top"><i class="fa fa-phone iconFooter" aria-hidden="true"></i></td>
-                                            <td style="vertical-align:top">{{ h.render_markdown(g.site_org_contact) }}</td>
-                                        </tr>
-                                    </table>
+                                    <div class="row" style="display: flex;">
+                                            <div style="vertical-align:top" class="column"><em class="fa fa-phone iconFooter"></em></div>
+                                            <div style="vertical-align:top" class="column">{{ h.render_markdown(g.site_org_contact) }}</div>
+                                    </div>
                                 </div>
                                 <div class="col-md-12 col-sm-12 col-xs-12 mt-1">
-                                    <table>
-                                        <tr>
-                                            <td style="vertical-align:top"><i class="fa fa-envelope iconFooter" aria-hidden="true"></i></td>
-                                            <td style="vertical-align:top">{{ h.render_markdown(g.site_org_email) }}</td>
-                                        </tr>
-                                    </table>
+                                    <div class="row" style="display: flex;">
+                                            <div style="vertical-align:top" class="column"><em class="fa fa-envelope iconFooter"></em></div>
+                                            <div style="vertical-align:top" class="column">{{ h.render_markdown(g.site_org_email) }}</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -52,14 +46,14 @@
                                     {% snippet "snippets/language_selector.html" %}
                                 {% endblock %}
                                 <div class="col-md-12 col-sm-12 col-xs-12" style="display: flex;justify-content: space-between;padding-left: 0px;margin-top: 10px;">
-                                    <span><span style="font-weight: bold;vertical-align: bottom;margin-right: 5px;color:rgba(255,255,255,0.85);">Powered by:</span><a class="hide-text ckan-footer-logo" href="http://ckan.org" target="_blank" style="padding-right: 5px;"><img src="/base/images/ckan-logo-footer.png"></a>
-                                        <a href="https://gitlab.nectec.or.th/opend/installing-ckan/-/blob/master/README.md" target="_blank"><img src="/base/images/logo-opend.png" style="width: 50px;opacity: 0.8;"></a>
+                                    <span><span style="font-weight: bold;vertical-align: bottom;margin-right: 5px;">Powered by:</span><a class="hide-text ckan-footer-logo" href="http://ckan.org" target="_blank" style="padding-right: 5px;"><img alt="CKAN logo" src="/base/images/ckan-logo-footer.png"></a>
+                                        <a href="https://gitlab.nectec.or.th/opend/installing-ckan/-/blob/master/README.md" target="_blank"><img alt="OpenD logo" src="/base/images/logo-opend.png" style="width: 50px;opacity: 0.8;"></a>
                                         <br/>
-                                        <span style="font-weight: bold;vertical-align: bottom;margin-right: 5px;color:rgba(255,255,255,0.85);line-height: 2;">สนับสนุนระบบ Thai-GDC โดย สำนักงานสถิติแห่งชาติ</span>
+                                        <span style="font-weight: bold;vertical-align: bottom;margin-right: 5px;line-height: 2;">สนับสนุนระบบ Thai-GDC โดย สำนักงานสถิติแห่งชาติ</span>
                                     </span>
                                 <span>
-                                    <small style="vertical-align: sub;">รุ่นโปรแกรม: {{h.thai_gdc_get_extension_version('version')}}</small><br/>
-                                    <small style="vertical-align: sub;line-height: 2.6;">วันที่: {{h.thai_gdc_get_extension_version('date')}}</small>
+                                    <small style="vertical-align: sub;color: #ffffff;">รุ่นโปรแกรม: {{h.thai_gdc_get_extension_version('version')}}</small><br/>
+                                    <small style="vertical-align: sub;line-height: 2.6;color: #ffffff;">วันที่: {{h.thai_gdc_get_extension_version('date')}}</small>
                                 </span>
                                 </div>
                                 {% endblock %}

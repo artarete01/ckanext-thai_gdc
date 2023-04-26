@@ -107,7 +107,7 @@
         "field_name": "maintainer",
         "label": {
           "en": "Contact Person",
-          "th": "ชื่อผู้ติดต่อ"
+          "th": "ชื่อหน่วยงาน"
         },
         "form_placeholder": {
           "en": "Organization name",
@@ -120,7 +120,7 @@
         "field_name": "maintainer_email",
         "label": {
           "en": "Contact Email",
-          "th": "อีเมลผู้ติดต่อ"
+          "th": "อีเมลหน่วยงาน"
         },
         "form_placeholder": "department@org.go.th",
         "display_snippet": "email.html",
@@ -1255,6 +1255,29 @@
         "label": "Description",
         "form_snippet": "markdown.html",
         "form_placeholder": "Some useful notes about the data",
+        "form_data_type": ["ข้อมูลระเบียน","ข้อมูลสถิติ","ข้อมูลภูมิสารสนเทศเชิงพื้นที่","ข้อมูลหลากหลายประเภท","ข้อมูลประเภทอื่นๆ"]
+      },
+      {
+        "field_name": "resource_private",
+        "label": "การเข้าถึง",
+        "choices": [
+          {
+            "value": "False",
+            "label": {
+              "en": "Public",
+              "th": "สาธารณะ"
+            }
+          },
+          {
+            "value": "True",
+            "label": {
+              "en": "Private",
+              "th": "ส่วนตัว"
+            }
+          }
+        ],
+        "form_snippet": "select.html",
+        "display_snippet": "select.html",
         "form_data_type": ["ข้อมูลระเบียน","ข้อมูลสถิติ","ข้อมูลภูมิสารสนเทศเชิงพื้นที่","ข้อมูลหลากหลายประเภท","ข้อมูลประเภทอื่นๆ"]
       },
       {

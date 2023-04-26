@@ -3,9 +3,28 @@
 {% block header_account_logged %}
 <li>
   <a href="/user" title="{{ _('User') }}">
-    <i class="fa fa-user" aria-hidden="true"></i>
+    <i class="fa fa-user"></i>
     <span class="text">{{ _('User') }}</span>
   </a>
 </li>
   {{ super() }}
+{% endblock %}
+
+{% block header_logo %} {% if g.site_logo %}
+      <a class="logo" href="{{ h.url_for('home.index') }}"><img src="{{ h.url_for_static_or_external(g.site_logo) }}" alt="Data Catalog logo" /></a>
+      {% else %}
+      <h1>
+        <a href="{{ h.url_for('home.index') }}">{{ g.site_title }}</a>
+      </h1>
+      {% if g.site_description %}
+      <h2>{{ g.site_description }}</h2>{% endif %} {% endif %} {% endblock %}
+
+{% block header_site_search %}
+  <form class="section site-search simple-input" action="{% url_for 'dataset.search' %}" method="get">
+    <div class="field">
+      <label for="field-sitewide-search">{% block header_site_search_label %}{{ _('Search Datasets') }}{% endblock %}</label>
+      <input id="field-sitewide-search" type="text" class="form-control" name="q" placeholder="{{ _('Search') }}"/>
+      <button class="btn-search" type="submit" aria-label="Submit to search dataset"><em class="fa fa-search"></em></button>
+    </div>
+  </form>
 {% endblock %}

@@ -119,10 +119,10 @@ def get_opend_playground_url():
     return config.get('thai_gdc.opend_playground_url')
 
 def get_catalog_org_type():
-    return config.get('thai_gdc.catalog_org_type', 'agency')
+    return config.get('thai_gdc.catalog_org_type')
 
 def get_is_as_a_service():
-    return config.get('thai_gdc.is_as_a_service', 'false')
+    return config.get('thai_gdc.is_as_a_service')
 
 def get_gdcatalog_status_show():
     return config.get('thai_gdc.gdcatalog_status_show')
@@ -337,3 +337,17 @@ def get_all_groups_all_type(type=None):
     return [[group['id'], group['display_name']]
                             for group in user_groups if
                             group['id'] not in pkg_group_ids]
+
+def users_in_organization(organization_id):
+    ''' users in organization '''
+    query = model.Session.query(model.Member) \
+        .filter(model.Member.state == 'active') \
+        .filter(model.Member.table_name == 'user') \
+        .filter(model.Member.group_id == organization_id)
+    users = query.all()
+    context = {'model': model,
+                    'user': c.user, 'auth_user_obj': c.userobj}
+    users_list = []
+    for user in users:
+        users_list.append(model_dictize.member_dictize(user, context))
+    return users_list

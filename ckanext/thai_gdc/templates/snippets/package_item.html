@@ -63,7 +63,13 @@
             {% block resources_outer %}
               <ul class="dataset-resources list-unstyled">
                 {% block resources_inner %}
-                  {% for resource in h.dict_list_reduce(package.resources, 'format') %}
+                  {% set auth_resources=[] %}
+                  {% for resource in package.resources %}
+                    {% if h.check_access('resource_show', {'id':resource.id }) %}
+                      {%- do auth_resources.append({'format': resource.format}) -%}
+                    {% endif %}
+                  {% endfor %}
+                  {% for resource in h.dict_list_reduce(auth_resources, 'format') %}
                   <li>
                     {% if h.ckan_version() > '2.9' %}
                     <a href="{{ h.url_for(package.type ~ '.read', id=package.name) }}" class="label label-default" data-format="{{ resource.lower() }}">{{ resource }}</a>

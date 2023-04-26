@@ -16,9 +16,10 @@ from ckan.model import (MAX_TAG_LENGTH, MIN_TAG_LENGTH, PACKAGE_NAME_MIN_LENGTH)
 from ckanext.thai_gdc import helpers as noh
 import ckan.lib.navl.dictization_functions as df
 from ckan.model.core import State
+import ckan.model as model
 
 from ckanext.thai_gdc.logic import (
-    bulk_update_public, dataset_bulk_import, tag_list, group_type_patch
+    bulk_update_public, dataset_bulk_import, tag_list, group_type_patch, status_show
 )
 
 import logging
@@ -46,6 +47,18 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
         facets_dict['data_type'] = toolkit._('Dataset Type') #ประเภทชุดข้อมูล
         facets_dict['data_category'] = toolkit._('Data Category') #หมวดหมู่ตามธรรมาภิบาลข้อมูล
         return facets_dict
+
+    # IPackageController
+
+    def after_show(item, context, data_dict):
+        resources = []
+        for resource_dict in data_dict['resources']:
+            logic_authorization = authz.is_authorized('resource_show', context, resource_dict)
+            if logic_authorization['success']:
+                resources.append(resource_dict)
+        data_dict['resources'] = resources
+        data_dict['num_resources'] = len(data_dict['resources'])
+        return
 
     # IResourceController
     def before_show(self, res_dict):
@@ -91,11 +104,13 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
         config_['ckan.group_and_organization_list_max'] = '200'
         config_['ckan.datasets_per_page'] = '30'
         config_['ckan.jobs.timeout'] = '3600'
-        config_['ckan.recline.dataproxy_url'] = 'https://dataproxy.gdcatalog.go.th'
-        config_['thai_gdc.opend_playground_url'] = 'https://opend-playground.gdcatalog.go.th'
-        config_['thai_gdc.gdcatalog_harvester_url'] = 'https://harvester.gdcatalog.go.th'
-        config_['thai_gdc.gdcatalog_status_show'] = 'true'
-        config_['thai_gdc.gdcatalog_portal_url'] = 'https://gdcatalog.go.th'
+        config_['ckan.recline.dataproxy_url'] = config_.get('ckan.recline.dataproxy_url','https://dataproxy.gdcatalog.go.th')
+        config_['thai_gdc.opend_playground_url'] = config_.get('thai_gdc.opend_playground_url','https://opend-playground.gdcatalog.go.th')
+        config_['thai_gdc.gdcatalog_harvester_url'] = config_.get('thai_gdc.gdcatalog_harvester_url','https://harvester.gdcatalog.go.th')
+        config_['thai_gdc.gdcatalog_status_show'] = config_.get('thai_gdc.gdcatalog_status_show','true')
+        config_['thai_gdc.gdcatalog_portal_url'] = config_.get('thai_gdc.gdcatalog_portal_url','https://gdcatalog.go.th')
+        config_['thai_gdc.catalog_org_type'] = config_.get('thai_gdc.catalog_org_type','agency') #agency/area_based/data_center
+        config_['thai_gdc.is_as_a_service'] = config_.get('thai_gdc.is_as_a_service', 'false')
 
     def before_map(self, map):
 
@@ -191,6 +206,7 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
         auth_functions = {
             'member_create': self.member_create,
             'user_generate_apikey': self.user_generate_apikey,
+            'resource_show': self.resource_show,
         }
         return auth_functions
     
@@ -201,8 +217,39 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             'dataset_bulk_import': dataset_bulk_import,
             'tag_list': tag_list,
             'group_type_patch': group_type_patch,
+            'status_show': status_show
         }
         return action_functions
+
+    @toolkit.auth_allow_anonymous_access
+    def resource_show(self, context, data_dict):
+        model = context['model']
+        user = context.get('user')
+        resource = logic_auth.get_resource_object(context, data_dict)
+
+        # check authentication against package
+        pkg = model.Package.get(resource.package_id)
+        if not pkg:
+            raise logic.NotFound(_('No package found for this resource, cannot check auth.'))
+
+        pkg_dict = {'id': pkg.id}
+
+        authorized = authz.is_authorized('package_update', context, pkg_dict).get('success')
+        try:
+            res = model.Resource.get(data_dict['id'])
+            res_private = res.extras['resource_private']
+        except:
+            res_private = ''
+
+        if res_private == "True" and not authorized:
+            return {'success': False, 'msg': _('User %s not authorized to read resource %s') % (user, resource.id)}
+
+        authorized = authz.is_authorized('package_show', context, pkg_dict).get('success')
+
+        if not authorized:
+            return {'success': False, 'msg': _('User %s not authorized to read resource %s') % (user, resource.id)}
+        else:
+            return {'success': True}
 
     def member_create(self, context, data_dict):
         """
@@ -247,6 +294,19 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
         #     return {'success': True}
         return {'success': False, 'msg': _('User {0} not authorized to update user'
                 ' {1}'.format(user, user_obj.id))}
+    
+    def after_search(self, search_results, pkg_dict):
+        if toolkit.c.action == 'action':
+            package_list = search_results['results']
+            for package_dict in package_list:
+                show_resources = []
+                for resource_dict in package_dict.get('resources',[]):
+                    if resource_dict.get('resource_private','') != "True":
+                        show_resources.append(resource_dict)
+                package_dict['resources'] = show_resources
+                package_dict['num_resources'] = len(package_dict['resources'])
+        
+        return search_results
     
     def before_view(self, pkg_dict):
         try:
@@ -349,6 +409,7 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             'thai_gdc_dataset_bulk_import_log': noh.dataset_bulk_import_log,
             'thai_gdc_get_is_as_a_service': noh.get_is_as_a_service,
             'thai_gdc_get_gdcatalog_version_update': noh.get_gdcatalog_version_update,
+            'thai_gdc_users_in_organization': noh.users_in_organization,
             'get_site_statistics': noh.get_site_statistics
         }
 

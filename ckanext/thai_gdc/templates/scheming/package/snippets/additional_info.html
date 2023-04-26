@@ -13,7 +13,7 @@
         {% block package_additional_info %}
 
         {% set catalog_org_type = h.thai_gdc_get_catalog_org_type() %}
-        {% if catalog_org_type == 'area_based' %}
+        {% if catalog_org_type == 'area_based' or catalog_org_type == 'data_center' %}
         <tr>
           <th scope="row" class="dataset-label">
             {{ _('Reference URL Catalog') }}</th>
