@@ -69,11 +69,11 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
     # IConfigurer
     def update_config(self, config_):
         if toolkit.check_ckan_version(max_version='2.9'):
-            toolkit.add_ckan_admin_tab(config_, 'banner_edit', 'Banner Editor')
-            toolkit.add_ckan_admin_tab(config_, 'dataset_import', 'Dataset Importer')
+            toolkit.add_ckan_admin_tab(config_, 'banner_edit', 'แก้ไขแบนเนอร์')
+            toolkit.add_ckan_admin_tab(config_, 'dataset_import', 'นำเข้ารายการชุดข้อมูล')
         else:
-            toolkit.add_ckan_admin_tab(config_, 'banner_edit', 'Banner Editor', icon='wrench')
-            toolkit.add_ckan_admin_tab(config_, 'dataset_import', 'Dataset Importer', icon='cloud-upload')
+            toolkit.add_ckan_admin_tab(config_, 'banner_edit', 'แก้ไขแบนเนอร์', icon='wrench')
+            toolkit.add_ckan_admin_tab(config_, 'dataset_import', 'นำเข้ารายการชุดข้อมูล', icon='cloud-upload')
         toolkit.add_template_directory(config_, 'templates')
         toolkit.add_public_directory(config_, 'public')
         toolkit.add_public_directory(config_, 'fanstatic')

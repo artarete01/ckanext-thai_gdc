@@ -19,21 +19,23 @@
               {% endblock %}
             </div>
           </div>
-        </div>
-  </div>
-  </div>
-  <div role="main">
-    <div class="container">
-      <div class="row row2">
-        {% block featured_group %}
-        {% set category_dict = h.scheming_group_schemas() %}
-        {% if category_dict and category_dict.keys()|length %}
-          {% snippet 'home/snippets/multi_groups.html', category_dict=category_dict %}
-        {% else %}
-          {% set stats = h.get_site_statistics() %}
-          {% snippet 'home/snippets/groups.html', stats=stats %}
-        {% endif %}
-        {% endblock %}
       </div>
+  </div>
+</div>
+<div role="main">
+  <div class="container">
+    <div class="row row2">
+      {% block featured_group %}
+      {% set category_dict = h.scheming_group_schemas() %}
+      {% if category_dict and category_dict.keys()|length %}
+        {% snippet 'home/snippets/multi_groups.html', category_dict=category_dict %}
+      {% else %}
+        {% set stats = h.get_site_statistics() %}
+        {% snippet 'home/snippets/groups.html', stats=stats %}
+      {% endif %}
+      {% endblock %}
     </div>
   </div>
+</div>
+{% block layout_extra %}
+{% endblock %}
