@@ -130,6 +130,9 @@ def get_gdcatalog_status_show():
 def get_gdcatalog_portal_url():
     return config.get('thai_gdc.gdcatalog_portal_url')
 
+def get_gdcatalog_apiregister_url():
+    return config.get('thai_gdc.gdcatalog_apiregister_url')
+
 def get_gdcatalog_version_update():
     gdcatalog_harvester_url = config.get('thai_gdc.gdcatalog_harvester_url')
     request_proxy = config.get('thai_gdc.proxy_request', None)
@@ -351,3 +354,32 @@ def users_in_organization(organization_id):
     for user in users:
         users_list.append(model_dictize.member_dictize(user, context))
     return users_list
+
+def get_suggest_view(resources):
+    suggest_view_list = []
+    for rs in resources:
+        if rs.get('resource_private','') != "True":
+            view_list = toolkit.get_action('resource_view_list')(data_dict={'id': rs['id']})
+
+            for v in view_list:
+                v_des = v['description'].strip()
+
+                if len(v_des) > 0 and v_des[0] == '*':
+                    suggest_view_list.append({
+                        'title': v['title'],
+                        'resource_id': v['resource_id'],
+                        'view_id': v['id']
+                    })
+
+    return suggest_view_list
+
+
+def get_conf_group(conf_group):
+    try:
+        conf = toolkit.get_action('gdc_agency_get_conf_group')(data_dict={'conf_group': conf_group})
+        if 'EVENT_IMAGE' in conf.keys() and conf['EVENT_IMAGE'].strip() != '' \
+                and not conf['EVENT_IMAGE'].startswith('http'):
+            conf['EVENT_IMAGE'] = '/uploads/admin/{}'.format(conf['EVENT_IMAGE'])
+        return conf
+    except:
+        return {}

@@ -134,7 +134,13 @@
           "en": "Tags",
           "th": "คำสำคัญ"
         },
-        "preset": "tag_string_autocomplete",
+        "form_snippet": "tag_string.html",
+        "validators": "ignore_missing tag_string_convert",
+        "classes": ["control-full"],
+        "form_attrs": {
+          "data-module": "autocomplete",
+          "data-module-tags": ""
+        },
         "form_placeholder": "eg. economy, mental health, government",
         "form_data_type": ["ข้อมูลระเบียน","ข้อมูลสถิติ","ข้อมูลภูมิสารสนเทศเชิงพื้นที่","ข้อมูลหลากหลายประเภท","ข้อมูลประเภทอื่นๆ"],
         "required": true
@@ -1253,31 +1259,8 @@
       {
         "field_name": "description",
         "label": "Description",
-        "form_snippet": "markdown.html",
+        "form_snippet": "description.html",
         "form_placeholder": "Some useful notes about the data",
-        "form_data_type": ["ข้อมูลระเบียน","ข้อมูลสถิติ","ข้อมูลภูมิสารสนเทศเชิงพื้นที่","ข้อมูลหลากหลายประเภท","ข้อมูลประเภทอื่นๆ"]
-      },
-      {
-        "field_name": "resource_private",
-        "label": "การเข้าถึง",
-        "choices": [
-          {
-            "value": "False",
-            "label": {
-              "en": "Public",
-              "th": "สาธารณะ"
-            }
-          },
-          {
-            "value": "True",
-            "label": {
-              "en": "Private",
-              "th": "ส่วนตัว"
-            }
-          }
-        ],
-        "form_snippet": "select.html",
-        "display_snippet": "select.html",
         "form_data_type": ["ข้อมูลระเบียน","ข้อมูลสถิติ","ข้อมูลภูมิสารสนเทศเชิงพื้นที่","ข้อมูลหลากหลายประเภท","ข้อมูลประเภทอื่นๆ"]
       },
       {

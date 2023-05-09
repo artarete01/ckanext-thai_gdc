@@ -20,7 +20,7 @@ CKAN Extension เพื่อสนับสนุนการจัดทำ G
 Requirements
 ------------
 
-สามารถติดตั้งร่วมกับ CKAN 2.9.1 ขึ้นไป โดยจำเป็นต้องติดตั้ง Extensions เหล่านี้ก่อน 
+สามารถติดตั้งร่วมกับ CKAN 2.9.5 ขึ้นไป ที่ติดตั้งโดยใช้ Python 2.x โดยจำเป็นต้องติดตั้ง Extensions เหล่านี้ก่อน
 
 - `ckanext-scheming <https://gitlab.nectec.or.th/opend/installing-ckan/-/blob/master/ckan-extension.md#2-ckanext-scheming>`_
 - `ckanext-hierarchy <https://gitlab.nectec.or.th/opend/installing-ckan/-/blob/master/ckan-extension.md#3-ckanext-hierarchy>`_

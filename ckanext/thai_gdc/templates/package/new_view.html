@@ -45,9 +45,12 @@
         return decodeURIComponent(results[1].replace(/\+/g, " "));
       }
       
-      var url      = window.location.href; 
-      $('#field-page_url').val(getParameterByName("playground_url", url));
-      document.getElementById("field-title").focus();
+      var url      = window.location.href;
+      var playground_url = getParameterByName("playground_url", url)
+      if(playground_url) { 
+        $('#field-page_url').val(playground_url);
+        document.getElementById("field-title").focus();
+      }
     }); 
   
   </script>

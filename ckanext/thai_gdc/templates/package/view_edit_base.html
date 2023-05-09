@@ -10,7 +10,7 @@
   {% else %}
     {{ super() }}
   {% endif %}
-  {% if (to_preview and h.resource_view_display_preview(resource_view)) or (h.resource_view_display_preview(resource_view) and data.page_url and not errors) %}
+  {% if (request.params | length > 0) and ((to_preview and h.resource_view_display_preview(resource_view)) or (h.resource_view_display_preview(resource_view) and data.page_url and not errors)) %}
     <div class="row wrapper no-nav view-preview-container">
       <section class="module module-narrow module-shallow">
         <h2 class="module-heading">

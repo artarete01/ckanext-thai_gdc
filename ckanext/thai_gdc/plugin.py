@@ -3,30 +3,21 @@
 
 import ckan.plugins as plugins
 import ckan.plugins.toolkit as toolkit
-from ckan.common import _, c
+from ckan.common import _
 
 import ckan.authz as authz
-import ckan.logic.auth as logic_auth
 from ckan.lib.plugins import DefaultTranslation
 from ckan import logic
-import re
-from itertools import count
-from six import string_types
-from ckan.model import (MAX_TAG_LENGTH, MIN_TAG_LENGTH, PACKAGE_NAME_MIN_LENGTH)
-from ckanext.thai_gdc import helpers as noh
-import ckan.lib.navl.dictization_functions as df
-from ckan.model.core import State
-import ckan.model as model
 
-from ckanext.thai_gdc.logic import (
-    bulk_update_public, dataset_bulk_import, tag_list, group_type_patch, status_show
-)
+from six import string_types
+
+from actions import exporter_action, popup_action, opend_action
+from ckanext.thai_gdc import helpers as thai_gdc_h
+from ckanext.thai_gdc import auth as thai_gdc_auth
+from ckanext.thai_gdc import validation as thai_gdc_validator
 
 import logging
 import os
-
-Invalid = df.Invalid
-missing = df.missing
 
 log = logging.getLogger(__name__)
 
@@ -42,14 +33,14 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
     plugins.implements(plugins.IFacets, inherit=True)
     plugins.implements(plugins.IActions)
 
+    # IFacets
     def dataset_facets(self, facets_dict, package_type):
-
         facets_dict['data_type'] = toolkit._('Dataset Type') #ประเภทชุดข้อมูล
         facets_dict['data_category'] = toolkit._('Data Category') #หมวดหมู่ตามธรรมาภิบาลข้อมูล
+        facets_dict['private'] = toolkit._('Visibility') #การเข้าถึง
         return facets_dict
 
     # IPackageController
-
     def after_show(item, context, data_dict):
         resources = []
         for resource_dict in data_dict['resources']:
@@ -60,10 +51,83 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
         data_dict['num_resources'] = len(data_dict['resources'])
         return
 
+    def after_search(self, search_results, pkg_dict):
+        if toolkit.c.action == 'action' and toolkit.c.controller == 'api':
+            package_list = search_results['results']
+            for package_dict in package_list:
+                show_resources = []
+                for resource_dict in package_dict.get('resources',[]):
+                    if resource_dict.get('resource_private','') != "True":
+                        show_resources.append(resource_dict)
+                package_dict['resources'] = show_resources
+                package_dict['num_resources'] = len(package_dict['resources'])
+        return search_results
+
+    def before_view(self, pkg_dict):
+        try:
+            context = {'ignore_auth': True}
+            pkg_dict = logic.get_action("package_show")(context, {
+                'include_tracking': True,
+                'id': pkg_dict['id']
+            })
+        except:
+            log.info('before_view error')
+        return pkg_dict
+
+    def _isEnglish(self, s):
+        try:
+            s.encode(encoding='utf-8').decode('ascii')
+        except UnicodeDecodeError:
+            return False
+        else:
+            return True
+
+    def before_search(self, search_params):
+        import shlex
+        if 'q' in search_params:
+            q = search_params['q']
+            lelist = ["+","-","&&","||","!","(",")","{","}","[","]","^","~","*","?",":","/"]
+            if len(q) > 0 and len([e for e in lelist if e in q]) == 0:
+                q_list = shlex.split(search_params['q'])
+                q_list_result = []
+                for q_item in q_list:
+                    if q_item not in ['AND','OR','NOT'] and not self._isEnglish(q_item):
+                        q_item = 'text:*'+q_item+'*'
+                    elif q_item not in ['AND','OR','NOT'] and self._isEnglish(q_item):
+                        q_item = 'text:'+q_item
+                    q_list_result.append(q_item)
+                q = ' '.join(q_list_result)
+            search_params['q'] = q
+        return search_params
+
+    def _unicode_string_convert(self, value):
+        values = value.strip('[]').split(',')
+        value_list = ""
+        for v in values:
+            try:
+                value_list = value_list + v.strip(' ').encode('latin-1').decode('unicode-escape')
+            except:
+                value_list = value_list + v
+        return "["+value_list.replace('""','","')+"]"
+
+    def _modify_package_before(self, package):
+        package.state = 'active'
+
+        for extra in package.extras_list:
+            if extra.key == 'objective' and isinstance(extra.value, string_types):
+                extra.value = self._unicode_string_convert(extra.value)
+
+    def create(self, package):
+        if package.type == 'dataset':
+            self._modify_package_before(package)
+
+    def edit(self, package):
+        if package.type == 'dataset':
+            self._modify_package_before(package)
+
     # IResourceController
     def before_show(self, res_dict):
         res_dict['created_at'] = res_dict.get('created')
-
         return res_dict
 
     # IConfigurer
@@ -71,9 +135,14 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
         if toolkit.check_ckan_version(max_version='2.9'):
             toolkit.add_ckan_admin_tab(config_, 'banner_edit', 'แก้ไขแบนเนอร์')
             toolkit.add_ckan_admin_tab(config_, 'dataset_import', 'นำเข้ารายการชุดข้อมูล')
+            toolkit.add_ckan_admin_tab(config_, 'gdc_agency_admin_export', 'ส่งออกรายการชุดข้อมูล')
+            toolkit.add_ckan_admin_tab(config_, 'gdc_agency_admin_popup', 'ป็อปอัพ')
         else:
             toolkit.add_ckan_admin_tab(config_, 'banner_edit', 'แก้ไขแบนเนอร์', icon='wrench')
             toolkit.add_ckan_admin_tab(config_, 'dataset_import', 'นำเข้ารายการชุดข้อมูล', icon='cloud-upload')
+            toolkit.add_ckan_admin_tab(config_, 'gdc_agency_admin_export', 'ส่งออกรายการชุดข้อมูล', icon='cloud-download')
+            toolkit.add_ckan_admin_tab(config_, 'gdc_agency_admin_popup', 'ป็อปอัพ', icon='window-maximize')
+
         toolkit.add_template_directory(config_, 'templates')
         toolkit.add_public_directory(config_, 'public')
         toolkit.add_public_directory(config_, 'fanstatic')
@@ -100,8 +169,8 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
         config_['ckan.locale_default'] = 'th'
         config_['ckan.locale_order'] = 'en th pt_BR ja it cs_CZ ca es fr el sv sr sr@latin no sk fi ru de pl nl bg ko_KR hu sa sl lv'
         config_['ckan.datapusher.formats'] = 'csv xls xlsx tsv application/csv application/vnd.ms-excel application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        config_['ckan.group_and_organization_list_all_fields_max'] = '200'
-        config_['ckan.group_and_organization_list_max'] = '200'
+        config_['ckan.group_and_organization_list_all_fields_max'] = '300'
+        config_['ckan.group_and_organization_list_max'] = '300'
         config_['ckan.datasets_per_page'] = '30'
         config_['ckan.jobs.timeout'] = '3600'
         config_['ckan.recline.dataproxy_url'] = config_.get('ckan.recline.dataproxy_url','https://dataproxy.gdcatalog.go.th')
@@ -111,69 +180,11 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
         config_['thai_gdc.gdcatalog_portal_url'] = config_.get('thai_gdc.gdcatalog_portal_url','https://gdcatalog.go.th')
         config_['thai_gdc.catalog_org_type'] = config_.get('thai_gdc.catalog_org_type','agency') #agency/area_based/data_center
         config_['thai_gdc.is_as_a_service'] = config_.get('thai_gdc.is_as_a_service', 'false')
-
-    def before_map(self, map):
-
-        map.connect(
-            'banner_edit',
-            '/ckan-admin/banner-edit',
-            action='edit_banner',
-            ckan_icon='wrench',
-            controller='ckanext.thai_gdc.controllers.banner:BannerEditController',
-            )
-        map.connect(
-            'dataset_import',
-            '/ckan-admin/dataset-import',
-            action='import_dataset',
-            ckan_icon='cloud-upload',
-            controller='ckanext.thai_gdc.controllers.dataset:DatasetImportController',
-            )
-        map.connect(
-            'clear_import_log',
-            '/ckan-admin/clear-import-log',
-            action='clear_import_log',
-            controller='ckanext.thai_gdc.controllers.dataset:DatasetImportController',
-            )
-        map.connect(
-            'dataset_datatype_patch',
-            '/dataset/edit-datatype/{package_id}',
-            action='datatype_patch',
-            controller='ckanext.thai_gdc.controllers.dataset:DatasetManageController',
-            )
-        map.connect(
-            'user_active',
-            '/user/edit/user_active',
-            action='user_active',
-            controller='ckanext.thai_gdc.controllers.user:UserManageController',
-            )
-        map.connect(
-            'dataset_gdcatalog_state',
-            '/dataset/gdcatalog-state/{package_id}',
-            action='gdcatalog_state',
-            controller='ckanext.thai_gdc.controllers.dataset:DatasetManageController',
-            )
-        
-        map.connect(
-            'organizations_index',
-            '/organization/',
-            action='index',
-            controller='ckanext.thai_gdc.controllers.organization:OrganizationCustomController'
-        )
-
-        map.connect(
-            'organizations_index',
-            '/organization',
-            action='index',
-            controller='ckanext.thai_gdc.controllers.organization:OrganizationCustomController'
-        )
-
-        return map
+        config_['thai_gdc.gdcatalog_apiregister_url'] = config_.get('thai_gdc.gdcatalog_apiregister_url', 'https://apiregister.gdcatalog.go.th')
 
     def update_config_schema(self, schema):
-
         ignore_missing = toolkit.get_validator('ignore_missing')
         unicode_safe = toolkit.get_validator('unicode_safe')
-
         schema.update({
             'ckan.site_org_address': [ignore_missing, unicode_safe],
             'ckan.site_org_contact': [ignore_missing, unicode_safe],
@@ -198,308 +209,151 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             'ckan.import_row': [ignore_missing, unicode_safe],
             'ckan.import_params': [ignore_missing, unicode_safe],
         })
-
         return schema
+
+    # IRoutes
+    def before_map(self, map):
+        map.connect(
+            'banner_edit',
+            '/ckan-admin/banner-edit',
+            action='edit_banner',
+            ckan_icon='wrench',
+            controller='ckanext.thai_gdc.controllers.banner:BannerEditController',
+        )
+        map.connect(
+            'dataset_import',
+            '/ckan-admin/dataset-import',
+            action='import_dataset',
+            ckan_icon='cloud-upload',
+            controller='ckanext.thai_gdc.controllers.dataset:DatasetImportController',
+        )
+        map.connect(
+            'clear_import_log',
+            '/ckan-admin/clear-import-log',
+            action='clear_import_log',
+            controller='ckanext.thai_gdc.controllers.dataset:DatasetImportController',
+        )
+        map.connect(
+            'dataset_datatype_patch',
+            '/dataset/edit-datatype/{package_id}',
+            action='datatype_patch',
+            controller='ckanext.thai_gdc.controllers.dataset:DatasetManageController',
+        )
+        map.connect(
+            'user_active',
+            '/user/edit/user_active',
+            action='user_active',
+            controller='ckanext.thai_gdc.controllers.user:UserManageController',
+        )
+        map.connect(
+            'dataset_gdcatalog_state',
+            '/dataset/gdcatalog-state/{package_id}',
+            action='gdcatalog_state',
+            controller='ckanext.thai_gdc.controllers.dataset:DatasetManageController',
+        )
+        map.connect(
+            'organizations_index',
+            '/organization/',
+            action='index',
+            controller='ckanext.thai_gdc.controllers.organization:OrganizationCustomController'
+        )
+        map.connect(
+            'organizations_index',
+            '/organization',
+            action='index',
+            controller='ckanext.thai_gdc.controllers.organization:OrganizationCustomController'
+        )
+        map.connect(
+            'gdc_agency_admin_export',
+            '/ckan-admin/dataset-export',
+            action='index',
+            ckan_icon='file',
+            controller='ckanext.thai_gdc.controllers.export_package:ExportPackageController'
+        )
+        map.connect(
+            'gdc_agency_admin_download',
+            '/ckan-admin/dataset-export/{id:.*|}',
+            action='download',
+            ckan_icon='file',
+            controller='ckanext.thai_gdc.controllers.export_package:ExportPackageController'
+        )
+        map.connect(
+            'gdc_agency_admin_popup',
+            '/ckan-admin/dataset-popup',
+            action='index',
+            ckan_icon='file',
+            controller='ckanext.thai_gdc.controllers.popup:PopupController'
+        )
+        return map
 
     # IAuthFunctions
     def get_auth_functions(self):
         auth_functions = {
-            'member_create': self.member_create,
-            'user_generate_apikey': self.user_generate_apikey,
-            'resource_show': self.resource_show,
+            'member_create': thai_gdc_auth.member_create,
+            'user_generate_apikey': thai_gdc_auth.user_generate_apikey,
+            'resource_show': thai_gdc_auth.resource_show,
+            'package_delete': thai_gdc_auth.package_delete,
         }
         return auth_functions
-    
+
     # IActionFunctions
     def get_actions(self):
         action_functions = {
-            'bulk_update_public': bulk_update_public,
-            'dataset_bulk_import': dataset_bulk_import,
-            'tag_list': tag_list,
-            'group_type_patch': group_type_patch,
-            'status_show': status_show
+            'bulk_update_public': opend_action.bulk_update_public,
+            'dataset_bulk_import': opend_action.dataset_bulk_import,
+            'tag_list': opend_action.tag_list,
+            'group_type_patch': opend_action.group_type_patch,
+            'status_show': opend_action.status_show,
+            'gdc_agency_export_package': exporter_action.package,
+            'gdc_agency_get_conf_group': popup_action.get_conf_group,
+            'gdc_agency_update_conf_group': popup_action.update_conf_group,
         }
         return action_functions
 
-    @toolkit.auth_allow_anonymous_access
-    def resource_show(self, context, data_dict):
-        model = context['model']
-        user = context.get('user')
-        resource = logic_auth.get_resource_object(context, data_dict)
-
-        # check authentication against package
-        pkg = model.Package.get(resource.package_id)
-        if not pkg:
-            raise logic.NotFound(_('No package found for this resource, cannot check auth.'))
-
-        pkg_dict = {'id': pkg.id}
-
-        authorized = authz.is_authorized('package_update', context, pkg_dict).get('success')
-        try:
-            res = model.Resource.get(data_dict['id'])
-            res_private = res.extras['resource_private']
-        except:
-            res_private = ''
-
-        if res_private == "True" and not authorized:
-            return {'success': False, 'msg': _('User %s not authorized to read resource %s') % (user, resource.id)}
-
-        authorized = authz.is_authorized('package_show', context, pkg_dict).get('success')
-
-        if not authorized:
-            return {'success': False, 'msg': _('User %s not authorized to read resource %s') % (user, resource.id)}
-        else:
-            return {'success': True}
-
-    def member_create(self, context, data_dict):
-        """
-        This code is largely borrowed from /src/ckan/ckan/logic/auth/create.py
-        With a modification to allow users to add datasets to any group
-        :param context:
-        :param data_dict:
-        :return:
-        """
-        group = logic_auth.get_group_object(context, data_dict)
-        user = context['user']
-
-        # User must be able to update the group to add a member to it
-        permission = 'update'
-        # However if the user is member of group then they can add/remove datasets
-        if not group.is_organization and data_dict.get('object_type') == 'package':
-            permission = 'manage_group'
-
-        if c.controller in ['package', 'dataset'] and c.action in ['groups']:
-            authorized = noh.user_has_admin_access(include_editor_access=True)
-            # Fallback to the default CKAN behaviour
-            if not authorized:
-                authorized = authz.has_user_permission_for_group_or_org(group.id,
-                                                                        user,
-                                                                        permission)
-        else:
-            authorized = authz.has_user_permission_for_group_or_org(group.id,
-                                                                    user,
-                                                                    permission)
-        if not authorized:
-            return {'success': False,
-                    'msg': _('User %s not authorized to edit group %s') %
-                           (str(user), group.id)}
-        else:
-            return {'success': True}
-        
-    def user_generate_apikey(self, context, data_dict):
-        user = context['user']
-        user_obj = logic_auth.get_user_object(context, data_dict)
-        # if user == user_obj.name:
-        #     # Allow users to update only their own user accounts.
-        #     return {'success': True}
-        return {'success': False, 'msg': _('User {0} not authorized to update user'
-                ' {1}'.format(user, user_obj.id))}
-    
-    def after_search(self, search_results, pkg_dict):
-        if toolkit.c.action == 'action':
-            package_list = search_results['results']
-            for package_dict in package_list:
-                show_resources = []
-                for resource_dict in package_dict.get('resources',[]):
-                    if resource_dict.get('resource_private','') != "True":
-                        show_resources.append(resource_dict)
-                package_dict['resources'] = show_resources
-                package_dict['num_resources'] = len(package_dict['resources'])
-        
-        return search_results
-    
-    def before_view(self, pkg_dict):
-        try:
-            context = {'ignore_auth': True}
-            pkg_dict = logic.get_action("package_show")(context, {
-                'include_tracking': True,
-                'id': pkg_dict['id']
-            })
-        except:
-            log.info('before_view error')
-        return pkg_dict
-    
-    def _isEnglish(self, s):
-        try:
-            s.encode(encoding='utf-8').decode('ascii')
-        except UnicodeDecodeError:
-            return False
-        else:
-            return True
-    
-    def before_search(self, search_params):
-        import shlex
-        if 'q' in search_params:
-            q = search_params['q']
-            lelist = ["+","&&","||","!","(",")","{","}","[","]","^","~","*","?",":","/"]
-            if len(q) > 0 and len([e for e in lelist if e in q]) == 0:
-                q_list = shlex.split(search_params['q'])
-                q_list_result = []
-                for q_item in q_list:
-                    if q_item not in ['AND','OR','NOT'] and not self._isEnglish(q_item):
-                        q_item = 'text:*'+q_item+'*'
-                    elif q_item not in ['AND','OR','NOT'] and self._isEnglish(q_item):
-                        q_item = 'text:'+q_item
-                    q_list_result.append(q_item)
-                q = ' '.join(q_list_result)
-            search_params['q'] = q
-        return search_params
-    
-    def create(self, package):
-        if package.type == 'dataset':
-            self.modify_package_before(package)
-    
-    def edit(self, package):
-        if package.type == 'dataset':
-            self.modify_package_before(package)
-    
-    def modify_package_before(self, package):
-        package.state = 'active'
-
-        for extra in package.extras_list:
-            if extra.key == 'objective' and isinstance(extra.value, string_types):
-                extra.value = self.unicode_string_convert(extra.value)
-    
-    def unicode_string_convert(self, value):
-        values = value.strip('[]').split(',')
-        value_list = ""
-        for v in values:
-            try:
-                value_list = value_list + v.strip(' ').encode('latin-1').decode('unicode-escape')
-            except:
-                value_list = value_list + v
-        return "["+value_list.replace('""','","')+"]"
-        
+    # IValidators
     def get_validators(self):
         return {
-            'tag_name_validator': tag_name_validator,
-            'tag_length_validator': tag_length_validator,
-            'tag_string_convert': tag_string_convert,
-            'package_name_validator': package_name_validator,
-            'package_title_validator': package_title_validator,
+            'tag_name_validator': thai_gdc_validator.tag_name_validator,
+            'tag_length_validator': thai_gdc_validator.tag_length_validator,
+            'tag_string_convert': thai_gdc_validator.tag_string_convert,
+            'package_name_validator': thai_gdc_validator.package_name_validator,
+            'package_title_validator': thai_gdc_validator.package_title_validator,
         }
     
+    # ITemplateHelpers
     def get_helpers(self):
         return {
-            'thai_gdc_get_organizations': noh.get_organizations,
-            'thai_gdc_get_groups': noh.get_groups,
-            'thai_gdc_get_resource_download': noh.get_resource_download,
-            'thai_gdc_day_thai': noh.day_thai,
-            'thai_gdc_get_stat_all_view': noh.get_stat_all_view,
-            'thai_gdc_get_last_update_tracking': noh.get_last_update_tracking,
-            'thai_gdc_facet_chart': noh.facet_chart,
-            'thai_gdc_get_page': noh.get_page,
-            'thai_gdc_get_recent_view_for_package': noh.get_recent_view_for_package,
-            'thai_gdc_get_featured_pages': noh.get_featured_pages,
-            'thai_gdc_get_all_groups': noh.get_all_groups,
-            'thai_gdc_get_all_groups_all_type': noh.get_all_groups_all_type,
-            'thai_gdc_get_action': noh.get_action,
-            'thai_gdc_get_extension_version': noh.get_extension_version,
-            'thai_gdc_get_users_deleted': noh.get_users_deleted,
-            'thai_gdc_get_users_non_member': noh.get_users_non_member,
-            'thai_gdc_get_gdcatalog_state': noh.get_gdcatalog_state,
-            'thai_gdc_get_opend_playground_url': noh.get_opend_playground_url,
-            'thai_gdc_get_catalog_org_type': noh.get_catalog_org_type,
-            'thai_gdc_get_gdcatalog_status_show': noh.get_gdcatalog_status_show,
-            'thai_gdc_get_gdcatalog_portal_url': noh.get_gdcatalog_portal_url,
-            'thai_gdc_convert_string_todate': noh.convert_string_todate,
-            'thai_gdc_get_group_color': noh.get_group_color,
-            'thai_gdc_dataset_bulk_import_status': noh.dataset_bulk_import_status,
-            'thai_gdc_dataset_bulk_import_count': noh.dataset_bulk_import_count,
-            'thai_gdc_dataset_bulk_import_log': noh.dataset_bulk_import_log,
-            'thai_gdc_get_is_as_a_service': noh.get_is_as_a_service,
-            'thai_gdc_get_gdcatalog_version_update': noh.get_gdcatalog_version_update,
-            'thai_gdc_users_in_organization': noh.users_in_organization,
-            'get_site_statistics': noh.get_site_statistics
+            'thai_gdc_get_organizations': thai_gdc_h.get_organizations,
+            'thai_gdc_get_groups': thai_gdc_h.get_groups,
+            'thai_gdc_get_resource_download': thai_gdc_h.get_resource_download,
+            'thai_gdc_day_thai': thai_gdc_h.day_thai,
+            'thai_gdc_get_stat_all_view': thai_gdc_h.get_stat_all_view,
+            'thai_gdc_get_last_update_tracking': thai_gdc_h.get_last_update_tracking,
+            'thai_gdc_facet_chart': thai_gdc_h.facet_chart,
+            'thai_gdc_get_page': thai_gdc_h.get_page,
+            'thai_gdc_get_recent_view_for_package': thai_gdc_h.get_recent_view_for_package,
+            'thai_gdc_get_featured_pages': thai_gdc_h.get_featured_pages,
+            'thai_gdc_get_all_groups': thai_gdc_h.get_all_groups,
+            'thai_gdc_get_all_groups_all_type': thai_gdc_h.get_all_groups_all_type,
+            'thai_gdc_get_action': thai_gdc_h.get_action,
+            'thai_gdc_get_extension_version': thai_gdc_h.get_extension_version,
+            'thai_gdc_get_users_deleted': thai_gdc_h.get_users_deleted,
+            'thai_gdc_get_users_non_member': thai_gdc_h.get_users_non_member,
+            'thai_gdc_get_gdcatalog_state': thai_gdc_h.get_gdcatalog_state,
+            'thai_gdc_get_opend_playground_url': thai_gdc_h.get_opend_playground_url,
+            'thai_gdc_get_catalog_org_type': thai_gdc_h.get_catalog_org_type,
+            'thai_gdc_get_gdcatalog_status_show': thai_gdc_h.get_gdcatalog_status_show,
+            'thai_gdc_get_gdcatalog_portal_url': thai_gdc_h.get_gdcatalog_portal_url,
+            'thai_gdc_get_gdcatalog_apiregister_url': thai_gdc_h.get_gdcatalog_apiregister_url,
+            'thai_gdc_convert_string_todate': thai_gdc_h.convert_string_todate,
+            'thai_gdc_get_group_color': thai_gdc_h.get_group_color,
+            'thai_gdc_dataset_bulk_import_status': thai_gdc_h.dataset_bulk_import_status,
+            'thai_gdc_dataset_bulk_import_count': thai_gdc_h.dataset_bulk_import_count,
+            'thai_gdc_dataset_bulk_import_log': thai_gdc_h.dataset_bulk_import_log,
+            'thai_gdc_get_is_as_a_service': thai_gdc_h.get_is_as_a_service,
+            'thai_gdc_get_gdcatalog_version_update': thai_gdc_h.get_gdcatalog_version_update,
+            'thai_gdc_users_in_organization': thai_gdc_h.users_in_organization,
+            'gdc_agency_get_suggest_view': thai_gdc_h.get_suggest_view,
+            'gdc_agency_get_conf_group': thai_gdc_h.get_conf_group,
+            'get_site_statistics': thai_gdc_h.get_site_statistics
         }
-
-def tag_name_validator(value, context):
-
-    tagname_match = re.compile('[ก-๙\w \-.]*', re.UNICODE)
-    #if not tagname_match.match(value):
-    if isinstance(value, str):
-        value = value.decode('utf8')
-    if not tagname_match.match(value, re.U):
-        raise Invalid(_('Tag "%s" must be alphanumeric '
-                        'characters or symbols: -_.') % (value))
-    return value
-
-def tag_length_validator(value, context):
-    if isinstance(value, str):
-        value = value.decode('utf8')
-    if len(value) < MIN_TAG_LENGTH:
-        raise Invalid(
-            _('Tag "%s" length is less than minimum %s') % (value, MIN_TAG_LENGTH)
-        )
-    if len(value) > MAX_TAG_LENGTH:
-        raise Invalid(
-            _('Tag "%s" length is more than maximum %i') % (value, MAX_TAG_LENGTH)
-        )
-    return value
-
-def tag_string_convert(key, data, errors, context):
-    '''Takes a list of tags that is a comma-separated string (in data[key])
-    and parses tag names. These are added to the data dict, enumerated. They
-    are also validated.'''
-
-    if isinstance(data[key], string_types):
-        tags = [tag.strip() \
-                for tag in data[key].split(',') \
-                if tag.strip()]
-    else:
-        tags = data[key]
-    
-    if not len(tags):
-        raise Invalid(_('Tag "%s" must be alphanumeric '
-                        'characters or symbols: -_.') % (''))
-
-    current_index = max( [int(k[1]) for k in data.keys() if len(k) == 3 and k[0] == 'tags'] + [-1] )
-
-    for num, tag in zip(count(current_index+1), tags):
-        data[('tags', num, 'name')] = tag
-
-    for tag in tags:
-        tag_length_validator(tag, context)
-        tag_name_validator(tag, context)
-    
-def package_name_validator(key, data, errors, context):
-    model = context['model']
-    session = context['session']
-    package = context.get('package')
-
-    query = session.query(model.Package.state).filter_by(name=data[key])
-    if package:
-        package_id = package.id
-    else:
-        package_id = data.get(key[:-1] + ('id',))
-    if package_id and package_id is not missing:
-        query = query.filter(model.Package.id != package_id)
-    result = query.first()
-    if result and result.state != State.DELETED:
-        errors[key].append(_('That URL is already in use.'))
-
-    value = data[key]
-    if len(value) < PACKAGE_NAME_MIN_LENGTH:
-        raise Invalid(
-            _('Name "%s" length is less than minimum %s') % (value, PACKAGE_NAME_MIN_LENGTH)
-        )
-    if len(value) > 70:
-        raise Invalid(
-            _('Name "%s" length is more than maximum %s') % (value, 70)
-        )
-    
-def package_title_validator(key, data, errors, context):
-    model = context['model']
-    session = context['session']
-    package = context.get('package')
-
-    query = session.query(model.Package.state).filter_by(title=data[key]).filter_by(type='dataset')
-    if package:
-        package_id = package.id
-    else:
-        package_id = data.get(key[:-1] + ('id',))
-    if package_id and package_id is not missing:
-        query = query.filter(model.Package.id != package_id)
-    result = query.first()
-    if result and result.state != State.DELETED:
-        errors[key].append(_('That title is already in use.'))
