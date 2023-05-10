@@ -52,15 +52,18 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
         return
 
     def after_search(self, search_results, pkg_dict):
-        if toolkit.c.action == 'action' and toolkit.c.controller == 'api':
-            package_list = search_results['results']
-            for package_dict in package_list:
-                show_resources = []
-                for resource_dict in package_dict.get('resources',[]):
-                    if resource_dict.get('resource_private','') != "True":
-                        show_resources.append(resource_dict)
-                package_dict['resources'] = show_resources
-                package_dict['num_resources'] = len(package_dict['resources'])
+        try:
+            if toolkit.c.action == 'action' and toolkit.c.controller == 'api':
+                package_list = search_results['results']
+                for package_dict in package_list:
+                    show_resources = []
+                    for resource_dict in package_dict.get('resources',[]):
+                        if resource_dict.get('resource_private','') != "True":
+                            show_resources.append(resource_dict)
+                    package_dict['resources'] = show_resources
+                    package_dict['num_resources'] = len(package_dict['resources'])
+        except:
+            return search_results
         return search_results
 
     def before_view(self, pkg_dict):
