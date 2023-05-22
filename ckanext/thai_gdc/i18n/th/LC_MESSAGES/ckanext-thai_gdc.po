@@ -221,6 +221,9 @@ msgstr "อยู่ระหว่างกระบวนการเพิก
 msgid "REVOKE"
 msgstr "อยู่ระหว่างกระบวนการเพิกถอน"
 
+msgid "DELETED"
+msgstr "เพิกถอนแล้ว"
+
 msgid "Reference URL Catalog"
 msgstr "อ้างอิง URL Catalog"
 

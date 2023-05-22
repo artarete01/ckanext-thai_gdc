@@ -89,7 +89,7 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
         import shlex
         if 'q' in search_params:
             q = search_params['q']
-            lelist = ["+","-","&&","||","!","(",")","{","}","[","]","^","~","*","?",":","/"]
+            lelist = ["+","&&","||","!","(",")","{","}","[","]","^","~","*","?",":","/"]
             if len(q) > 0 and len([e for e in lelist if e in q]) == 0:
                 q_list = shlex.split(search_params['q'])
                 q_list_result = []
@@ -356,6 +356,7 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             'thai_gdc_get_is_as_a_service': thai_gdc_h.get_is_as_a_service,
             'thai_gdc_get_gdcatalog_version_update': thai_gdc_h.get_gdcatalog_version_update,
             'thai_gdc_users_in_organization': thai_gdc_h.users_in_organization,
+            'thai_gdc_get_popular_datasets': thai_gdc_h.get_popular_datasets,
             'gdc_agency_get_suggest_view': thai_gdc_h.get_suggest_view,
             'gdc_agency_get_conf_group': thai_gdc_h.get_conf_group,
             'get_site_statistics': thai_gdc_h.get_site_statistics

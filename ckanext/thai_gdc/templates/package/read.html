@@ -17,7 +17,7 @@
   }
 </style>
 {% set gdcatalog_status_show = h.thai_gdc_get_gdcatalog_status_show() %}
-{% if gdcatalog_status_show == 'true' and pkg.allow_harvest != 'False' and (not pkg.reference_url_catalog or pkg.reference_url_catalog == '') %}
+{% if gdcatalog_status_show == 'true' and pkg.type == 'dataset' and pkg.allow_harvest != 'False' and (not pkg.reference_url_catalog or pkg.reference_url_catalog == '') %}
 <div class="text-right" style="margin-bottom: 20px;">
   {% set return_state = h.thai_gdc_get_gdcatalog_state('published', pkg.id) %}
   {% if return_state | length > 0 and 'result' in return_state %}
@@ -81,6 +81,11 @@
         <span class="label label-inverse gdcatalog-warning">
           <i class="fa fa-lock"></i>
           GD-Catalog: {{ _('WAIT') }}
+        </span>
+        {% elif state == 'DELETED' %}
+        <span class="label label-inverse gdcatalog-warning">
+          <i class="fa fa-lock"></i>
+          GD-Catalog: {{ _('DELETED') }}
         </span>
         {% elif state == 'REJECT' %}
         {% set modified_at = return_state.get('result')[0]['metadata_modified'] %}

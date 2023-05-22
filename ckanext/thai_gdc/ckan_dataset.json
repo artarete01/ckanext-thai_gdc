@@ -444,8 +444,12 @@
             "label": "HTML"
           },
           {
+            "value": "DOC/DOCX",
+            "label": "DOC/DOCX"
+          },
+          {
             "value": "XLS",
-            "label": "XLS"
+            "label": "XLS/XLSX"
           },
           {
             "value": "PDF",

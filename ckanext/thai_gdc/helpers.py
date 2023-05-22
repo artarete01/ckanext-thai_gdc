@@ -383,3 +383,17 @@ def get_conf_group(conf_group):
         return conf
     except:
         return {}
+
+def get_popular_datasets(limit):
+    package_list = []
+
+    result_pkg_list = toolkit.get_action('package_search')(data_dict={'sort': 'views_recent desc','rows':limit})
+    log.info(result_pkg_list)
+    for item in result_pkg_list['results']:
+        result_pkg = toolkit.get_action('package_show')(data_dict={'id': item['id'],'include_tracking':'true'})
+        package_list.append({
+            'name': item['name'],
+            'title': item['title'],
+            'recent_view': result_pkg['tracking_summary']['recent']})
+
+    return package_list
