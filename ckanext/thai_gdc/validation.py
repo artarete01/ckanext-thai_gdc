@@ -75,6 +75,8 @@ def package_name_validator(key, data, errors, context):
     result = query.first()
     if result and result.state != State.DELETED:
         errors[key].append(_('That URL is already in use.'))
+    elif result and result.state == State.DELETED:
+        errors[key].append(_('That URL is already in trash.'))
 
     value = data[key]
     if len(value) < PACKAGE_NAME_MIN_LENGTH:

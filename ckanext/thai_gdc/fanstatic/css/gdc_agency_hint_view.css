@@ -7,10 +7,10 @@
 .gdc-field-hint-icon {
     font-size: 11px;
     font-weight: normal;
-    background-color: #5b6ea5;
+    background-color: #c7c9ce;
+    color: #ffff;
     border: none;
-    color: #FFF;
-    padding: 0px 7px;
+    padding: 2px 7px 0px;
     border-radius: 50px;
     margin: 0px 5px;
     user-select: none;
@@ -37,7 +37,15 @@
     box-shadow: rgba(17, 17, 26, 0.1) 0px 4px 16px, rgba(17, 17, 26, 0.1) 0px 8px 24px, rgba(17, 17, 26, 0.1) 0px 16px 56px;
 }
 
+@media (max-width: 580px) {
+    .gdc-field-hint-tooltip {
+        width: 225px;
+    }
+}
+
+
 .gdc-field-hint-tooltip.active {
     transform: scale(1);
     opacity: 1;
 }
+

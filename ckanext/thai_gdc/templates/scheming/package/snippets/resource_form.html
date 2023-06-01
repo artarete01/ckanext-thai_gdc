@@ -16,6 +16,11 @@
   might not be compatible with ckanext-scheming
   </p>
 {%- endif -%}
+{% resource 'thai_gdc/js/gdc_agency_hint_form.js' %}
+{% resource 'thai_gdc/css/gdc_agency_hint_form.css' %}
+{% set gdcatalog_portal_url = h.thai_gdc_get_gdcatalog_portal_url() %}
+<span data-module="gdc_agency_hint_form"
+    data-module-des_url="{{ gdcatalog_portal_url }}/gdplus/metadata_desc.json" data-module-cat="resource_metadata"></span>
 {%- set schema = h.scheming_get_dataset_schema(dataset_type) -%}
 {%- for field in schema.resource_fields -%}
   {%- if field.form_snippet is not none -%}

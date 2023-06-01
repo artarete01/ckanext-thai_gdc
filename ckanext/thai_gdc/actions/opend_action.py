@@ -31,7 +31,7 @@ def status_show(context, data_dict):
         'thaigdc_catalog_type': config.get('thai_gdc.catalog_org_type'),
         'thaigdc_is_as_a_service': config.get('thai_gdc.is_as_a_service'),
         'thaigdc_version': thai_gdc_h.get_extension_version('version'),
-        'thaigdc_update': {"scheming":config.get('thaigdc.scheming.extension_update_date',''), "xloader":config.get('thaigdc.xloader.extension_update_date',''), "discovery":config.get('thaigdc.discovery.extension_update_date','')},
+        'thaigdc_update': {"thai_gdc":thai_gdc_h.get_extension_version('date'), "scheming":config.get('thaigdc.scheming.extension_update_date',''), "xloader":config.get('thaigdc.xloader.extension_update_date',''), "discovery":config.get('thaigdc.discovery.extension_update_date','')},
         'ckan_version': ckan.__version__,
         'error_emails_to': config.get('email_to'),
         'locale_default': config.get('ckan.locale_default'),
