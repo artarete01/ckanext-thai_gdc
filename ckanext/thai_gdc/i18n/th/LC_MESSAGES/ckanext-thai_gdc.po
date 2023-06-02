@@ -221,6 +221,9 @@ msgstr "อยู่ระหว่างกระบวนการเพิก
 msgid "REVOKE"
 msgstr "อยู่ระหว่างกระบวนการเพิกถอน"
 
+msgid "DELETED"
+msgstr "เพิกถอนแล้ว"
+
 msgid "Reference URL Catalog"
 msgstr "อ้างอิง URL Catalog"
 
@@ -241,3 +244,24 @@ msgstr "สร้างโดย"
 
 msgid "That title is already in use."
 msgstr "ชื่อชุดข้อมูลนี้ถูกใช้แล้ว"
+
+msgid "Export"
+msgstr "ส่งออก"
+
+msgid "Recommend"
+msgstr "แนะนำ"
+
+msgid "Event image"
+msgstr "รูปภาพวันสำคัญ"
+
+msgid "External TEXT URL"
+msgstr "ข้อความ URL"
+
+msgid "External URL"
+msgstr "URL ภายนอก"
+
+msgid "Show Home Page"
+msgstr "แสดงในหน้าหลัก"
+
+msgid "Show"
+msgstr "แสดง"

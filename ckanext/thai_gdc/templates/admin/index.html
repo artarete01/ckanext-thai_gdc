@@ -5,37 +5,38 @@
   <div class="col-md-8">
     {% set top_nodes = h.group_tree(type_='organization') %}
     {% set use_longnames = False %}
+
     <ul class="hierarchy-tree-top" style="margin-top: 5px;">
-      {% for node in top_nodes recursive %}
-      {#% set longname = h.group_tree_get_longname(node.name) %#}
+  {% for node in top_nodes recursive %}
+      {% set longname = h.group_tree_get_longname(node.name, type_='organization') %}
       {% set display_text = node.title %}
-      {#% if use_longnames and longname%#}
-      {#% set display_text = longname + " (" + display_text + ")" %#}
-      {#% endif %#}
+      {% if use_longnames and longname%}
+          {% set display_text = longname + " (" + display_text + ")" %}
+      {% endif %}
       {% if node.highlighted %}
-      <li class="highlighted" id="node_{{ node.name }}">
-        {% else %}
-      <li id="node_{{ node.name }}">
-        {% endif %}
-        <a href="/organization/members/{{ node.name }}">{{ display_text }}</a><br />
-        {% for user_id, user_displayname, role in node.users %}
-        {% if role == 'admin' %}
-        <span class="badge"
-          style="background-color:#ffff005e"><a href="/user/{{ user_id }}">{{ user_displayname }}</a></span>&nbsp;
-        {% elif role == 'editor' %}
-        <span class="badge"
-          style="background-color:rgb(227,220,255)"><a href="/user/{{ user_id }}">{{ user_displayname }}</a></span>&nbsp;
-        {% elif role == 'member' %}
-        <span class="badge"
-          style="background-color:rgb(207,240,251)"><a href="/user/{{ user_id }}">{{ user_displayname }}</a></span>&nbsp;
-        {% endif %}
-        {% endfor %}
-        {% if node.children %}
-        <ul class="hierarchy-tree" style="margin-top: 5px;"> {{ loop(node.children) }} </ul>
-        {% endif %}
-      </li>
+          <li class="highlighted" id="node_{{ node.name }}">
+      {% else %}
+          <li id="node_{{ node.name }}">
+      {% endif %}
+      {% link_for display_text, controller='organization', action='members', id=node.name %}<br/>
+      {% set users = h.thai_gdc_users_in_organization(node.id) %}
+      {% for user in users %}
+      {% if user.capacity == 'admin' %}
+      <span class="badge"
+        style="background-color:#ffff005e">{{ h.linked_user(user.table_id,0,0) }}</span>&nbsp;
+      {% elif user.capacity == 'editor' %}
+      <span class="badge"
+        style="background-color:rgb(227,220,255)">{{ h.linked_user(user.table_id,0,0) }}</span>&nbsp;
+      {% elif user.capacity == 'member' %}
+      <span class="badge"
+        style="background-color:rgb(207,240,251)">{{ h.linked_user(user.table_id,0,0) }}</span>&nbsp;
+      {% endif %}
       {% endfor %}
-    </ul>
+      {% if node.children %}
+        <ul class="hierarchy-tree" style="margin-top: 5px;"> {{ loop(node.children) }} </ul>
+      {% endif %}
+    </li>
+  {% endfor %}
 
   </div>
   <div class="col-md-4">

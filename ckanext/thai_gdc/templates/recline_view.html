@@ -1,0 +1,15 @@
+{% ckan_extends %}
+{% block custom_styles %}
+{{super()}}
+<style>
+    div.recline-data-explorer div.header div.navigation {
+        display: none;
+    }
+
+    div.recline-data-explorer div.header div.recline-results-info {
+        margin-left: 0 !important;
+        margin-bottom: 8px;
+    }
+
+</style>
+{% endblock %}

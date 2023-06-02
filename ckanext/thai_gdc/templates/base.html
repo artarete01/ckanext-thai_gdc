@@ -6,3 +6,8 @@
   {% set type = 'asset' if h.ckan_version() > '2.9' else 'resource' %}
   {% include 'thai_gdc/snippets/thai_gdc_' ~ type ~ '.html' %}
 {% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+  {% asset 'thai_gdc/thai_gdc_js' %}
+{% endblock %}

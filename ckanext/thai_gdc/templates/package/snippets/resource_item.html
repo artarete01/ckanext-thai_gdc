@@ -1,6 +1,12 @@
 {% ckan_extends %}
 
   {% block resource_item_title %}
+  {% if res.resource_private == "True" %}
+  <span class="dataset-private label label-inverse">
+    <i class="fa fa-lock"></i>
+    {{ _('Private') }}
+  </span>
+  {% endif %}
   <a class="heading" href="{{ url }}" title="{{ res.name or res.description }}">
     {{ h.resource_display_name(res) | truncate(80) }}<span class="format-label" property="dc:format" data-format="{{ res.format.lower() or 'data' }}">{{ h.get_translated(res, 'format') }}</span>
     {#{ h.popular('views', res.tracking_summary.total, min=10) }#}

@@ -25,15 +25,26 @@
         </tr>
       </thead>
       <tbody>
+        {% resource "thai_gdc/js/gdc_agency_hint_view.js" %}
+        {% resource "thai_gdc/css/gdc_agency_hint_view.css" %}
+        {% set gdcatalog_portal_url = h.thai_gdc_get_gdcatalog_portal_url() %}
+        <tr>
+            <th colspan="2"
+                id="gdc_hint_module_controls"
+                data-module="gdc_agency_hint_view"
+                data-module-des_url="{{gdcatalog_portal_url}}/gdplus/metadata_desc.json"
+                data-module-cat="resource_metadata"></th>
+        </tr>
+
         {%- block resource_format -%}
           <tr>
-            <th scope="row">{{ _('Format') }}</th>
+            <th scope="row" id="field-format">{{ _('Format') }}</th>
             <td>{{ res.mimetype_inner or res.mimetype or res.format or _('unknown') }}</td>
           </tr>
         {%- endblock -%}
         {%- block resource_license -%}
           <tr>
-            <th scope="row">{{ _('License') }}</th>
+            <th scope="row" id="field-license_id">{{ _('License') }}</th>
             <td>{% snippet "snippets/license.html", pkg_dict=pkg, text_only=True %}</td>
           </tr>
         {%- endblock -%}
@@ -44,7 +55,7 @@
                 and field.display_snippet is not none -%}
                 {% if pkg.data_type in form_data_type %}
               <tr>
-                <th scope="row">
+                <th scope="row" id="field-{{field.field_name}}">
                   {{- h.scheming_language_text(field.label) -}}
                 </th>
                 <td>
@@ -60,7 +71,7 @@
         {%- block resource_created -%}
             {% if res.created_at %}
             <tr>
-            <th scope="row">{{ _('Created') }}</th>
+            <th scope="row" id="field-system_created">{{ _('Created') }}</th>
             <td>{{ h.thai_gdc_day_thai(h.date_str_to_datetime(res.created_at)) }}</td>
             </tr>
             {% endif %}
@@ -68,7 +79,7 @@
         {%- block resource_last_updated -%}
             {% if res.last_modified %}
             <tr>
-            <th scope="row">{{ _('Last Updated') }}</th>
+            <th scope="row" id="field-system_modified">{{ _('Last Updated') }}</th>
             <td>{{ h.thai_gdc_day_thai(h.date_str_to_datetime(res.last_modified)) }}</td>
             </tr>
             {% endif %}

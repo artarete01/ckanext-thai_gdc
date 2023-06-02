@@ -12,12 +12,31 @@ import ckan.lib.dictization.model_dictize as model_dictize
 from six import string_types
 import ckan.model.misc as misc
 from ckan.common import config
+import ckan
+from ckanext.thai_gdc import helpers as thai_gdc_h
 
 _check_access = logic.check_access
 _get_or_bust = logic.get_or_bust
 NotFound = logic.NotFound
 
 log = logging.getLogger(__name__)
+
+@toolkit.side_effect_free
+def status_show(context, data_dict):
+
+    return {
+        'site_title': config.get('ckan.site_title'),
+        'site_description': config.get('ckan.site_description'),
+        'site_url': config.get('ckan.site_url'),
+        'thaigdc_catalog_type': config.get('thai_gdc.catalog_org_type'),
+        'thaigdc_is_as_a_service': config.get('thai_gdc.is_as_a_service'),
+        'thaigdc_version': thai_gdc_h.get_extension_version('version'),
+        'thaigdc_update': {"thai_gdc":thai_gdc_h.get_extension_version('date'), "scheming":config.get('thaigdc.scheming.extension_update_date',''), "xloader":config.get('thaigdc.xloader.extension_update_date',''), "discovery":config.get('thaigdc.discovery.extension_update_date','')},
+        'ckan_version': ckan.__version__,
+        'error_emails_to': config.get('email_to'),
+        'locale_default': config.get('ckan.locale_default'),
+        'extensions': config.get('ckan.plugins').split(),
+    }
 
 def group_type_patch(context, data_dict):
     _check_access('sysadmin', context, data_dict)

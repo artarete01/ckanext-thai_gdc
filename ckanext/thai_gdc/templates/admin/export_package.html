@@ -1,0 +1,41 @@
+{% extends "admin/base.html" %}
+
+{% block primary_content_inner %}
+{% resource 'thai_gdc/js/gdc_agency_export_package.js' %}
+{% resource 'thai_gdc/css/gdc_agency_export_package.css' %}
+<div class="col-md-12 col">
+    <button data-module="gdc_agency_export_package"
+            data-module-progress_id="export-progress"
+            class="btn btn-success">
+        <span class="fa fa-cloud-download"></span>
+        {{_('Export')}}
+    </button>
+</div>
+<div class="col-md-12">
+    <div id="export-progress" class="progress">
+        <div class="progress-bar"
+             role="progressbar"
+             aria-valuenow="0"
+             aria-valuemin="0"
+             aria-valuemax="100"
+             style="width:0%">
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block secondary_content %}
+<div class="module module-narrow module-shallow">
+    <h2 class="module-heading">
+        <i class="fa fa-info-circle"></i>
+        ส่งออกชุดข้อมูล
+    </h2>
+    <div class="module-content">
+        {% block admin_form_help %}
+        {% trans %}
+        <p>การ ส่งออกชุดข้อมูลเป็นไฟล์ xlsx โดยจำแนกประเภทชุดข้อมูลในแต่ละ worksheet</p>
+        {% endtrans %}
+        {% endblock %}
+    </div>
+</div>
+{% endblock %}

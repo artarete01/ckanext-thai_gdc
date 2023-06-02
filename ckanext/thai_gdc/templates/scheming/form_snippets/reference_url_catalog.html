@@ -2,7 +2,7 @@
 
 {% set catalog_org_type = h.thai_gdc_get_catalog_org_type() %}
 
-{% if catalog_org_type == 'area_based' %}
+{% if catalog_org_type == 'area_based' or catalog_org_type == 'data_center' %}
 {% call form.input(
     field.field_name,
     id='field-' + field.field_name,

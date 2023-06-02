@@ -1,4 +1,7 @@
 {% ckan_extends %}
+        {% block group_item_header_title %}
+          <p class="media-heading" style="font-size: 18px;"><a href="{{ h.url_for(controller='group', action='read', id=group.name) }}">{{ group.title or group.name }}</a></p>
+        {% endblock %}
         {% block group_item_header_description %}
 
           {% if group.package_count %}

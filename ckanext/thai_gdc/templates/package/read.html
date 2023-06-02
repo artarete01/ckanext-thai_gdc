@@ -17,7 +17,7 @@
   }
 </style>
 {% set gdcatalog_status_show = h.thai_gdc_get_gdcatalog_status_show() %}
-{% if gdcatalog_status_show == 'true' and pkg.allow_harvest != 'False' and (not pkg.reference_url_catalog or pkg.reference_url_catalog == '') %}
+{% if gdcatalog_status_show == 'true' and pkg.type == 'dataset' and pkg.allow_harvest != 'False' and (not pkg.reference_url_catalog or pkg.reference_url_catalog == '') %}
 <div class="text-right" style="margin-bottom: 20px;">
   {% set return_state = h.thai_gdc_get_gdcatalog_state('published', pkg.id) %}
   {% if return_state | length > 0 and 'result' in return_state %}
@@ -82,6 +82,11 @@
           <i class="fa fa-lock"></i>
           GD-Catalog: {{ _('WAIT') }}
         </span>
+        {% elif state == 'DELETED' %}
+        <span class="label label-inverse gdcatalog-warning">
+          <i class="fa fa-lock"></i>
+          GD-Catalog: {{ _('DELETED') }}
+        </span>
         {% elif state == 'REJECT' %}
         {% set modified_at = return_state.get('result')[0]['metadata_modified'] %}
         <span class="label label-inverse gdcatalog-warning">
@@ -135,4 +140,28 @@
 {% endblock %}
 {# FIXME why is this here? seems wrong #}
 <span class="insert-comment-thread"></span>
+{% endblock %}
+
+{% block primary_content_inner %}
+{{super()}}
+
+{% block suggest_view %}
+{% set view_list = h.gdc_agency_get_suggest_view(pkg.resources) %}
+{% if view_list | length > 0 %}
+{% set view_proto_url = h.url_for('dataset_read', id=pkg.name) %}
+<section>
+    <h3>{{_('Recommend')}}</h3>
+    {% for v in view_list: %}
+    {% set view_final_url = view_proto_url ~ '/resource/' ~ v.resource_id ~ '/view/' ~ v.view_id %}
+    <div class="panel panel-default">
+        <div class="panel-heading">{{v.title}}</div>
+        <div class="panel-body">
+            <iframe style="width: 100%;height: 400px;overflow: hidden" src="{{view_final_url}}"></iframe>
+        </div>
+    </div>
+    {% endfor %}
+</section>
+{% endif %}
+{% endblock %}
+
 {% endblock %}

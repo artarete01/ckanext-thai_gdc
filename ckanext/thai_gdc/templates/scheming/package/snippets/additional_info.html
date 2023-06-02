@@ -13,7 +13,7 @@
         {% block package_additional_info %}
 
         {% set catalog_org_type = h.thai_gdc_get_catalog_org_type() %}
-        {% if catalog_org_type == 'area_based' %}
+        {% if catalog_org_type == 'area_based' or catalog_org_type == 'data_center' %}
         <tr>
           <th scope="row" class="dataset-label">
             {{ _('Reference URL Catalog') }}</th>
@@ -21,13 +21,23 @@
         </tr>
         {% endif %}
 
+        {% resource "thai_gdc/js/gdc_agency_hint_view.js" %}
+        {% resource "thai_gdc/css/gdc_agency_hint_view.css" %}
+        {% set gdcatalog_portal_url = h.thai_gdc_get_gdcatalog_portal_url() %}
+        <tr>
+            <th colspan="2" id="gdc_hint_module_controls"
+                data-module="gdc_agency_hint_view"
+                data-module-des_url="{{ gdcatalog_portal_url }}/gdplus/metadata_desc.json"></th>
+        </tr>
+
+
         {%- for field in schema.dataset_fields -%}
         {% set form_data_type = field.form_data_type %}
         {%- if field.field_name not in exclude_fields
             and field.display_snippet is not none -%}
             {% if pkg_dict.data_type in form_data_type %}
           <tr>
-            <th scope="row" class="dataset-label">
+            <th scope="row" class="dataset-label" id="field-{{field.field_name}}">
               {% if field.required %}* {% endif %}
               {{ h.scheming_language_text(field.label) }}</th>
             <td class="dataset-details"{%
@@ -40,7 +50,7 @@
       {%- endfor -%}
       {% if h.check_access('package_update',{'id':pkg_dict.id}) %}
         <tr>
-          <th scope="row" class="dataset-label">{{ _("State") }}</th>
+          <th id="field-system_state" scope="row" class="dataset-label">{{ _("State") }}</th>
           <td class="dataset-details">{{ _(pkg_dict.state) }}</td>
         </tr>
       {% endif %}
@@ -54,7 +64,7 @@
         {% endif %}
         {% if pkg_dict.metadata_created %}
           <tr>
-            <th scope="row" class="dataset-label">{{ _("Created") }}</th>
+            <th id="field-system_created" scope="row" class="dataset-label">{{ _("Created") }}</th>
             <td class="dataset-details">
                 {{ h.thai_gdc_day_thai(h.date_str_to_datetime(pkg_dict.metadata_created)) }}
             </td>
@@ -62,7 +72,7 @@
         {% endif %}
         {% if pkg_dict.metadata_modified %}
           <tr>
-            <th scope="row" class="dataset-label">{{ _("Last Updated") }}</th>
+            <th id="field-system_modified" scope="row" class="dataset-label">{{ _("Last Updated") }}</th>
             <td class="dataset-details">
                 {{ h.thai_gdc_day_thai(h.date_str_to_datetime(pkg_dict.metadata_modified)) }}
             </td>

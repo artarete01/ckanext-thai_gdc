@@ -23,3 +23,11 @@ thai_gdc_red_css:
   filters: cssrewrite
   output: ckanext-thai-gdc/%(version)s_thai_gdc_red.css
   contents: css/thai_gdc_red.css
+thai_gdc_js:
+  filter: rjsmin
+  output: ckanext-thai-gdc/%(version)s_thai-gdc.js
+  extra:
+    preload:
+      - base/main
+  contents:
+    - js/cookie_consent.js

@@ -45,3 +45,35 @@
     </div>
   </div>
 </div>
+{% block layout_extra %}
+  {% set event_conf = h.gdc_agency_get_conf_group('EVENT') %}
+  {% if event_conf.EVENT_PUBLIC and event_conf.EVENT_PUBLIC == 'True' %}
+
+      {% if event_conf.EVENT_IMAGE %}
+      <div class="modal fade" id="homeEventModal" role="dialog">
+          <div class="modal-dialog">
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                  </div>
+                  <div class="modal-body">
+                      <img src="{{event_conf.EVENT_IMAGE}}" style="width:100%" alt="event popup banner image">
+                  </div>
+                  {% if event_conf.EVENT_URL and event_conf.EVENT_URL != '' %}
+                  <div class="modal-footer">
+                      <a href="{{event_conf.EVENT_URL}}" class="btn btn-success" target="_blank">
+                          {{event_conf.EVENT_TEXT if event_conf.EVENT_TEXT else 'เพิ่มเติม'}}
+                      </a>
+                  </div>
+                  {% endif %}
+              </div>
+          </div>
+      </div>
+      <script>
+          setTimeout(() => {
+              $("#homeEventModal").modal('show');
+          }, 500)
+      </script>
+      {% endif %}
+  {% endif %}
+{% endblock %}

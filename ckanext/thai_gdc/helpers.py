@@ -119,16 +119,19 @@ def get_opend_playground_url():
     return config.get('thai_gdc.opend_playground_url')
 
 def get_catalog_org_type():
-    return config.get('thai_gdc.catalog_org_type', 'agency')
+    return config.get('thai_gdc.catalog_org_type')
 
 def get_is_as_a_service():
-    return config.get('thai_gdc.is_as_a_service', 'false')
+    return config.get('thai_gdc.is_as_a_service')
 
 def get_gdcatalog_status_show():
     return config.get('thai_gdc.gdcatalog_status_show')
 
 def get_gdcatalog_portal_url():
     return config.get('thai_gdc.gdcatalog_portal_url')
+
+def get_gdcatalog_apiregister_url():
+    return config.get('thai_gdc.gdcatalog_apiregister_url')
 
 def get_gdcatalog_version_update():
     gdcatalog_harvester_url = config.get('thai_gdc.gdcatalog_harvester_url')
@@ -337,3 +340,60 @@ def get_all_groups_all_type(type=None):
     return [[group['id'], group['display_name']]
                             for group in user_groups if
                             group['id'] not in pkg_group_ids]
+
+def users_in_organization(organization_id):
+    ''' users in organization '''
+    query = model.Session.query(model.Member) \
+        .filter(model.Member.state == 'active') \
+        .filter(model.Member.table_name == 'user') \
+        .filter(model.Member.group_id == organization_id)
+    users = query.all()
+    context = {'model': model,
+                    'user': c.user, 'auth_user_obj': c.userobj}
+    users_list = []
+    for user in users:
+        users_list.append(model_dictize.member_dictize(user, context))
+    return users_list
+
+def get_suggest_view(resources):
+    suggest_view_list = []
+    for rs in resources:
+        if rs.get('resource_private','') != "True":
+            view_list = toolkit.get_action('resource_view_list')(data_dict={'id': rs['id']})
+
+            for v in view_list:
+                v_des = v['description'].strip()
+
+                if len(v_des) > 0 and v_des[0] == '*':
+                    suggest_view_list.append({
+                        'title': v['title'],
+                        'resource_id': v['resource_id'],
+                        'view_id': v['id']
+                    })
+
+    return suggest_view_list
+
+
+def get_conf_group(conf_group):
+    try:
+        conf = toolkit.get_action('gdc_agency_get_conf_group')(data_dict={'conf_group': conf_group})
+        if 'EVENT_IMAGE' in conf.keys() and conf['EVENT_IMAGE'].strip() != '' \
+                and not conf['EVENT_IMAGE'].startswith('http'):
+            conf['EVENT_IMAGE'] = '/uploads/admin/{}'.format(conf['EVENT_IMAGE'])
+        return conf
+    except:
+        return {}
+
+def get_popular_datasets(limit):
+    package_list = []
+
+    result_pkg_list = toolkit.get_action('package_search')(data_dict={'sort': 'views_recent desc','rows':limit})
+    log.info(result_pkg_list)
+    for item in result_pkg_list['results']:
+        result_pkg = toolkit.get_action('package_show')(data_dict={'id': item['id'],'include_tracking':'true'})
+        package_list.append({
+            'name': item['name'],
+            'title': item['title'],
+            'recent_view': result_pkg['tracking_summary']['recent']})
+
+    return package_list

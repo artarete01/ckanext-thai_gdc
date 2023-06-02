@@ -107,7 +107,7 @@
         "field_name": "maintainer",
         "label": {
           "en": "Contact Person",
-          "th": "ชื่อผู้ติดต่อ"
+          "th": "ชื่อหน่วยงาน"
         },
         "form_placeholder": {
           "en": "Organization name",
@@ -120,7 +120,7 @@
         "field_name": "maintainer_email",
         "label": {
           "en": "Contact Email",
-          "th": "อีเมลผู้ติดต่อ"
+          "th": "อีเมลหน่วยงาน"
         },
         "form_placeholder": "department@org.go.th",
         "display_snippet": "email.html",
@@ -134,7 +134,13 @@
           "en": "Tags",
           "th": "คำสำคัญ"
         },
-        "preset": "tag_string_autocomplete",
+        "form_snippet": "tag_string.html",
+        "validators": "ignore_missing tag_string_convert",
+        "classes": ["control-full"],
+        "form_attrs": {
+          "data-module": "autocomplete",
+          "data-module-tags": ""
+        },
         "form_placeholder": "eg. economy, mental health, government",
         "form_data_type": ["ข้อมูลระเบียน","ข้อมูลสถิติ","ข้อมูลภูมิสารสนเทศเชิงพื้นที่","ข้อมูลหลากหลายประเภท","ข้อมูลประเภทอื่นๆ"],
         "required": true
@@ -438,8 +444,12 @@
             "label": "HTML"
           },
           {
+            "value": "DOC/DOCX",
+            "label": "DOC/DOCX"
+          },
+          {
             "value": "XLS",
-            "label": "XLS"
+            "label": "XLS/XLSX"
           },
           {
             "value": "PDF",
@@ -1253,7 +1263,7 @@
       {
         "field_name": "description",
         "label": "Description",
-        "form_snippet": "markdown.html",
+        "form_snippet": "description.html",
         "form_placeholder": "Some useful notes about the data",
         "form_data_type": ["ข้อมูลระเบียน","ข้อมูลสถิติ","ข้อมูลภูมิสารสนเทศเชิงพื้นที่","ข้อมูลหลากหลายประเภท","ข้อมูลประเภทอื่นๆ"]
       },
