@@ -47,7 +47,7 @@
     {% if h.check_access('package_delete', {'id': pkg_dict.id}) %}
       <a class="btn btn-danger pull-left" href="{% url_for dataset_type ~ '.delete', id=data.id %}" data-module="confirm-action" data-module-content="{{ _('Are you sure you want to delete this dataset?') }}">{% block delete_button_text %}{{ _('Delete') }}{% endblock %}</a>
     {% else %}
-    <div style="text-align: left;margin-bottom: 10px;"><strong>หมายเหตุ</strong> ไม่สามารถลบชุดข้อมูลนี้ได้ เนื่องจากมีการลงทะเบียนที่ GD-Catalog แล้ว หากต้องการลบชุดข้อมูล กรุณายื่นเรื่องขอเพิกถอนที่ระบบลงทะเบียนก่อน</div>
+    <div style="text-align: left;margin-bottom: 10px;"><strong>หมายเหตุ</strong> ไม่สามารถลบชุดข้อมูลนี้ได้ เนื่องจากมีการลงทะเบียนที่ GD-Catalog แล้ว หากต้องการลบชุดข้อมูล กรุณาแจ้งเพิกถอนที่ระบบลงทะเบียนบัญชีข้อมูลภาครัฐก่อน</div>
       <a class="btn btn-danger pull-left" href="#" disabled>{{ _('Delete') }}</a>
     {% endif %}
   {% endif %}
