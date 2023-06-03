@@ -53,13 +53,14 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
 
     def after_search(self, search_results, pkg_dict):
         try:
-            if toolkit.c.action == 'action' and toolkit.c.controller == 'api':
+            if toolkit.c.action == 'action':
                 package_list = search_results['results']
                 for package_dict in package_list:
                     show_resources = []
                     for resource_dict in package_dict.get('resources',[]):
                         if resource_dict.get('resource_private','') != "True":
                             show_resources.append(resource_dict)
+                            log.info("resource_dict append "+str(resource_dict['id']))
                     package_dict['resources'] = show_resources
                     package_dict['num_resources'] = len(package_dict['resources'])
         except:
