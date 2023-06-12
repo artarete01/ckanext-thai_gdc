@@ -107,7 +107,7 @@
         "field_name": "maintainer",
         "label": {
           "en": "Contact Person",
-          "th": "ชื่อหน่วยงาน"
+          "th": "ชื่อผู้ติดต่อ"
         },
         "form_placeholder": {
           "en": "Organization name",
@@ -120,7 +120,7 @@
         "field_name": "maintainer_email",
         "label": {
           "en": "Contact Email",
-          "th": "อีเมลหน่วยงาน"
+          "th": "อีเมลผู้ติดต่อ"
         },
         "form_placeholder": "department@org.go.th",
         "display_snippet": "email.html",
