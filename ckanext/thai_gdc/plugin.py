@@ -42,13 +42,17 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
 
     # IPackageController
     def after_show(item, context, data_dict):
-        resources = []
-        for resource_dict in data_dict['resources']:
-            logic_authorization = authz.is_authorized('resource_show', context, resource_dict)
-            if logic_authorization['success']:
-                resources.append(resource_dict)
-        data_dict['resources'] = resources
-        data_dict['num_resources'] = len(data_dict['resources'])
+        try:
+            if toolkit.c.action != 'edit' and toolkit.c.action != 'new':
+                resources = []
+                for resource_dict in data_dict['resources']:
+                    logic_authorization = authz.is_authorized('resource_show', context, resource_dict)
+                    if logic_authorization['success']:
+                        resources.append(resource_dict)
+                data_dict['resources'] = resources
+                data_dict['num_resources'] = len(data_dict['resources'])
+        except:
+            return
         return
 
     def after_search(self, search_results, pkg_dict):
