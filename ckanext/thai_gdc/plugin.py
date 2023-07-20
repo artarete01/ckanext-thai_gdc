@@ -95,17 +95,23 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
         if 'q' in search_params:
             q = search_params['q']
             lelist = ["+","&&","||","!","(",")","{","}","[","]","^","~","*","?",":","/"]
+            contains_word = lambda s, l: any(map(lambda x: x in s, l))
             if len(q) > 0 and len([e for e in lelist if e in q]) == 0:
                 q_list = shlex.split(search_params['q'])
                 q_list_result = []
                 for q_item in q_list:
-                    if q_item not in ['AND','OR','NOT'] and not self._isEnglish(q_item):
+                    if contains_word(q, ['AND','OR','NOT']) and q_item not in ['AND','OR','NOT'] and not self._isEnglish(q_item):
                         q_item = 'text:*'+q_item+'*'
-                    elif q_item not in ['AND','OR','NOT'] and self._isEnglish(q_item):
+                    elif contains_word(q, ['AND','OR','NOT']) and q_item not in ['AND','OR','NOT'] and self._isEnglish(q_item):
                         q_item = 'text:'+q_item
+                    elif not contains_word(q, ['AND','OR','NOT']):
+                        q_item = '*'+q_item+'*'
                     q_list_result.append(q_item)
                 q = ' '.join(q_list_result)
             search_params['q'] = q
+            if not contains_word(q, ['AND','OR','NOT']):
+                search_params['defType'] = 'edismax'
+                search_params['qf'] = 'name^4 title^4 tags^3 groups^2 organization^2 notes^2 maintainer^2 text'
         return search_params
 
     def _unicode_string_convert(self, value):
@@ -189,6 +195,7 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
         config_['thai_gdc.catalog_org_type'] = config_.get('thai_gdc.catalog_org_type','agency') #agency/area_based/data_center
         config_['thai_gdc.is_as_a_service'] = config_.get('thai_gdc.is_as_a_service', 'false')
         config_['thai_gdc.gdcatalog_apiregister_url'] = config_.get('thai_gdc.gdcatalog_apiregister_url', 'https://apiregister.gdcatalog.go.th')
+        config_['ckan.datastore.sqlsearch.enabled'] = config_.get('ckan.datastore.sqlsearch.enabled', 'false')
 
     def update_config_schema(self, schema):
         ignore_missing = toolkit.get_validator('ignore_missing')
@@ -326,6 +333,7 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             'tag_string_convert': thai_gdc_validator.tag_string_convert,
             'package_name_validator': thai_gdc_validator.package_name_validator,
             'package_title_validator': thai_gdc_validator.package_title_validator,
+            'resource_not_empty': thai_gdc_validator.resource_not_empty,
         }
     
     # ITemplateHelpers
