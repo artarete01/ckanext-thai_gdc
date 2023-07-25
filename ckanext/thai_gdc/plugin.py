@@ -333,7 +333,6 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             'tag_string_convert': thai_gdc_validator.tag_string_convert,
             'package_name_validator': thai_gdc_validator.package_name_validator,
             'package_title_validator': thai_gdc_validator.package_title_validator,
-            'resource_not_empty': thai_gdc_validator.resource_not_empty,
         }
     
     # ITemplateHelpers

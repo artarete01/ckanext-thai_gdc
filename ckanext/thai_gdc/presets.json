@@ -42,7 +42,7 @@
     {
       "preset_name": "resource_url_upload",
       "values": {
-        "validators": "ignore_missing unicode remove_whitespace resource_not_empty",
+        "validators": "ignore_missing unicode remove_whitespace",
         "form_snippet": "upload.html",
         "form_placeholder": "http://example.com/my-data.csv",
         "upload_field": "upload",
