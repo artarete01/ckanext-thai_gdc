@@ -59,10 +59,6 @@ def tag_string_convert(key, data, errors, context):
     for tag in tags:
         tag_length_validator(tag, context)
         tag_name_validator(tag, context)
-
-def resource_not_empty(key, data, errors, context):
-    if data.get(key[:-1] + ('url',))=='':
-        raise Invalid(_('Missing value'))
     
 def package_name_validator(key, data, errors, context):
     model = context['model']
