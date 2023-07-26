@@ -96,6 +96,8 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
         config_['thai_gdc.gdcatalog_harvester_url'] = 'https://harvester.gdcatalog.go.th'
         config_['thai_gdc.gdcatalog_status_show'] = 'true'
         config_['thai_gdc.gdcatalog_portal_url'] = 'https://gdcatalog.go.th'
+        config_['ckan.datastore.sqlsearch.enabled'] = config_.get('ckan.datastore.sqlsearch.enabled', 'false')
+        config_['ckan.datastore.search.rows_max'] = config_.get('ckan.datastore.search.rows_max', '10000')
 
     def before_map(self, map):
 
@@ -267,22 +269,46 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
         else:
             return True
     
+    # def before_search(self, search_params):
+    #     import shlex
+    #     if 'q' in search_params:
+    #         q = search_params['q']
+    #         lelist = ["+","&&","||","!","(",")","{","}","[","]","^","~","*","?",":","/"]
+    #         if len(q) > 0 and len([e for e in lelist if e in q]) == 0:
+    #             q_list = shlex.split(search_params['q'])
+    #             q_list_result = []
+    #             for q_item in q_list:
+    #                 if q_item not in ['AND','OR','NOT'] and not self._isEnglish(q_item):
+    #                     q_item = 'text:*'+q_item+'*'
+    #                 elif q_item not in ['AND','OR','NOT'] and self._isEnglish(q_item):
+    #                     q_item = 'text:'+q_item
+    #                 q_list_result.append(q_item)
+    #             q = ' '.join(q_list_result)
+    #         search_params['q'] = q
+    #     return search_params
+
     def before_search(self, search_params):
         import shlex
         if 'q' in search_params:
             q = search_params['q']
             lelist = ["+","&&","||","!","(",")","{","}","[","]","^","~","*","?",":","/"]
+            contains_word = lambda s, l: any(map(lambda x: x in s, l))
             if len(q) > 0 and len([e for e in lelist if e in q]) == 0:
                 q_list = shlex.split(search_params['q'])
                 q_list_result = []
                 for q_item in q_list:
-                    if q_item not in ['AND','OR','NOT'] and not self._isEnglish(q_item):
+                    if contains_word(q, ['AND','OR','NOT']) and q_item not in ['AND','OR','NOT'] and not self._isEnglish(q_item):
                         q_item = 'text:*'+q_item+'*'
-                    elif q_item not in ['AND','OR','NOT'] and self._isEnglish(q_item):
+                    elif contains_word(q, ['AND','OR','NOT']) and q_item not in ['AND','OR','NOT'] and self._isEnglish(q_item):
                         q_item = 'text:'+q_item
+                    elif not contains_word(q, ['AND','OR','NOT']):
+                        q_item = '*'+q_item+'*'
                     q_list_result.append(q_item)
                 q = ' '.join(q_list_result)
             search_params['q'] = q
+            if not contains_word(q, ['AND','OR','NOT']):
+                search_params['defType'] = 'edismax'
+                search_params['qf'] = 'name^4 title^4 tags^3 groups^2 organization^2 notes^2 maintainer^2 text'
         return search_params
     
     def create(self, package):
