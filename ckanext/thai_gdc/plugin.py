@@ -309,6 +309,7 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             'user_generate_apikey': thai_gdc_auth.user_generate_apikey,
             'resource_show': thai_gdc_auth.resource_show,
             'package_delete': thai_gdc_auth.package_delete,
+            'resource_delete': thai_gdc_auth.resource_delete,
         }
         return auth_functions
 

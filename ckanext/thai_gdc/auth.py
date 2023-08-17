@@ -86,9 +86,27 @@ def package_delete(context, data_dict):
     # are essentially changing the state field
     try:
         gd_pkg_state = thai_gdc_h.get_gdcatalog_state('published', data_dict.get('id')).get('result')
-        if gd_pkg_state[0].get('metadata_modified') != '':
+        if gd_pkg_state[0].get('metadata_modified') != '' and toolkit.c.controller == 'dataset':
             return {'success': False}
         else:
             return authz.is_authorized('package_update', context, data_dict)
     except:
         return {'success': False}
+
+def resource_delete(context, data_dict):
+    model = context['model']
+    user = context.get('user')
+    resource = logic_auth.get_resource_object(context, data_dict)
+
+    # check authentication against package
+    pkg = model.Package.get(resource.package_id)
+    if not pkg:
+        raise logic.NotFound(_('No package found for this resource, cannot check auth.'))
+
+    pkg_dict = {'id': pkg.id}
+    authorized = authz.is_authorized('package_update', context, pkg_dict).get('success')
+
+    if not authorized:
+        return {'success': False, 'msg': _('User %s not authorized to delete resource %s') % (user, resource.id)}
+    else:
+        return {'success': True}
