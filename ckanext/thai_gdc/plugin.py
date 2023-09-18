@@ -44,11 +44,7 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
     def after_show(item, context, data_dict):
         try:
             if toolkit.c.action != 'edit' and toolkit.c.action != 'new':
-                resources = []
-                for resource_dict in data_dict['resources']:
-                    logic_authorization = authz.is_authorized('resource_show', context, resource_dict)
-                    if logic_authorization['success']:
-                        resources.append(resource_dict)
+                resources = [resource_dict for resource_dict in data_dict['resources'] if authz.is_authorized('resource_show', context, resource_dict)['success']]
                 data_dict['resources'] = resources
                 data_dict['num_resources'] = len(data_dict['resources'])
         except:
@@ -60,12 +56,8 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             if toolkit.c.action == 'action':
                 package_list = search_results['results']
                 for package_dict in package_list:
-                    show_resources = []
-                    for resource_dict in package_dict.get('resources',[]):
-                        if resource_dict.get('resource_private','') != "True":
-                            show_resources.append(resource_dict)
-                            log.info("resource_dict append "+str(resource_dict['id']))
-                    package_dict['resources'] = show_resources
+                    resources = [resource_dict for resource_dict in package_dict.get('resources',[]) if resource_dict.get('resource_private','') != "True"]
+                    package_dict['resources'] = resources
                     package_dict['num_resources'] = len(package_dict['resources'])
         except:
             return search_results
@@ -324,6 +316,9 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             'gdc_agency_export_package': exporter_action.package,
             'gdc_agency_get_conf_group': popup_action.get_conf_group,
             'gdc_agency_update_conf_group': popup_action.update_conf_group,
+            'resource_view_create': opend_action.resource_view_create,
+            'resource_view_update': opend_action.resource_view_update,
+            'resource_view_delete': opend_action.resource_view_delete,
         }
         return action_functions
 
