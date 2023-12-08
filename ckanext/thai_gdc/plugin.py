@@ -368,5 +368,7 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             'thai_gdc_get_popular_datasets': thai_gdc_h.get_popular_datasets,
             'gdc_agency_get_suggest_view': thai_gdc_h.get_suggest_view,
             'gdc_agency_get_conf_group': thai_gdc_h.get_conf_group,
+            'nso_get_last_modified_datasets': thai_gdc_h.get_last_modified_datasets,
+            'nso_get_popular_datasets' : thai_gdc_h.get_popular_datasets,
             'get_site_statistics': thai_gdc_h.get_site_statistics
         }

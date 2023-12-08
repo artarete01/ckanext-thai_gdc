@@ -1,0 +1,14 @@
+<div >
+    {% for dataset in datasets %}
+    <!-- <div class="blockContentSearchData"> -->
+    <div class="column">
+      <div class="row">
+        <div class="col-md-9 col-sm-9 col-xs-12" style="width: 100%;">
+          <a href="{{ h.url_for('%s.read' % dataset.type, id=dataset.name) }}" class="textHeaderContentSearch">{{ dataset.title }}</a><br>
+          <span class="blockContentSearchDate"><i class="fa fa-calendar" aria-hidden="true"></i> วันที่ปรับปรุง {{ h.thai_gdc_day_thai(dataset.date_modified) }}</span>
+          <hr class="dash"> 
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>

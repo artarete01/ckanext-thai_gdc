@@ -17,7 +17,7 @@
       {{ form.select('ckan.theme', id='field-ckan-main-css', label=_('Style'), options=styles, selected=data['ckan.theme'], error=error) }}
     {% endif %}
 
-    {% set homepages = [{'text': 'Introductory area, search and stats', 'value': '1'}, {'text': 'Introductory area and search', 'value': '2'}] %}
+    {% set homepages = [{'text': 'Introductory area, search and stats', 'value': '1'}, {'text': 'Introductory area and search', 'value': '2'}, {'text': 'Introductory area, search, stats and detail', 'value': '3'}] %}
     {{ form.select('ckan.homepage_style', id='field-homepage-style', label=_('Homepage'), options=homepages, selected=data['ckan.homepage_style'], error=error) }}
 
     {{ form.textarea('ckan.site_custom_css', id='field-ckan-site-custom-css', label=_('Custom CSS'), value=data['ckan.site_custom_css'], error=error, placeholder=_('Customisable css inserted into the page header')) }}

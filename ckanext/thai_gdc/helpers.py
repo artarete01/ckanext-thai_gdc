@@ -397,3 +397,27 @@ def get_popular_datasets(limit):
             'recent_view': result_pkg['tracking_summary']['recent']})
 
     return package_list
+
+def get_last_modified_datasets(limit):
+    try:
+        package = model.Package
+        q = model.Session.query(package.name, package.title, package.type, package.metadata_modified.label('date_modified')).filter(package.state == 'active').order_by(package.metadata_modified.desc()).limit(limit)
+        packages = q.all()
+    except:
+        return []
+    return packages
+
+def get_popular_datasets(limit):
+    package_list = []
+
+    result_pkg_list = toolkit.get_action('package_search')(data_dict={'sort': 'views_recent desc','rows':limit})
+    for item in result_pkg_list['results']:
+        result_pkg = toolkit.get_action('package_show')(data_dict={'id': item['id'],'include_tracking':'true'})
+        package_list.append({
+            'name': item['name'],
+            'title': item['title'],
+            'type': item['type'],
+            'date_modified' : item['metadata_modified'],
+            'recent_view': result_pkg['tracking_summary']['recent']})
+
+    return package_list
