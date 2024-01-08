@@ -410,7 +410,7 @@ def get_last_modified_datasets(limit):
 def get_popular_datasets(limit):
     package_list = []
 
-    result_pkg_list = toolkit.get_action('package_search')(data_dict={'sort': 'views_recent desc','rows':limit})
+    result_pkg_list = toolkit.get_action('package_search')(data_dict={'sort': 'views_total desc','rows':limit})
     for item in result_pkg_list['results']:
         result_pkg = toolkit.get_action('package_show')(data_dict={'id': item['id'],'include_tracking':'true'})
         package_list.append({

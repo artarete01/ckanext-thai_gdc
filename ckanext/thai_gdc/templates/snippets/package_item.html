@@ -26,10 +26,10 @@
                   <span class="label label-danger">{{ _('Deleted') }}</span>
                 {% endif %}
                 {% if package.tracking_summary %}
-                  <span class="textRecentViews">
+                  <!--<span class="textRecentViews">
                     <i class="fa fa-line-chart" aria-hidden="true"></i>
-                    {{package.tracking_summary.total}} total views
-                  </span>
+                    {#{package.tracking_summary.total}#} total views
+                  </span>-->
                   <span class="textRecentViews">
                     <i class="fa fa-line-chart" aria-hidden="true"></i>
                     {{package.tracking_summary.recent}} recent views
