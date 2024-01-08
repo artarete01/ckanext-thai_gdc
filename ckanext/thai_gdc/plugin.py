@@ -43,8 +43,8 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
     # IPackageController
     def after_show(item, context, data_dict):
         try:
-            if toolkit.c.action != 'edit' and toolkit.c.action != 'new':
-                resources = [resource_dict for resource_dict in data_dict['resources'] if authz.is_authorized('resource_show', context, resource_dict)['success']]
+            if toolkit.c.action not in ['search','new','edit']:
+                resources = [resource_dict for resource_dict in data_dict['resources'] if not (resource_dict.get('resource_private','') == "True" and not authz.is_authorized('package_update', context, data_dict).get('success'))]
                 data_dict['resources'] = resources
                 data_dict['num_resources'] = len(data_dict['resources'])
         except:
@@ -299,7 +299,8 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
         auth_functions = {
             'member_create': thai_gdc_auth.member_create,
             'user_generate_apikey': thai_gdc_auth.user_generate_apikey,
-            'resource_show': thai_gdc_auth.resource_show,
+            'resource_show': thai_gdc_auth.restrict_resource_show,
+            'resource_view_show': thai_gdc_auth.restrict_resource_show,
             'package_delete': thai_gdc_auth.package_delete,
             'resource_delete': thai_gdc_auth.resource_delete,
         }

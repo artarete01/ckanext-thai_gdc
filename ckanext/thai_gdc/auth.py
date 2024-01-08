@@ -13,7 +13,7 @@ import logging
 log = logging.getLogger(__name__)
 
 @toolkit.auth_allow_anonymous_access
-def resource_show(context, data_dict):
+def restrict_resource_show(context, data_dict):
     model = context['model']
     user = context.get('user')
     resource = logic_auth.get_resource_object(context, data_dict)
@@ -25,7 +25,7 @@ def resource_show(context, data_dict):
 
     pkg_dict = {'id': pkg.id}
 
-    res_private = data_dict.get('resource_private','')
+    res_private = resource.extras.get('resource_private','')
 
     if res_private == "True" and not authz.is_authorized('package_update', context, pkg_dict).get('success'):
         return {'success': False, 'msg': _('User %s not authorized to read resource %s') % (user, resource.id)}
