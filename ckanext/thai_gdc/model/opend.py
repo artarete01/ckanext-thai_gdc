@@ -40,11 +40,8 @@ class OpendModel:
         try:
             resultproxy = model.Session.execute(sql)
             row = resultproxy.fetchone()
-            model.Session.commit()
             return row['page_view'] is not None and row['page_view'] or 0
-        except SQLAlchemyError as e:
-            print(str(e))
-            model.Session.rollback()
+        except:
             return 0
 
     def get_last_update_tracking(self):
@@ -54,11 +51,8 @@ class OpendModel:
         try:
             resultproxy = model.Session.execute(sql)
             row = resultproxy.fetchone()
-            model.Session.commit()
             return row['last_tracking'] is not None and row['last_tracking'] or 0
-        except SQLAlchemyError as e:
-            print(str(e))
-            model.Session.rollback()
+        except:
             return 0
 
     def get_resource_download_top(self, limit):
