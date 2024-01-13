@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import ckan.plugins as p
-import ckan.lib.helpers as helpers
 from pylons import config
 import ckan.logic as logic
 import ckan.lib.navl.dictization_functions as dict_fns
@@ -8,21 +7,16 @@ import ckan.model as model
 import ckan.lib.uploader as uploader
 import six
 import logging
-import sys
-import locale
 import pandas as pd
 import numpy as np
-import re
 from ckanapi import LocalCKAN
 import datetime
-import ckan.lib.base as base
 
 import uuid
 import ckan.plugins.toolkit as toolkit
 
 from ckan.plugins.toolkit import (
-    _, c, h, BaseController, check_access, NotAuthorized, abort, render,
-    redirect_to, request,
+    _, c, h, check_access, abort, render, request
     )
 
 from ckan.controllers.home import CACHE_PARAMETERS
@@ -34,9 +28,6 @@ NotFound = logic.NotFound
 NotAuthorized = logic.NotAuthorized
 
 log = logging.getLogger(__name__)
-
-reload(sys)
-sys.setdefaultencoding("utf-8")
 
 class DatasetManageController(p.toolkit.BaseController):
 
@@ -56,30 +47,22 @@ class DatasetManageController(p.toolkit.BaseController):
             except logic.ValidationError as e:
                 return e
 
-    def gdcatalog_state(self, package_id):
-        try:
-            pkg_dict = p.toolkit.get_action('package_show')(None, {'id':package_id})
-        except (NotFound, NotAuthorized):
-            return base.abort(404, _(u'Dataset not found'))
-            
-        vars = {'pkg': pkg_dict}
-        return render('package/snippets/gdcatalog_state.html', extra_vars=vars)
-
 class DatasetImportController(p.toolkit.BaseController):
 
     def _record_type_process(self, data_dict):
         try:
-            record_df = pd.read_excel(data_dict['filename'], header=[3], sheet_name='Temp2_Meta_Record', dtype=str)
+            record_df = pd.read_excel(data_dict['filename'], header=[3], sheet_name='Temp2_Meta_Record')
             record_df.drop(0, inplace=True)
-            record_df["data_type"] = 'ข้อมูลระเบียน'
+            record_df["data_type"] = u'ข้อมูลระเบียน'
 
             record_df.columns = ['name','d_type','title','owner_org','maintainer','maintainer_email','tag_string','notes','objective','update_frequency_unit','update_frequency_interval','geo_coverage','data_source','data_format','data_category','license_id','accessible_condition','created_date','last_updated_date','url','data_support','data_collect','data_language','high_value_dataset','reference_data','data_type']
             record_df.drop(['d_type'], axis=1, inplace=True)
-            record_df = record_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
             record_df.replace(np.nan, '', regex=True, inplace=True)
+            record_df = record_df.astype('unicode')
+            record_df = record_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
 
-            record_df['high_value_dataset'] = np.where(record_df['high_value_dataset'].str.contains("ไม่"), False, True)
-            record_df['reference_data'] = np.where(record_df['reference_data'].str.contains("ไม่"), False, True)
+            record_df['high_value_dataset'] = np.where(record_df['high_value_dataset'].str.contains(u'ไม่'), "False", "True")
+            record_df['reference_data'] = np.where(record_df['reference_data'].str.contains(u'ไม่'), "False", "True")
 
             record_df["dataset_name"] = record_df["name"]
             record_df["name"] = record_df["name"].str.lower()
@@ -89,66 +72,57 @@ class DatasetImportController(p.toolkit.BaseController):
                 record_df.reset_index(drop=True, inplace=True)
             record_df["owner_org"] = data_dict['owner_org']
             record_df["private"] = True
-            record_df["allow_harvest"] = False
-            record_df['tag_string'] = record_df.tag_string.astype(str)
+            record_df["allow_harvest"] = "False"
             record_df['tag_string'] = record_df['tag_string'].str.split(',').apply(lambda x: [e.strip() for e in x]).tolist()
 
             record_df["created_date"] = pd.to_datetime((pd.to_numeric(record_df["created_date"].str.slice(stop=4), errors='coerce').astype('Int64')-543).astype(str)+record_df["created_date"].str.slice(start=4), errors='coerce').astype(str)
             record_df["last_updated_date"] = pd.to_datetime((pd.to_numeric(record_df["last_updated_date"].str.slice(stop=4), errors='coerce').astype('Int64')-543).astype(str)+record_df["last_updated_date"].str.slice(start=4), errors='coerce').astype(str)
 
-            objective_choices = ['ยุทธศาสตร์ชาติ', 'แผนพัฒนาเศรษฐกิจและสังคมแห่งชาติ', 'แผนความมั่นคงแห่งชาติ','แผนแม่บทภายใต้ยุทธศาสตร์ชาติ','แผนปฏิรูปประเทศ','แผนระดับที่ 3 (มติครม. 4 ธ.ค. 2560)','นโยบายรัฐบาล/ข้อสั่งการนายกรัฐมนตรี','มติคณะรัฐมนตรี','เพื่อการให้บริการประชาชน','กฎหมายที่เกี่ยวข้อง','พันธกิจหน่วยงาน','ดัชนี/ตัวชี้วัดระดับนานาชาติ','ไม่ทราบ']
+            objective_choices = [u'ยุทธศาสตร์ชาติ', u'แผนพัฒนาเศรษฐกิจและสังคมแห่งชาติ', u'แผนความมั่นคงแห่งชาติ',u'แผนแม่บทภายใต้ยุทธศาสตร์ชาติ',u'แผนปฏิรูปประเทศ',u'แผนระดับที่ 3 (มติครม. 4 ธ.ค. 2560)',u'นโยบายรัฐบาล/ข้อสั่งการนายกรัฐมนตรี',u'มติคณะรัฐมนตรี',u'เพื่อการให้บริการประชาชน',u'กฎหมายที่เกี่ยวข้อง',u'พันธกิจหน่วยงาน',u'ดัชนี/ตัวชี้วัดระดับนานาชาติ',u'ไม่ทราบ']
             record_df['objective_other'] = record_df['objective'].isin(objective_choices)
-            record_df['objective_other'] = record_df.objective_other.astype(str)
-            record_df['objective_other'] = np.where(record_df['objective_other'] == 'True', 'True', record_df['objective'])
+            record_df['objective_other'] = np.where(record_df['objective_other'], 'True', record_df['objective'])
             record_df['objective'] = np.where(record_df['objective_other'] == 'True', record_df['objective'], u'อื่นๆ')
             record_df['objective_other'].replace('True', '', regex=True, inplace=True)
 
-            update_frequency_unit_choices = ['ไม่ทราบ', 'ปี', 'ครึ่งปี','ไตรมาส','เดือน','สัปดาห์','วัน','วันทำการ','ชั่วโมง','นาที','ตามเวลาจริง','ไม่มีการปรับปรุงหลังจากการจัดเก็บข้อมูล']
+            update_frequency_unit_choices = [u'ไม่ทราบ', u'ปี', u'ครึ่งปี',u'ไตรมาส',u'เดือน',u'สัปดาห์',u'วัน',u'วันทำการ',u'ชั่วโมง',u'นาที',u'ตามเวลาจริง',u'ไม่มีการปรับปรุงหลังจากการจัดเก็บข้อมูล']
             record_df['update_frequency_unit_other'] = record_df['update_frequency_unit'].isin(update_frequency_unit_choices)
-            record_df['update_frequency_unit_other'] = record_df.update_frequency_unit_other.astype(str)
-            record_df['update_frequency_unit_other'] = np.where(record_df['update_frequency_unit_other'] == 'True', 'True', record_df['update_frequency_unit'])
-            record_df['update_frequency_unit'] = np.where(record_df['update_frequency_unit_other'] == 'True', record_df['update_frequency_unit'], 'อื่นๆ')
+            record_df['update_frequency_unit_other'] = np.where(record_df['update_frequency_unit_other'], 'True', record_df['update_frequency_unit'])
+            record_df['update_frequency_unit'] = np.where(record_df['update_frequency_unit_other'] == 'True', record_df['update_frequency_unit'], u'อื่นๆ')
             record_df['update_frequency_unit_other'].replace('True', '', regex=True, inplace=True)
 
-            geo_coverage_choices = ['ไม่มี', 'โลก', 'ทวีป/กลุ่มประเทศในทวีป','กลุ่มประเทศทางเศรษฐกิจ','ประเทศ','ภาค','จังหวัด','อำเภอ','ตำบล','หมู่บ้าน','เทศบาล/อบต.','พิกัด','ไม่ทราบ']
+            geo_coverage_choices = [u'ไม่มี', u'โลก', u'ทวีป/กลุ่มประเทศในทวีป',u'กลุ่มประเทศทางเศรษฐกิจ',u'ประเทศ',u'ภาค',u'จังหวัด',u'อำเภอ',u'ตำบล',u'หมู่บ้าน',u'เทศบาล/อบต.',u'พิกัด',u'ไม่ทราบ']
             record_df['geo_coverage_other'] = record_df['geo_coverage'].isin(geo_coverage_choices)
-            record_df['geo_coverage_other'] = record_df.geo_coverage_other.astype(str)
-            record_df['geo_coverage_other'] = np.where(record_df['geo_coverage_other'] == 'True', 'True', record_df['geo_coverage'])
-            record_df['geo_coverage'] = np.where(record_df['geo_coverage_other'] == 'True', record_df['geo_coverage'], 'อื่นๆ')
+            record_df['geo_coverage_other'] = np.where(record_df['geo_coverage_other'], 'True', record_df['geo_coverage'])
+            record_df['geo_coverage'] = np.where(record_df['geo_coverage_other'] == 'True', record_df['geo_coverage'], u'อื่นๆ')
             record_df['geo_coverage_other'].replace('True', '', regex=True, inplace=True)
 
-            data_format_choices = ['ไม่ทราบ', 'Database', 'CSV','XML','Image','Video','Audio','Text','JSON','HTML','XLS','PDF','RDF','NoSQL','Arc/Info Coverage','Shapefile','GeoTiff','GML']
+            data_format_choices = [u'ไม่ทราบ', 'Database', 'CSV','XML','Image','Video','Audio','Text','JSON','HTML','DOC/DOCX','XLS','PDF','RDF','NoSQL','Arc/Info Coverage','Shapefile','GeoTiff','GML']
             record_df['data_format_other'] = record_df['data_format'].isin(data_format_choices)
-            record_df['data_format_other'] = record_df.data_format_other.astype(str)
-            record_df['data_format_other'] = np.where(record_df['data_format_other'] == 'True', 'True', record_df['data_format'])
+            record_df['data_format_other'] = np.where(record_df['data_format_other'], 'True', record_df['data_format'])
             record_df['data_format'] = np.where(record_df['data_format_other'] == 'True', record_df['data_format'], u'อื่นๆ')
             record_df['data_format_other'].replace('True', '', regex=True, inplace=True)
 
             license_id_choices = ['License not specified', 'Creative Commons Attributions','Creative Commons Attribution Share-Alike','Creative Commons Non-Commercial (Any)','Open Data Common','GNU Free Documentation License']
             record_df['license_id_other'] = record_df['license_id'].isin(license_id_choices)
-            record_df['license_id_other'] = record_df.license_id_other.astype(str)
-            record_df['license_id_other'] = np.where(record_df['license_id_other'] == 'True', 'True', record_df['license_id'])
-            record_df['license_id'] = np.where(record_df['license_id_other'] == 'True', record_df['license_id'], 'อื่นๆ')
+            record_df['license_id_other'] = np.where(record_df['license_id_other'], 'True', record_df['license_id'])
+            record_df['license_id'] = np.where(record_df['license_id_other'] == 'True', record_df['license_id'], u'อื่นๆ')
             record_df['license_id_other'].replace('True', '', regex=True, inplace=True)
             
-            data_support_choices = ['','ไม่มี', 'หน่วยงานของรัฐ', 'หน่วยงานเอกชน','หน่วยงาน/องค์กรระหว่างประเทศ','มูลนิธิ/สมาคม','สถาบันการศึกษา']
+            data_support_choices = ['',u'ไม่มี', u'หน่วยงานของรัฐ', u'หน่วยงานเอกชน',u'หน่วยงาน/องค์กรระหว่างประเทศ',u'มูลนิธิ/สมาคม',u'สถาบันการศึกษา']
             record_df['data_support_other'] = record_df['data_support'].isin(data_support_choices)
-            record_df['data_support_other'] = record_df.data_support_other.astype(str)
-            record_df['data_support_other'] = np.where(record_df['data_support_other'] == 'True', 'True', record_df['data_support'])
-            record_df['data_support'] = np.where(record_df['data_support_other'] == 'True', record_df['data_support'], 'อื่นๆ')
+            record_df['data_support_other'] = np.where(record_df['data_support_other'], 'True', record_df['data_support'])
+            record_df['data_support'] = np.where(record_df['data_support_other'] == 'True', record_df['data_support'], u'อื่นๆ')
             record_df['data_support_other'].replace('True', '', regex=True, inplace=True)
 
-            data_collect_choices = ['','ไม่มี','บุคคล', 'ครัวเรือน/ครอบครัว', 'บ้าน/ที่อยู่อาศัย','บริษัท/ห้างร้าน/สถานประกอบการ','อาคาร/สิ่งปลูกสร้าง','พื้นที่การเกษตร ประมง ป่าไม้','สัตว์และพันธุ์พืช','ขอบเขตเชิงภูมิศาสตร์หรือเชิงพื้นที่','แหล่งน้ำ เช่น แม่น้ำ อ่างเก็บน้ำ','เส้นทางการเดินทาง เช่น ถนน ทางรถไฟ','ไม่ทราบ']
+            data_collect_choices = ['',u'ไม่มี',u'บุคคล', u'ครัวเรือน/ครอบครัว', u'บ้าน/ที่อยู่อาศัย',u'บริษัท/ห้างร้าน/สถานประกอบการ',u'อาคาร/สิ่งปลูกสร้าง',u'พื้นที่การเกษตร ประมง ป่าไม้',u'สัตว์และพันธุ์พืช',u'ขอบเขตเชิงภูมิศาสตร์หรือเชิงพื้นที่',u'แหล่งน้ำ เช่น แม่น้ำ อ่างเก็บน้ำ',u'เส้นทางการเดินทาง เช่น ถนน ทางรถไฟ',u'ไม่ทราบ']
             record_df['data_collect_other'] = record_df['data_collect'].isin(data_collect_choices)
-            record_df['data_collect_other'] = record_df.data_collect_other.astype(str)
-            record_df['data_collect_other'] = np.where(record_df['data_collect_other'] == 'True', 'True', record_df['data_collect'])
-            record_df['data_collect'] = np.where(record_df['data_collect_other'] == 'True', record_df['data_collect'], 'อื่นๆ')
+            record_df['data_collect_other'] = np.where(record_df['data_collect_other'], 'True', record_df['data_collect'])
+            record_df['data_collect'] = np.where(record_df['data_collect_other'] == 'True', record_df['data_collect'], u'อื่นๆ')
             record_df['data_collect_other'].replace('True', '', regex=True, inplace=True)
 
-            data_language_choices = ['','ไทย', 'อังกฤษ', 'จีน','มลายู','พม่า','ลาว','เขมร','ญี่ปุ่น','เกาหลี','ฝรั่งเศส','เยอรมัน','อารบิก','ไม่ทราบ']
+            data_language_choices = ['',u'ไทย', u'อังกฤษ', u'จีน',u'มลายู',u'พม่า',u'ลาว',u'เขมร',u'ญี่ปุ่น',u'เกาหลี',u'ฝรั่งเศส',u'เยอรมัน',u'อารบิก',u'ไม่ทราบ']
             record_df['data_language_other'] = record_df['data_language'].isin(data_language_choices)
-            record_df['data_language_other'] = record_df.data_language_other.astype(str)
-            record_df['data_language_other'] = np.where(record_df['data_language_other'] == 'True', 'True', record_df['data_language'])
+            record_df['data_language_other'] = np.where(record_df['data_language_other'], 'True', record_df['data_language'])
             record_df['data_language'] = np.where(record_df['data_language_other'] == 'True', record_df['data_language'], u'อื่นๆ')
             record_df['data_language_other'].replace('True', '', regex=True, inplace=True)
 
@@ -157,8 +131,9 @@ class DatasetImportController(p.toolkit.BaseController):
         except Exception as err:
            log.info(err)
            record_df = pd.DataFrame(columns=['name','d_type','title','owner_org','maintainer','maintainer_email','tag_string','notes','objective','update_frequency_unit','update_frequency_interval','geo_coverage','data_source','data_format','data_category','license_id','accessible_condition','created_date','last_updated_date','url','data_support','data_collect','data_language','high_value_dataset','reference_data','data_type'])
-           record_df = record_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
            record_df.replace(np.nan, '', regex=True, inplace=True)
+           record_df = record_df.astype('unicode')
+           record_df = record_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
             
         portal = LocalCKAN()
 
@@ -191,15 +166,17 @@ class DatasetImportController(p.toolkit.BaseController):
                 log.info(log_str)
 
         try:
-            resource_df = pd.read_excel(data_dict['filename'], header=[3], sheet_name='Temp3_Resource_Record', dtype=str)
+            resource_df = pd.read_excel(data_dict['filename'], header=[3], sheet_name='Temp3_Resource_Record')
             resource_df.drop(0, inplace=True)
             resource_df.columns = ['dataset_name','resource_name','resource_url','description','resource_accessible_condition','resource_last_updated_date','format','resource_created_date','resource_data_collect']
-            resource_df = resource_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
             resource_df.replace(np.nan, '', regex=True, inplace=True)
+            resource_df = resource_df.astype('unicode')
+            resource_df = resource_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
         except:
             resource_df = pd.DataFrame(columns=['dataset_name','resource_name','resource_url','description','resource_accessible_condition','resource_last_updated_date','format','resource_created_date','resource_data_collect'])
-            resource_df = resource_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
             resource_df.replace(np.nan, '', regex=True, inplace=True)
+            resource_df = resource_df.astype('unicode')
+            resource_df = resource_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
 
         try:
             final_df = pd.merge(record_df,resource_df,how='left',left_on='dataset_name',right_on='dataset_name')
@@ -223,16 +200,17 @@ class DatasetImportController(p.toolkit.BaseController):
 
     def _stat_type_process(self, data_dict):
         try:
-            stat_df = pd.read_excel(data_dict['filename'], header=[3], sheet_name='Temp2_Meta_Stat', dtype=str)
+            stat_df = pd.read_excel(data_dict['filename'], header=[3], sheet_name='Temp2_Meta_Stat')
             stat_df.drop(0, inplace=True)
-            stat_df["data_type"] = 'ข้อมูลสถิติ'
+            stat_df["data_type"] = u'ข้อมูลสถิติ'
 
             stat_df.columns = ['name','d_type','title','owner_org','maintainer','maintainer_email','tag_string','notes','objective','update_frequency_unit','update_frequency_interval','geo_coverage','data_source','data_format','data_category','license_id','accessible_condition','first_year_of_data','last_year_of_data','data_release_calendar','last_updated_date','disaggregate','unit_of_measure','unit_of_multiplier','calculation_method','standard','url','data_language','official_statistics','data_type']
             stat_df.drop(['d_type'], axis=1, inplace=True)
-            stat_df = stat_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
             stat_df.replace(np.nan, '', regex=True, inplace=True)
+            stat_df = stat_df.astype('unicode')
+            stat_df = stat_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
 
-            stat_df['official_statistics'] = np.where(stat_df['official_statistics'].str.contains("ไม่"), False, True)
+            stat_df['official_statistics'] = np.where(stat_df['official_statistics'].str.contains(u'ไม่'), "False", "True")
             
             stat_df["dataset_name"] = stat_df["name"]
             stat_df["name"] = stat_df["name"].str.lower()
@@ -242,67 +220,58 @@ class DatasetImportController(p.toolkit.BaseController):
                 stat_df.reset_index(drop=True, inplace=True)
             stat_df["owner_org"] = data_dict['owner_org']
             stat_df["private"] = True
-            stat_df["allow_harvest"] = False
-            stat_df['tag_string'] = stat_df.tag_string.astype(str)
+            stat_df["allow_harvest"] = "False"
             stat_df['tag_string'] = stat_df['tag_string'].str.split(',').apply(lambda x: [e.strip() for e in x]).tolist()
 
             stat_df["last_updated_date"] = pd.to_datetime((pd.to_numeric(stat_df["last_updated_date"].str.slice(stop=4), errors='coerce').astype('Int64')-543).astype(str)+stat_df["last_updated_date"].str.slice(start=4), errors='coerce').astype(str)
 
-            objective_choices = ['ยุทธศาสตร์ชาติ', 'แผนพัฒนาเศรษฐกิจและสังคมแห่งชาติ', 'แผนความมั่นคงแห่งชาติ','แผนแม่บทภายใต้ยุทธศาสตร์ชาติ','แผนปฏิรูปประเทศ','แผนระดับที่ 3 (มติครม. 4 ธ.ค. 2560)','นโยบายรัฐบาล/ข้อสั่งการนายกรัฐมนตรี','มติคณะรัฐมนตรี','เพื่อการให้บริการประชาชน','กฎหมายที่เกี่ยวข้อง','พันธกิจหน่วยงาน','ดัชนี/ตัวชี้วัดระดับนานาชาติ','ไม่ทราบ']
+            objective_choices = [u'ยุทธศาสตร์ชาติ', u'แผนพัฒนาเศรษฐกิจและสังคมแห่งชาติ', u'แผนความมั่นคงแห่งชาติ',u'แผนแม่บทภายใต้ยุทธศาสตร์ชาติ',u'แผนปฏิรูปประเทศ',u'แผนระดับที่ 3 (มติครม. 4 ธ.ค. 2560)',u'นโยบายรัฐบาล/ข้อสั่งการนายกรัฐมนตรี',u'มติคณะรัฐมนตรี',u'เพื่อการให้บริการประชาชน',u'กฎหมายที่เกี่ยวข้อง',u'พันธกิจหน่วยงาน',u'ดัชนี/ตัวชี้วัดระดับนานาชาติ',u'ไม่ทราบ']
             stat_df['objective_other'] = stat_df['objective'].isin(objective_choices)
-            stat_df['objective_other'] = stat_df.objective_other.astype(str)
-            stat_df['objective_other'] = np.where(stat_df['objective_other'] == 'True', 'True', stat_df['objective'])
+            stat_df['objective_other'] = np.where(stat_df['objective_other'], 'True', stat_df['objective'])
             stat_df['objective'] = np.where(stat_df['objective_other'] == 'True', stat_df['objective'], u'อื่นๆ')
             stat_df['objective_other'].replace('True', '', regex=True, inplace=True)
 
-            update_frequency_unit_choices = ['ไม่ทราบ', 'ปี', 'ครึ่งปี','ไตรมาส','เดือน','สัปดาห์','วัน','วันทำการ','ชั่วโมง','นาที','ตามเวลาจริง','ไม่มีการปรับปรุงหลังจากการจัดเก็บข้อมูล']
+            update_frequency_unit_choices = [u'ไม่ทราบ', u'ปี', u'ครึ่งปี',u'ไตรมาส',u'เดือน',u'สัปดาห์',u'วัน',u'วันทำการ',u'ชั่วโมง',u'นาที',u'ตามเวลาจริง',u'ไม่มีการปรับปรุงหลังจากการจัดเก็บข้อมูล']
             stat_df['update_frequency_unit_other'] = stat_df['update_frequency_unit'].isin(update_frequency_unit_choices)
-            stat_df['update_frequency_unit_other'] = stat_df.update_frequency_unit_other.astype(str)
-            stat_df['update_frequency_unit_other'] = np.where(stat_df['update_frequency_unit_other'] == 'True', 'True', stat_df['update_frequency_unit'])
-            stat_df['update_frequency_unit'] = np.where(stat_df['update_frequency_unit_other'] == 'True', stat_df['update_frequency_unit'], 'อื่นๆ')
+            stat_df['update_frequency_unit_other'] = np.where(stat_df['update_frequency_unit_other'], 'True', stat_df['update_frequency_unit'])
+            stat_df['update_frequency_unit'] = np.where(stat_df['update_frequency_unit_other'] == 'True', stat_df['update_frequency_unit'], u'อื่นๆ')
             stat_df['update_frequency_unit_other'].replace('True', '', regex=True, inplace=True)
 
-            geo_coverage_choices = ['ไม่มี', 'โลก', 'ทวีป/กลุ่มประเทศในทวีป','กลุ่มประเทศทางเศรษฐกิจ','ประเทศ','ภาค','จังหวัด','อำเภอ','ตำบล','หมู่บ้าน','เทศบาล/อบต.','พิกัด','ไม่ทราบ']
+            geo_coverage_choices = [u'ไม่มี', u'โลก', u'ทวีป/กลุ่มประเทศในทวีป',u'กลุ่มประเทศทางเศรษฐกิจ',u'ประเทศ',u'ภาค',u'จังหวัด',u'อำเภอ',u'ตำบล',u'หมู่บ้าน',u'เทศบาล/อบต.',u'พิกัด',u'ไม่ทราบ']
             stat_df['geo_coverage_other'] = stat_df['geo_coverage'].isin(geo_coverage_choices)
-            stat_df['geo_coverage_other'] = stat_df.geo_coverage_other.astype(str)
-            stat_df['geo_coverage_other'] = np.where(stat_df['geo_coverage_other'] == 'True', 'True', stat_df['geo_coverage'])
-            stat_df['geo_coverage'] = np.where(stat_df['geo_coverage_other'] == 'True', stat_df['geo_coverage'], 'อื่นๆ')
+            stat_df['geo_coverage_other'] = np.where(stat_df['geo_coverage_other'], 'True', stat_df['geo_coverage'])
+            stat_df['geo_coverage'] = np.where(stat_df['geo_coverage_other'] == 'True', stat_df['geo_coverage'], u'อื่นๆ')
             stat_df['geo_coverage_other'].replace('True', '', regex=True, inplace=True)
 
-            data_format_choices = ['ไม่ทราบ', 'Database', 'CSV','XML','Image','Video','Audio','Text','JSON','HTML','XLS','PDF','RDF','NoSQL','Arc/Info Coverage','Shapefile','GeoTiff','GML']
+            data_format_choices = [u'ไม่ทราบ', 'Database', 'CSV','XML','Image','Video','Audio','Text','JSON','HTML','DOC/DOCX','XLS','PDF','RDF','NoSQL','Arc/Info Coverage','Shapefile','GeoTiff','GML']
             stat_df['data_format_other'] = stat_df['data_format'].isin(data_format_choices)
-            stat_df['data_format_other'] = stat_df.data_format_other.astype(str)
-            stat_df['data_format_other'] = np.where(stat_df['data_format_other'] == 'True', 'True', stat_df['data_format'])
+            stat_df['data_format_other'] = np.where(stat_df['data_format_other'], 'True', stat_df['data_format'])
             stat_df['data_format'] = np.where(stat_df['data_format_other'] == 'True', stat_df['data_format'], u'อื่นๆ')
             stat_df['data_format_other'].replace('True', '', regex=True, inplace=True)
 
             license_id_choices = ['License not specified', 'Creative Commons Attributions','Creative Commons Attribution Share-Alike','Creative Commons Non-Commercial (Any)','Open Data Common','GNU Free Documentation License']
             stat_df['license_id_other'] = stat_df['license_id'].isin(license_id_choices)
-            stat_df['license_id_other'] = stat_df.license_id_other.astype(str)
-            stat_df['license_id_other'] = np.where(stat_df['license_id_other'] == 'True', 'True', stat_df['license_id'])
-            stat_df['license_id'] = np.where(stat_df['license_id_other'] == 'True', stat_df['license_id'], 'อื่นๆ')
+            stat_df['license_id_other'] = np.where(stat_df['license_id_other'], 'True', stat_df['license_id'])
+            stat_df['license_id'] = np.where(stat_df['license_id_other'] == 'True', stat_df['license_id'], u'อื่นๆ')
             stat_df['license_id_other'].replace('True', '', regex=True, inplace=True)
 
             stat_df["data_release_calendar"] = pd.to_datetime((pd.to_numeric(stat_df["data_release_calendar"].str.slice(stop=4), errors='coerce').astype('Int64')-543).astype(str)+stat_df["data_release_calendar"].str.slice(start=4), errors='coerce').astype(str)
             
-            disaggregate_choices = ['','ไม่มี', 'เพศ', 'อายุ/กลุ่มอายุ','สถานภาพสมรส','ศาสนา','ระดับการศึกษา','อาชีพ','สถานภาพการทำงาน','อุตสาหกรรม/ประเภทกิจการ','รายได้','ขอบเขตเชิงภูมิศาสตร์หรือเชิงพื้นที่','ผลิตภัณฑ์','ไม่ทราบ']
+            disaggregate_choices = ['',u'ไม่มี', u'เพศ', u'อายุ/กลุ่มอายุ',u'สถานภาพสมรส',u'ศาสนา',u'ระดับการศึกษา',u'อาชีพ',u'สถานภาพการทำงาน',u'อุตสาหกรรม/ประเภทกิจการ',u'รายได้',u'ขอบเขตเชิงภูมิศาสตร์หรือเชิงพื้นที่',u'ผลิตภัณฑ์',u'ไม่ทราบ']
             stat_df['disaggregate_other'] = stat_df['disaggregate'].isin(disaggregate_choices)
-            stat_df['disaggregate_other'] = stat_df.disaggregate_other.astype(str)
-            stat_df['disaggregate_other'] = np.where(stat_df['disaggregate_other'] == 'True', 'True', stat_df['disaggregate'])
+            stat_df['disaggregate_other'] = np.where(stat_df['disaggregate_other'], 'True', stat_df['disaggregate'])
             stat_df['disaggregate'] = np.where(stat_df['disaggregate_other'] == 'True', stat_df['disaggregate'], u'อื่นๆ')
             stat_df['disaggregate_other'].replace('True', '', regex=True, inplace=True)
             
-            unit_of_multiplier_choices = ['','หน่วย', 'สิบ', 'ร้อย','พัน','หมื่น','แสน','ล้าน','สิบล้าน','ร้อยล้าน','พันล้าน','หมื่นล้าน','แสนล้าน','ล้านล้าน','ไม่ทราบ']
+            unit_of_multiplier_choices = ['',u'หน่วย', u'สิบ', u'ร้อย',u'พัน',u'หมื่น',u'แสน',u'ล้าน',u'สิบล้าน',u'ร้อยล้าน',u'พันล้าน',u'หมื่นล้าน',u'แสนล้าน',u'ล้านล้าน',u'ไม่ทราบ']
             stat_df['unit_of_multiplier_other'] = stat_df['unit_of_multiplier'].isin(unit_of_multiplier_choices)
-            stat_df['unit_of_multiplier_other'] = stat_df.unit_of_multiplier_other.astype(str)
-            stat_df['unit_of_multiplier_other'] = np.where(stat_df['unit_of_multiplier_other'] == 'True', 'True', stat_df['unit_of_multiplier'])
-            stat_df['unit_of_multiplier'] = np.where(stat_df['unit_of_multiplier_other'] == 'True', stat_df['unit_of_multiplier'], 'อื่นๆ')
+            stat_df['unit_of_multiplier_other'] = np.where(stat_df['unit_of_multiplier_other'], 'True', stat_df['unit_of_multiplier'])
+            stat_df['unit_of_multiplier'] = np.where(stat_df['unit_of_multiplier_other'] == 'True', stat_df['unit_of_multiplier'], u'อื่นๆ')
             stat_df['unit_of_multiplier_other'].replace('True', '', regex=True, inplace=True)
             
-            data_language_choices = ['','ไทย', 'อังกฤษ', 'จีน','มลายู','พม่า','ลาว','เขมร','ญี่ปุ่น','เกาหลี','ฝรั่งเศส','เยอรมัน','อารบิก','ไม่ทราบ']
+            data_language_choices = ['',u'ไทย', u'อังกฤษ', u'จีน',u'มลายู',u'พม่า',u'ลาว',u'เขมร',u'ญี่ปุ่น',u'เกาหลี',u'ฝรั่งเศส',u'เยอรมัน',u'อารบิก',u'ไม่ทราบ']
             stat_df['data_language_other'] = stat_df['data_language'].isin(data_language_choices)
-            stat_df['data_language_other'] = stat_df.data_language_other.astype(str)
-            stat_df['data_language_other'] = np.where(stat_df['data_language_other'] == 'True', 'True', stat_df['data_language'])
+            stat_df['data_language_other'] = np.where(stat_df['data_language_other'], 'True', stat_df['data_language'])
             stat_df['data_language'] = np.where(stat_df['data_language_other'] == 'True', stat_df['data_language'], u'อื่นๆ')
             stat_df['data_language_other'].replace('True', '', regex=True, inplace=True)
             
@@ -311,8 +280,9 @@ class DatasetImportController(p.toolkit.BaseController):
         except Exception as err:
             log.info(err)
             stat_df = pd.DataFrame(columns=['name','d_type','title','owner_org','maintainer','maintainer_email','tag_string','notes','objective','update_frequency_unit','update_frequency_interval','geo_coverage','data_source','data_format','data_category','license_id','accessible_condition','first_year_of_data','last_year_of_data','data_release_calendar','last_updated_date','disaggregate','unit_of_measure','unit_of_multiplier','calculation_method','standard','url','data_language','official_statistics','data_type'])
-            stat_df = stat_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
             stat_df.replace(np.nan, '', regex=True, inplace=True)
+            stat_df = stat_df.astype('unicode')
+            stat_df = stat_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
 
         portal = LocalCKAN()
 
@@ -348,15 +318,17 @@ class DatasetImportController(p.toolkit.BaseController):
                 log.info(log_str)
 
         try:
-            resource_df = pd.read_excel(data_dict['filename'], header=[3], sheet_name='Temp3_Resource_Stat', dtype=str)
+            resource_df = pd.read_excel(data_dict['filename'], header=[3], sheet_name='Temp3_Resource_Stat')
             resource_df.drop(0, inplace=True)
             resource_df.columns = ['dataset_name','resource_name','resource_url','description','resource_accessible_condition','resource_last_updated_date','format','resource_first_year_of_data','resource_last_year_of_data','resource_data_release_calendar','resource_disaggregate','resource_unit_of_measure','resource_unit_of_multiplier','resource_official_statistics']
-            resource_df = resource_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
             resource_df.replace(np.nan, '', regex=True, inplace=True)
+            resource_df = resource_df.astype('unicode')
+            resource_df = resource_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
         except:
             resource_df = pd.DataFrame(columns=['dataset_name','resource_name','resource_url','description','resource_accessible_condition','resource_last_updated_date','format','resource_first_year_of_data','resource_last_year_of_data','resource_data_release_calendar','resource_disaggregate','resource_unit_of_measure','resource_unit_of_multiplier','resource_official_statistics'])
-            resource_df = resource_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
             resource_df.replace(np.nan, '', regex=True, inplace=True)
+            resource_df = resource_df.astype('unicode')
+            resource_df = resource_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
 
         try:
             final_df = pd.merge(stat_df,resource_df,how='left',left_on='dataset_name',right_on='dataset_name')
@@ -365,10 +337,9 @@ class DatasetImportController(p.toolkit.BaseController):
             resource_df = resource_df[['name','success','resource_name','resource_url','description','resource_accessible_condition','resource_last_updated_date','format','resource_first_year_of_data','resource_last_year_of_data','resource_data_release_calendar','resource_disaggregate','resource_unit_of_measure','resource_unit_of_multiplier','resource_official_statistics']]
             resource_df.columns = ['package_id','success','name','url','description','resource_accessible_condition','resource_last_updated_date','format','resource_first_year_of_data','resource_last_year_of_data','resource_data_release_calendar','resource_disaggregate','resource_unit_of_measure','resource_unit_of_multiplier','resource_official_statistics']
 
-            disaggregate_choices = ['','ไม่มี', 'เพศ', 'อายุ/กลุ่มอายุ','สถานภาพสมรส','ศาสนา','ระดับการศึกษา','อาชีพ','สถานภาพการทำงาน','อุตสาหกรรม/ประเภทกิจการ','รายได้','ขอบเขตเชิงภูมิศาสตร์หรือเชิงพื้นที่','ผลิตภัณฑ์','ไม่ทราบ']
+            disaggregate_choices = ['',u'ไม่มี', u'เพศ', u'อายุ/กลุ่มอายุ',u'สถานภาพสมรส',u'ศาสนา',u'ระดับการศึกษา',u'อาชีพ',u'สถานภาพการทำงาน',u'อุตสาหกรรม/ประเภทกิจการ',u'รายได้',u'ขอบเขตเชิงภูมิศาสตร์หรือเชิงพื้นที่',u'ผลิตภัณฑ์',u'ไม่ทราบ']
             resource_df['resource_disaggregate_other'] = resource_df['resource_disaggregate'].isin(disaggregate_choices)
-            resource_df['resource_disaggregate_other'] = resource_df.resource_disaggregate_other.astype(str)
-            resource_df['resource_disaggregate_other'] = np.where(resource_df['resource_disaggregate_other'] == 'True', 'True', resource_df['resource_disaggregate'])
+            resource_df['resource_disaggregate_other'] = np.where(resource_df['resource_disaggregate_other'], 'True', resource_df['resource_disaggregate'])
             resource_df['resource_disaggregate'] = np.where(resource_df['resource_disaggregate_other'] == 'True', resource_df['resource_disaggregate'], u'อื่นๆ')
             resource_df['resource_disaggregate_other'].replace('True', '', regex=True, inplace=True)
 
@@ -391,14 +362,15 @@ class DatasetImportController(p.toolkit.BaseController):
 
     def _gis_type_process(self, data_dict):
         try:
-            gis_df = pd.read_excel(data_dict['filename'], header=[3], sheet_name='Temp2_Meta_GIS', dtype=str)
+            gis_df = pd.read_excel(data_dict['filename'], header=[3], sheet_name='Temp2_Meta_GIS')
             gis_df.drop(0, inplace=True)
-            gis_df["data_type"] = 'ข้อมูลภูมิสารสนเทศเชิงพื้นที่'
+            gis_df["data_type"] = u'ข้อมูลภูมิสารสนเทศเชิงพื้นที่'
 
             gis_df.columns = ['name','d_type','title','owner_org','maintainer','maintainer_email','tag_string','notes','objective','update_frequency_unit','update_frequency_interval','geo_coverage','data_source','data_format','data_category','license_id','accessible_condition','geographic_data_set','equivalent_scale','west_bound_longitude','east_bound_longitude','north_bound_longitude','south_bound_longitude','positional_accuracy','reference_period','last_updated_date','data_release_calendar','data_release_date','url','data_language','data_type']
             gis_df.drop(['d_type'], axis=1, inplace=True)
-            gis_df = gis_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
             gis_df.replace(np.nan, '', regex=True, inplace=True)
+            gis_df = gis_df.astype('unicode')
+            gis_df = gis_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
 
             gis_df["dataset_name"] = gis_df["name"]
             gis_df["name"] = gis_df["name"].str.lower()
@@ -408,61 +380,53 @@ class DatasetImportController(p.toolkit.BaseController):
                 gis_df.reset_index(drop=True, inplace=True)
             gis_df["owner_org"] = data_dict['owner_org']
             gis_df["private"] = True
-            gis_df["allow_harvest"] = False
-            gis_df['tag_string'] = gis_df.tag_string.astype(str)
+            gis_df["allow_harvest"] = "False"
             gis_df['tag_string'] = gis_df['tag_string'].str.split(',').apply(lambda x: [e.strip() for e in x]).tolist()
 
             gis_df["last_updated_date"] = pd.to_datetime((pd.to_numeric(gis_df["last_updated_date"].str.slice(stop=4), errors='coerce').astype('Int64')-543).astype(str)+gis_df["last_updated_date"].str.slice(start=4), errors='coerce').astype(str)
 
-            objective_choices = ['ยุทธศาสตร์ชาติ', 'แผนพัฒนาเศรษฐกิจและสังคมแห่งชาติ', 'แผนความมั่นคงแห่งชาติ','แผนแม่บทภายใต้ยุทธศาสตร์ชาติ','แผนปฏิรูปประเทศ','แผนระดับที่ 3 (มติครม. 4 ธ.ค. 2560)','นโยบายรัฐบาล/ข้อสั่งการนายกรัฐมนตรี','มติคณะรัฐมนตรี','เพื่อการให้บริการประชาชน','กฎหมายที่เกี่ยวข้อง','พันธกิจหน่วยงาน','ดัชนี/ตัวชี้วัดระดับนานาชาติ','ไม่ทราบ']
+            objective_choices = [u'ยุทธศาสตร์ชาติ', u'แผนพัฒนาเศรษฐกิจและสังคมแห่งชาติ', u'แผนความมั่นคงแห่งชาติ',u'แผนแม่บทภายใต้ยุทธศาสตร์ชาติ',u'แผนปฏิรูปประเทศ',u'แผนระดับที่ 3 (มติครม. 4 ธ.ค. 2560)',u'นโยบายรัฐบาล/ข้อสั่งการนายกรัฐมนตรี',u'มติคณะรัฐมนตรี',u'เพื่อการให้บริการประชาชน',u'กฎหมายที่เกี่ยวข้อง',u'พันธกิจหน่วยงาน',u'ดัชนี/ตัวชี้วัดระดับนานาชาติ',u'ไม่ทราบ']
             gis_df['objective_other'] = gis_df['objective'].isin(objective_choices)
-            gis_df['objective_other'] = gis_df.objective_other.astype(str)
-            gis_df['objective_other'] = np.where(gis_df['objective_other'] == 'True', 'True', gis_df['objective'])
+            gis_df['objective_other'] = np.where(gis_df['objective_other'], 'True', gis_df['objective'])
             gis_df['objective'] = np.where(gis_df['objective_other'] == 'True', gis_df['objective'], u'อื่นๆ')
             gis_df['objective_other'].replace('True', '', regex=True, inplace=True)
 
-            update_frequency_unit_choices = ['ไม่ทราบ', 'ปี', 'ครึ่งปี','ไตรมาส','เดือน','สัปดาห์','วัน','วันทำการ','ชั่วโมง','นาที','ตามเวลาจริง','ไม่มีการปรับปรุงหลังจากการจัดเก็บข้อมูล']
+            update_frequency_unit_choices = [u'ไม่ทราบ', u'ปี', u'ครึ่งปี',u'ไตรมาส',u'เดือน',u'สัปดาห์',u'วัน',u'วันทำการ',u'ชั่วโมง',u'นาที',u'ตามเวลาจริง',u'ไม่มีการปรับปรุงหลังจากการจัดเก็บข้อมูล']
             gis_df['update_frequency_unit_other'] = gis_df['update_frequency_unit'].isin(update_frequency_unit_choices)
-            gis_df['update_frequency_unit_other'] = gis_df.update_frequency_unit_other.astype(str)
-            gis_df['update_frequency_unit_other'] = np.where(gis_df['update_frequency_unit_other'] == 'True', 'True', gis_df['update_frequency_unit'])
-            gis_df['update_frequency_unit'] = np.where(gis_df['update_frequency_unit_other'] == 'True', gis_df['update_frequency_unit'], 'อื่นๆ')
+            gis_df['update_frequency_unit_other'] = np.where(gis_df['update_frequency_unit_other'], 'True', gis_df['update_frequency_unit'])
+            gis_df['update_frequency_unit'] = np.where(gis_df['update_frequency_unit_other'] == 'True', gis_df['update_frequency_unit'], u'อื่นๆ')
             gis_df['update_frequency_unit_other'].replace('True', '', regex=True, inplace=True)
 
-            geo_coverage_choices = ['ไม่มี', 'โลก', 'ทวีป/กลุ่มประเทศในทวีป','กลุ่มประเทศทางเศรษฐกิจ','ประเทศ','ภาค','จังหวัด','อำเภอ','ตำบล','หมู่บ้าน','เทศบาล/อบต.','พิกัด','ไม่ทราบ']
+            geo_coverage_choices = [u'ไม่มี', u'โลก', u'ทวีป/กลุ่มประเทศในทวีป',u'กลุ่มประเทศทางเศรษฐกิจ',u'ประเทศ',u'ภาค',u'จังหวัด',u'อำเภอ',u'ตำบล',u'หมู่บ้าน',u'เทศบาล/อบต.',u'พิกัด',u'ไม่ทราบ']
             gis_df['geo_coverage_other'] = gis_df['geo_coverage'].isin(geo_coverage_choices)
-            gis_df['geo_coverage_other'] = gis_df.geo_coverage_other.astype(str)
-            gis_df['geo_coverage_other'] = np.where(gis_df['geo_coverage_other'] == 'True', 'True', gis_df['geo_coverage'])
-            gis_df['geo_coverage'] = np.where(gis_df['geo_coverage_other'] == 'True', gis_df['geo_coverage'], 'อื่นๆ')
+            gis_df['geo_coverage_other'] = np.where(gis_df['geo_coverage_other'], 'True', gis_df['geo_coverage'])
+            gis_df['geo_coverage'] = np.where(gis_df['geo_coverage_other'] == 'True', gis_df['geo_coverage'], u'อื่นๆ')
             gis_df['geo_coverage_other'].replace('True', '', regex=True, inplace=True)
 
-            data_format_choices = ['ไม่ทราบ', 'Database', 'CSV','XML','Image','Video','Audio','Text','JSON','HTML','XLS','PDF','RDF','NoSQL','Arc/Info Coverage','Shapefile','GeoTiff','GML']
+            data_format_choices = [u'ไม่ทราบ', 'Database', 'CSV','XML','Image','Video','Audio','Text','JSON','HTML','DOC/DOCX','XLS','PDF','RDF','NoSQL','Arc/Info Coverage','Shapefile','GeoTiff','GML']
             gis_df['data_format_other'] = gis_df['data_format'].isin(data_format_choices)
-            gis_df['data_format_other'] = gis_df.data_format_other.astype(str)
-            gis_df['data_format_other'] = np.where(gis_df['data_format_other'] == 'True', 'True', gis_df['data_format'])
+            gis_df['data_format_other'] = np.where(gis_df['data_format_other'], 'True', gis_df['data_format'])
             gis_df['data_format'] = np.where(gis_df['data_format_other'] == 'True', gis_df['data_format'], u'อื่นๆ')
             gis_df['data_format_other'].replace('True', '', regex=True, inplace=True)
 
             license_id_choices = ['License not specified', 'Creative Commons Attributions','Creative Commons Attribution Share-Alike','Creative Commons Non-Commercial (Any)','Open Data Common','GNU Free Documentation License']
             gis_df['license_id_other'] = gis_df['license_id'].isin(license_id_choices)
-            gis_df['license_id_other'] = gis_df.license_id_other.astype(str)
-            gis_df['license_id_other'] = np.where(gis_df['license_id_other'] == 'True', 'True', gis_df['license_id'])
-            gis_df['license_id'] = np.where(gis_df['license_id_other'] == 'True', gis_df['license_id'], 'อื่นๆ')
+            gis_df['license_id_other'] = np.where(gis_df['license_id_other'], 'True', gis_df['license_id'])
+            gis_df['license_id'] = np.where(gis_df['license_id_other'] == 'True', gis_df['license_id'], u'อื่นๆ')
             gis_df['license_id_other'].replace('True', '', regex=True, inplace=True)
 
             equivalent_scale_choices = ['','1:4,000', '1:10,000', '1:25,000','1:50,000','1:250,000']
             gis_df['equivalent_scale_other'] = gis_df['equivalent_scale'].isin(equivalent_scale_choices)
-            gis_df['equivalent_scale_other'] = gis_df.equivalent_scale_other.astype(str)
-            gis_df['equivalent_scale_other'] = np.where(gis_df['equivalent_scale_other'] == 'True', 'True', gis_df['equivalent_scale'])
-            gis_df['equivalent_scale'] = np.where(gis_df['equivalent_scale_other'] == 'True', gis_df['equivalent_scale'], 'อื่นๆ')
+            gis_df['equivalent_scale_other'] = np.where(gis_df['equivalent_scale_other'], 'True', gis_df['equivalent_scale'])
+            gis_df['equivalent_scale'] = np.where(gis_df['equivalent_scale_other'] == 'True', gis_df['equivalent_scale'], u'อื่นๆ')
             gis_df['equivalent_scale_other'].replace('True', '', regex=True, inplace=True)
 
             gis_df["data_release_calendar"] = pd.to_datetime((pd.to_numeric(gis_df["data_release_calendar"].str.slice(stop=4), errors='coerce').astype('Int64')-543).astype(str)+gis_df["data_release_calendar"].str.slice(start=4),errors='coerce').astype(str)
             gis_df["data_release_date"] = pd.to_datetime((pd.to_numeric(gis_df["data_release_date"].str.slice(stop=4), errors='coerce').astype('Int64')-543).astype(str)+gis_df["data_release_date"].str.slice(start=4),errors='coerce').astype(str)
 
-            data_language_choices = ['','ไทย', 'อังกฤษ', 'จีน','มลายู','พม่า','ลาว','เขมร','ญี่ปุ่น','เกาหลี','ฝรั่งเศส','เยอรมัน','อารบิก','ไม่ทราบ']
+            data_language_choices = ['',u'ไทย', u'อังกฤษ', u'จีน',u'มลายู',u'พม่า',u'ลาว',u'เขมร',u'ญี่ปุ่น',u'เกาหลี',u'ฝรั่งเศส',u'เยอรมัน',u'อารบิก',u'ไม่ทราบ']
             gis_df['data_language_other'] = gis_df['data_language'].isin(data_language_choices)
-            gis_df['data_language_other'] = gis_df.data_language_other.astype(str)
-            gis_df['data_language_other'] = np.where(gis_df['data_language_other'] == 'True', 'True', gis_df['data_language'])
+            gis_df['data_language_other'] = np.where(gis_df['data_language_other'], 'True', gis_df['data_language'])
             gis_df['data_language'] = np.where(gis_df['data_language_other'] == 'True', gis_df['data_language'], u'อื่นๆ')
             gis_df['data_language_other'].replace('True', '', regex=True, inplace=True)
 
@@ -471,8 +435,9 @@ class DatasetImportController(p.toolkit.BaseController):
         except Exception as err:
             log.info(err)
             gis_df = pd.DataFrame(columns=['name','d_type','title','owner_org','maintainer','maintainer_email','tag_string','notes','objective','update_frequency_unit','update_frequency_interval','geo_coverage','data_source','data_format','data_category','license_id','accessible_condition','geographic_data_set','equivalent_scale','west_bound_longitude','east_bound_longitude','north_bound_longitude','south_bound_longitude','positional_accuracy','reference_period','last_updated_date','data_release_calendar','data_release_date','url','data_language','data_type'])
-            gis_df = gis_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
             gis_df.replace(np.nan, '', regex=True, inplace=True)
+            gis_df = gis_df.astype('unicode')
+            gis_df = gis_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
 
         portal = LocalCKAN()
 
@@ -505,15 +470,17 @@ class DatasetImportController(p.toolkit.BaseController):
                 log.info(log_str)
 
         try:
-            resource_df = pd.read_excel(data_dict['filename'], header=[3], sheet_name='Temp3_Resource_GIS', dtype=str)
+            resource_df = pd.read_excel(data_dict['filename'], header=[3], sheet_name='Temp3_Resource_GIS')
             resource_df.drop(0, inplace=True)
             resource_df.columns = ['dataset_name','resource_name','resource_url','description','resource_accessible_condition','resource_last_updated_date','format','resource_equivalent_scale','resource_geographic_data_set','resource_created_date','resource_data_release_date','resource_positional_accuracy']
-            resource_df = resource_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
             resource_df.replace(np.nan, '', regex=True, inplace=True)
+            resource_df = resource_df.astype('unicode')
+            resource_df = resource_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
         except:
             resource_df = pd.DataFrame(columns=['dataset_name','resource_name','resource_url','description','resource_accessible_condition','resource_last_updated_date','format','resource_equivalent_scale','resource_geographic_data_set','resource_created_date','resource_data_release_date','resource_positional_accuracy'])
-            resource_df = resource_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
             resource_df.replace(np.nan, '', regex=True, inplace=True)
+            resource_df = resource_df.astype('unicode')
+            resource_df = resource_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
 
         try:
             final_df = pd.merge(gis_df,resource_df,how='left',left_on='dataset_name',right_on='dataset_name')
@@ -538,17 +505,18 @@ class DatasetImportController(p.toolkit.BaseController):
 
     def _multi_type_process(self, data_dict):
         try:
-            multi_df = pd.read_excel(data_dict['filename'], header=[3], sheet_name='Temp2_Meta_Multi', dtype=str)
+            multi_df = pd.read_excel(data_dict['filename'], header=[3], sheet_name='Temp2_Meta_Multi')
             multi_df.drop(0, inplace=True)
-            multi_df["data_type"] = 'ข้อมูลหลากหลายประเภท'
+            multi_df["data_type"] = u'ข้อมูลหลากหลายประเภท'
 
             multi_df.columns = ['name','d_type','title','owner_org','maintainer','maintainer_email','tag_string','notes','objective','update_frequency_unit','update_frequency_interval','geo_coverage','data_source','data_format','data_category','license_id','accessible_condition','created_date','last_updated_date','url','data_support','data_collect','data_language','high_value_dataset','reference_data','data_type']
             multi_df.drop(['d_type'], axis=1, inplace=True)
-            multi_df = multi_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
             multi_df.replace(np.nan, '', regex=True, inplace=True)
+            multi_df = multi_df.astype('unicode')
+            multi_df = multi_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
 
-            multi_df['high_value_dataset'] = np.where(multi_df['high_value_dataset'].str.contains("ไม่"), False, True)
-            multi_df['reference_data'] = np.where(multi_df['reference_data'].str.contains("ไม่"), False, True)
+            multi_df['high_value_dataset'] = np.where(multi_df['high_value_dataset'].str.contains(u'ไม่'), "False", "True")
+            multi_df['reference_data'] = np.where(multi_df['reference_data'].str.contains(u'ไม่'), "False", "True")
             
             multi_df["dataset_name"] = multi_df["name"]
             multi_df["name"] = multi_df["name"].str.lower()
@@ -558,66 +526,57 @@ class DatasetImportController(p.toolkit.BaseController):
                 multi_df.reset_index(drop=True, inplace=True)
             multi_df["owner_org"] = data_dict['owner_org']
             multi_df["private"] = True
-            multi_df["allow_harvest"] = False
-            multi_df['tag_string'] = multi_df.tag_string.astype(str)
+            multi_df["allow_harvest"] = "False"
             multi_df['tag_string'] = multi_df['tag_string'].str.split(',').apply(lambda x: [e.strip() for e in x]).tolist()
 
             multi_df["created_date"] = pd.to_datetime((pd.to_numeric(multi_df["created_date"].str.slice(stop=4), errors='coerce').astype('Int64')-543).astype(str)+multi_df["created_date"].str.slice(start=4), errors='coerce').astype(str)
             multi_df["last_updated_date"] = pd.to_datetime((pd.to_numeric(multi_df["last_updated_date"].str.slice(stop=4), errors='coerce').astype('Int64')-543).astype(str)+multi_df["last_updated_date"].str.slice(start=4), errors='coerce').astype(str)
 
-            objective_choices = ['ยุทธศาสตร์ชาติ', 'แผนพัฒนาเศรษฐกิจและสังคมแห่งชาติ', 'แผนความมั่นคงแห่งชาติ','แผนแม่บทภายใต้ยุทธศาสตร์ชาติ','แผนปฏิรูปประเทศ','แผนระดับที่ 3 (มติครม. 4 ธ.ค. 2560)','นโยบายรัฐบาล/ข้อสั่งการนายกรัฐมนตรี','มติคณะรัฐมนตรี','เพื่อการให้บริการประชาชน','กฎหมายที่เกี่ยวข้อง','พันธกิจหน่วยงาน','ดัชนี/ตัวชี้วัดระดับนานาชาติ','ไม่ทราบ']
+            objective_choices = [u'ยุทธศาสตร์ชาติ', u'แผนพัฒนาเศรษฐกิจและสังคมแห่งชาติ', u'แผนความมั่นคงแห่งชาติ',u'แผนแม่บทภายใต้ยุทธศาสตร์ชาติ',u'แผนปฏิรูปประเทศ',u'แผนระดับที่ 3 (มติครม. 4 ธ.ค. 2560)',u'นโยบายรัฐบาล/ข้อสั่งการนายกรัฐมนตรี',u'มติคณะรัฐมนตรี',u'เพื่อการให้บริการประชาชน',u'กฎหมายที่เกี่ยวข้อง',u'พันธกิจหน่วยงาน',u'ดัชนี/ตัวชี้วัดระดับนานาชาติ',u'ไม่ทราบ']
             multi_df['objective_other'] = multi_df['objective'].isin(objective_choices)
-            multi_df['objective_other'] = multi_df.objective_other.astype(str)
-            multi_df['objective_other'] = np.where(multi_df['objective_other'] == 'True', 'True', multi_df['objective'])
+            multi_df['objective_other'] = np.where(multi_df['objective_other'], 'True', multi_df['objective'])
             multi_df['objective'] = np.where(multi_df['objective_other'] == 'True', multi_df['objective'], u'อื่นๆ')
             multi_df['objective_other'].replace('True', '', regex=True, inplace=True)
 
-            update_frequency_unit_choices = ['ไม่ทราบ', 'ปี', 'ครึ่งปี','ไตรมาส','เดือน','สัปดาห์','วัน','วันทำการ','ชั่วโมง','นาที','ตามเวลาจริง','ไม่มีการปรับปรุงหลังจากการจัดเก็บข้อมูล']
+            update_frequency_unit_choices = [u'ไม่ทราบ', u'ปี', u'ครึ่งปี',u'ไตรมาส',u'เดือน',u'สัปดาห์',u'วัน',u'วันทำการ',u'ชั่วโมง',u'นาที',u'ตามเวลาจริง',u'ไม่มีการปรับปรุงหลังจากการจัดเก็บข้อมูล']
             multi_df['update_frequency_unit_other'] = multi_df['update_frequency_unit'].isin(update_frequency_unit_choices)
-            multi_df['update_frequency_unit_other'] = multi_df.update_frequency_unit_other.astype(str)
-            multi_df['update_frequency_unit_other'] = np.where(multi_df['update_frequency_unit_other'] == 'True', 'True', multi_df['update_frequency_unit'])
-            multi_df['update_frequency_unit'] = np.where(multi_df['update_frequency_unit_other'] == 'True', multi_df['update_frequency_unit'], 'อื่นๆ')
+            multi_df['update_frequency_unit_other'] = np.where(multi_df['update_frequency_unit_other'], 'True', multi_df['update_frequency_unit'])
+            multi_df['update_frequency_unit'] = np.where(multi_df['update_frequency_unit_other'] == 'True', multi_df['update_frequency_unit'], u'อื่นๆ')
             multi_df['update_frequency_unit_other'].replace('True', '', regex=True, inplace=True)
 
-            geo_coverage_choices = ['ไม่มี', 'โลก', 'ทวีป/กลุ่มประเทศในทวีป','กลุ่มประเทศทางเศรษฐกิจ','ประเทศ','ภาค','จังหวัด','อำเภอ','ตำบล','หมู่บ้าน','เทศบาล/อบต.','พิกัด','ไม่ทราบ']
+            geo_coverage_choices = [u'ไม่มี', u'โลก', u'ทวีป/กลุ่มประเทศในทวีป',u'กลุ่มประเทศทางเศรษฐกิจ',u'ประเทศ',u'ภาค',u'จังหวัด',u'อำเภอ',u'ตำบล',u'หมู่บ้าน',u'เทศบาล/อบต.',u'พิกัด',u'ไม่ทราบ']
             multi_df['geo_coverage_other'] = multi_df['geo_coverage'].isin(geo_coverage_choices)
-            multi_df['geo_coverage_other'] = multi_df.geo_coverage_other.astype(str)
-            multi_df['geo_coverage_other'] = np.where(multi_df['geo_coverage_other'] == 'True', 'True', multi_df['geo_coverage'])
-            multi_df['geo_coverage'] = np.where(multi_df['geo_coverage_other'] == 'True', multi_df['geo_coverage'], 'อื่นๆ')
+            multi_df['geo_coverage_other'] = np.where(multi_df['geo_coverage_other'], 'True', multi_df['geo_coverage'])
+            multi_df['geo_coverage'] = np.where(multi_df['geo_coverage_other'] == 'True', multi_df['geo_coverage'], u'อื่นๆ')
             multi_df['geo_coverage_other'].replace('True', '', regex=True, inplace=True)
 
-            data_format_choices = ['ไม่ทราบ', 'Database', 'CSV','XML','Image','Video','Audio','Text','JSON','HTML','XLS','PDF','RDF','NoSQL','Arc/Info Coverage','Shapefile','GeoTiff','GML']
+            data_format_choices = [u'ไม่ทราบ', 'Database', 'CSV','XML','Image','Video','Audio','Text','JSON','HTML','DOC/DOCX','XLS','PDF','RDF','NoSQL','Arc/Info Coverage','Shapefile','GeoTiff','GML']
             multi_df['data_format_other'] = multi_df['data_format'].isin(data_format_choices)
-            multi_df['data_format_other'] = multi_df.data_format_other.astype(str)
-            multi_df['data_format_other'] = np.where(multi_df['data_format_other'] == 'True', 'True', multi_df['data_format'])
+            multi_df['data_format_other'] = np.where(multi_df['data_format_other'], 'True', multi_df['data_format'])
             multi_df['data_format'] = np.where(multi_df['data_format_other'] == 'True', multi_df['data_format'], u'อื่นๆ')
             multi_df['data_format_other'].replace('True', '', regex=True, inplace=True)
 
             license_id_choices = ['License not specified', 'Creative Commons Attributions','Creative Commons Attribution Share-Alike','Creative Commons Non-Commercial (Any)','Open Data Common','GNU Free Documentation License']
             multi_df['license_id_other'] = multi_df['license_id'].isin(license_id_choices)
-            multi_df['license_id_other'] = multi_df.license_id_other.astype(str)
-            multi_df['license_id_other'] = np.where(multi_df['license_id_other'] == 'True', 'True', multi_df['license_id'])
-            multi_df['license_id'] = np.where(multi_df['license_id_other'] == 'True', multi_df['license_id'], 'อื่นๆ')
+            multi_df['license_id_other'] = np.where(multi_df['license_id_other'], 'True', multi_df['license_id'])
+            multi_df['license_id'] = np.where(multi_df['license_id_other'] == 'True', multi_df['license_id'], u'อื่นๆ')
             multi_df['license_id_other'].replace('True', '', regex=True, inplace=True)
             
-            data_support_choices = ['','ไม่มี', 'หน่วยงานของรัฐ', 'หน่วยงานเอกชน','หน่วยงาน/องค์กรระหว่างประเทศ','มูลนิธิ/สมาคม','สถาบันการศึกษา']
+            data_support_choices = ['',u'ไม่มี', u'หน่วยงานของรัฐ', u'หน่วยงานเอกชน',u'หน่วยงาน/องค์กรระหว่างประเทศ',u'มูลนิธิ/สมาคม',u'สถาบันการศึกษา']
             multi_df['data_support_other'] = multi_df['data_support'].isin(data_support_choices)
-            multi_df['data_support_other'] = multi_df.data_support_other.astype(str)
-            multi_df['data_support_other'] = np.where(multi_df['data_support_other'] == 'True', 'True', multi_df['data_support'])
-            multi_df['data_support'] = np.where(multi_df['data_support_other'] == 'True', multi_df['data_support'], 'อื่นๆ')
+            multi_df['data_support_other'] = np.where(multi_df['data_support_other'], 'True', multi_df['data_support'])
+            multi_df['data_support'] = np.where(multi_df['data_support_other'] == 'True', multi_df['data_support'], u'อื่นๆ')
             multi_df['data_support_other'].replace('True', '', regex=True, inplace=True)
 
-            data_collect_choices = ['','ไม่มี','บุคคล', 'ครัวเรือน/ครอบครัว', 'บ้าน/ที่อยู่อาศัย','บริษัท/ห้างร้าน/สถานประกอบการ','อาคาร/สิ่งปลูกสร้าง','พื้นที่การเกษตร ประมง ป่าไม้','สัตว์และพันธุ์พืช','ขอบเขตเชิงภูมิศาสตร์หรือเชิงพื้นที่','แหล่งน้ำ เช่น แม่น้ำ อ่างเก็บน้ำ','เส้นทางการเดินทาง เช่น ถนน ทางรถไฟ','ไม่ทราบ']
+            data_collect_choices = ['',u'ไม่มี',u'บุคคล', u'ครัวเรือน/ครอบครัว', u'บ้าน/ที่อยู่อาศัย',u'บริษัท/ห้างร้าน/สถานประกอบการ',u'อาคาร/สิ่งปลูกสร้าง',u'พื้นที่การเกษตร ประมง ป่าไม้',u'สัตว์และพันธุ์พืช',u'ขอบเขตเชิงภูมิศาสตร์หรือเชิงพื้นที่',u'แหล่งน้ำ เช่น แม่น้ำ อ่างเก็บน้ำ',u'เส้นทางการเดินทาง เช่น ถนน ทางรถไฟ',u'ไม่ทราบ']
             multi_df['data_collect_other'] = multi_df['data_collect'].isin(data_collect_choices)
-            multi_df['data_collect_other'] = multi_df.data_collect_other.astype(str)
-            multi_df['data_collect_other'] = np.where(multi_df['data_collect_other'] == 'True', 'True', multi_df['data_collect'])
-            multi_df['data_collect'] = np.where(multi_df['data_collect_other'] == 'True', multi_df['data_collect'], 'อื่นๆ')
+            multi_df['data_collect_other'] = np.where(multi_df['data_collect_other'], 'True', multi_df['data_collect'])
+            multi_df['data_collect'] = np.where(multi_df['data_collect_other'] == 'True', multi_df['data_collect'], u'อื่นๆ')
             multi_df['data_collect_other'].replace('True', '', regex=True, inplace=True)
 
-            data_language_choices = ['','ไทย', 'อังกฤษ', 'จีน','มลายู','พม่า','ลาว','เขมร','ญี่ปุ่น','เกาหลี','ฝรั่งเศส','เยอรมัน','อารบิก','ไม่ทราบ']
+            data_language_choices = ['',u'ไทย', u'อังกฤษ', u'จีน',u'มลายู',u'พม่า',u'ลาว',u'เขมร',u'ญี่ปุ่น',u'เกาหลี',u'ฝรั่งเศส',u'เยอรมัน',u'อารบิก',u'ไม่ทราบ']
             multi_df['data_language_other'] = multi_df['data_language'].isin(data_language_choices)
-            multi_df['data_language_other'] = multi_df.data_language_other.astype(str)
-            multi_df['data_language_other'] = np.where(multi_df['data_language_other'] == 'True', 'True', multi_df['data_language'])
+            multi_df['data_language_other'] = np.where(multi_df['data_language_other'], 'True', multi_df['data_language'])
             multi_df['data_language'] = np.where(multi_df['data_language_other'] == 'True', multi_df['data_language'], u'อื่นๆ')
             multi_df['data_language_other'].replace('True', '', regex=True, inplace=True)
 
@@ -626,8 +585,9 @@ class DatasetImportController(p.toolkit.BaseController):
         except Exception as err:
             log.info(err)
             multi_df = pd.DataFrame(columns=['name','d_type','title','owner_org','maintainer','maintainer_email','tag_string','notes','objective','update_frequency_unit','update_frequency_interval','geo_coverage','data_source','data_format','data_category','license_id','accessible_condition','created_date','last_updated_date','url','data_support','data_collect','data_language','high_value_dataset','reference_data','data_type'])
-            multi_df = multi_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
             multi_df.replace(np.nan, '', regex=True, inplace=True)
+            multi_df = multi_df.astype('unicode')
+            multi_df = multi_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
             
         portal = LocalCKAN()
 
@@ -660,15 +620,17 @@ class DatasetImportController(p.toolkit.BaseController):
                 log.info(log_str)
 
         try:
-            resource_df = pd.read_excel(data_dict['filename'], header=[3], sheet_name='Temp3_Resource_Multi', dtype=str)
+            resource_df = pd.read_excel(data_dict['filename'], header=[3], sheet_name='Temp3_Resource_Multi')
             resource_df.drop(0, inplace=True)
             resource_df.columns = ['dataset_name','resource_name','resource_url','description','resource_accessible_condition','resource_last_updated_date','format','resource_created_date','resource_data_collect']
-            resource_df = resource_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
             resource_df.replace(np.nan, '', regex=True, inplace=True)
+            resource_df = resource_df.astype('unicode')
+            resource_df = resource_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
         except:
             resource_df = pd.DataFrame(columns=['dataset_name','resource_name','resource_url','description','resource_accessible_condition','resource_last_updated_date','format','resource_created_date','resource_data_collect'])
-            resource_df = resource_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
             resource_df.replace(np.nan, '', regex=True, inplace=True)
+            resource_df = resource_df.astype('unicode')
+            resource_df = resource_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
 
         try:
             final_df = pd.merge(multi_df,resource_df,how='left',left_on='dataset_name',right_on='dataset_name')
@@ -692,16 +654,17 @@ class DatasetImportController(p.toolkit.BaseController):
 
     def _other_type_process(self, data_dict):
         try:
-            other_df = pd.read_excel(data_dict['filename'], header=[3], sheet_name='Temp2_Meta_Other', dtype=str)
+            other_df = pd.read_excel(data_dict['filename'], header=[3], sheet_name='Temp2_Meta_Other')
             other_df.drop(0, inplace=True)
-            other_df["data_type"] = 'ข้อมูลประเภทอื่นๆ'
+            other_df["data_type"] = u'ข้อมูลประเภทอื่นๆ'
 
             other_df.columns = ['name','data_type_other','title','owner_org','maintainer','maintainer_email','tag_string','notes','objective','update_frequency_unit','update_frequency_interval','geo_coverage','data_source','data_format','data_category','license_id','accessible_condition','created_date','last_updated_date','url','data_support','data_collect','data_language','high_value_dataset','reference_data','data_type']
-            other_df = other_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
             other_df.replace(np.nan, '', regex=True, inplace=True)
+            other_df = other_df.astype('unicode')
+            other_df = other_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
 
-            other_df['high_value_dataset'] = np.where(other_df['high_value_dataset'].str.contains("ไม่"), False, True)
-            other_df['reference_data'] = np.where(other_df['reference_data'].str.contains("ไม่"), False, True)
+            other_df['high_value_dataset'] = np.where(other_df['high_value_dataset'].str.contains(u'ไม่'), "False", "True")
+            other_df['reference_data'] = np.where(other_df['reference_data'].str.contains(u'ไม่'), "False", "True")
             
             other_df["dataset_name"] = other_df["name"]
             other_df["name"] = other_df["name"].str.lower()
@@ -711,66 +674,57 @@ class DatasetImportController(p.toolkit.BaseController):
                 other_df.reset_index(drop=True, inplace=True)
             other_df["owner_org"] = data_dict['owner_org']
             other_df["private"] = True
-            other_df["allow_harvest"] = False
-            other_df['tag_string'] = other_df.tag_string.astype(str)
+            other_df["allow_harvest"] = "False"
             other_df['tag_string'] = other_df['tag_string'].str.split(',').apply(lambda x: [e.strip() for e in x]).tolist()
 
             other_df["created_date"] = pd.to_datetime((pd.to_numeric(other_df["created_date"].str.slice(stop=4), errors='coerce').astype('Int64')-543).astype(str)+other_df["created_date"].str.slice(start=4), errors='coerce').astype(str)
             other_df["last_updated_date"] = pd.to_datetime((pd.to_numeric(other_df["last_updated_date"].str.slice(stop=4), errors='coerce').astype('Int64')-543).astype(str)+other_df["last_updated_date"].str.slice(start=4), errors='coerce').astype(str)
 
-            objective_choices = ['ยุทธศาสตร์ชาติ', 'แผนพัฒนาเศรษฐกิจและสังคมแห่งชาติ', 'แผนความมั่นคงแห่งชาติ','แผนแม่บทภายใต้ยุทธศาสตร์ชาติ','แผนปฏิรูปประเทศ','แผนระดับที่ 3 (มติครม. 4 ธ.ค. 2560)','นโยบายรัฐบาล/ข้อสั่งการนายกรัฐมนตรี','มติคณะรัฐมนตรี','เพื่อการให้บริการประชาชน','กฎหมายที่เกี่ยวข้อง','พันธกิจหน่วยงาน','ดัชนี/ตัวชี้วัดระดับนานาชาติ','ไม่ทราบ']
+            objective_choices = [u'ยุทธศาสตร์ชาติ', u'แผนพัฒนาเศรษฐกิจและสังคมแห่งชาติ', u'แผนความมั่นคงแห่งชาติ',u'แผนแม่บทภายใต้ยุทธศาสตร์ชาติ',u'แผนปฏิรูปประเทศ',u'แผนระดับที่ 3 (มติครม. 4 ธ.ค. 2560)',u'นโยบายรัฐบาล/ข้อสั่งการนายกรัฐมนตรี',u'มติคณะรัฐมนตรี',u'เพื่อการให้บริการประชาชน',u'กฎหมายที่เกี่ยวข้อง',u'พันธกิจหน่วยงาน',u'ดัชนี/ตัวชี้วัดระดับนานาชาติ',u'ไม่ทราบ']
             other_df['objective_other'] = other_df['objective'].isin(objective_choices)
-            other_df['objective_other'] = other_df.objective_other.astype(str)
-            other_df['objective_other'] = np.where(other_df['objective_other'] == 'True', 'True', other_df['objective'])
+            other_df['objective_other'] = np.where(other_df['objective_other'], 'True', other_df['objective'])
             other_df['objective'] = np.where(other_df['objective_other'] == 'True', other_df['objective'], u'อื่นๆ')
             other_df['objective_other'].replace('True', '', regex=True, inplace=True)
 
-            update_frequency_unit_choices = ['ไม่ทราบ', 'ปี', 'ครึ่งปี','ไตรมาส','เดือน','สัปดาห์','วัน','วันทำการ','ชั่วโมง','นาที','ตามเวลาจริง','ไม่มีการปรับปรุงหลังจากการจัดเก็บข้อมูล']
+            update_frequency_unit_choices = [u'ไม่ทราบ', u'ปี', u'ครึ่งปี',u'ไตรมาส',u'เดือน',u'สัปดาห์',u'วัน',u'วันทำการ',u'ชั่วโมง',u'นาที',u'ตามเวลาจริง',u'ไม่มีการปรับปรุงหลังจากการจัดเก็บข้อมูล']
             other_df['update_frequency_unit_other'] = other_df['update_frequency_unit'].isin(update_frequency_unit_choices)
-            other_df['update_frequency_unit_other'] = other_df.update_frequency_unit_other.astype(str)
-            other_df['update_frequency_unit_other'] = np.where(other_df['update_frequency_unit_other'] == 'True', 'True', other_df['update_frequency_unit'])
-            other_df['update_frequency_unit'] = np.where(other_df['update_frequency_unit_other'] == 'True', other_df['update_frequency_unit'], 'อื่นๆ')
+            other_df['update_frequency_unit_other'] = np.where(other_df['update_frequency_unit_other'], 'True', other_df['update_frequency_unit'])
+            other_df['update_frequency_unit'] = np.where(other_df['update_frequency_unit_other'] == 'True', other_df['update_frequency_unit'], u'อื่นๆ')
             other_df['update_frequency_unit_other'].replace('True', '', regex=True, inplace=True)
 
-            geo_coverage_choices = ['ไม่มี', 'โลก', 'ทวีป/กลุ่มประเทศในทวีป','กลุ่มประเทศทางเศรษฐกิจ','ประเทศ','ภาค','จังหวัด','อำเภอ','ตำบล','หมู่บ้าน','เทศบาล/อบต.','พิกัด','ไม่ทราบ']
+            geo_coverage_choices = [u'ไม่มี', u'โลก', u'ทวีป/กลุ่มประเทศในทวีป',u'กลุ่มประเทศทางเศรษฐกิจ',u'ประเทศ',u'ภาค',u'จังหวัด',u'อำเภอ',u'ตำบล',u'หมู่บ้าน',u'เทศบาล/อบต.',u'พิกัด',u'ไม่ทราบ']
             other_df['geo_coverage_other'] = other_df['geo_coverage'].isin(geo_coverage_choices)
-            other_df['geo_coverage_other'] = other_df.geo_coverage_other.astype(str)
-            other_df['geo_coverage_other'] = np.where(other_df['geo_coverage_other'] == 'True', 'True', other_df['geo_coverage'])
-            other_df['geo_coverage'] = np.where(other_df['geo_coverage_other'] == 'True', other_df['geo_coverage'], 'อื่นๆ')
+            other_df['geo_coverage_other'] = np.where(other_df['geo_coverage_other'], 'True', other_df['geo_coverage'])
+            other_df['geo_coverage'] = np.where(other_df['geo_coverage_other'] == 'True', other_df['geo_coverage'], u'อื่นๆ')
             other_df['geo_coverage_other'].replace('True', '', regex=True, inplace=True)
 
-            data_format_choices = ['ไม่ทราบ', 'Database', 'CSV','XML','Image','Video','Audio','Text','JSON','HTML','XLS','PDF','RDF','NoSQL','Arc/Info Coverage','Shapefile','GeoTiff','GML']
+            data_format_choices = [u'ไม่ทราบ', 'Database', 'CSV','XML','Image','Video','Audio','Text','JSON','HTML','DOC/DOCX','XLS','PDF','RDF','NoSQL','Arc/Info Coverage','Shapefile','GeoTiff','GML']
             other_df['data_format_other'] = other_df['data_format'].isin(data_format_choices)
-            other_df['data_format_other'] = other_df.data_format_other.astype(str)
-            other_df['data_format_other'] = np.where(other_df['data_format_other'] == 'True', 'True', other_df['data_format'])
+            other_df['data_format_other'] = np.where(other_df['data_format_other'], 'True', other_df['data_format'])
             other_df['data_format'] = np.where(other_df['data_format_other'] == 'True', other_df['data_format'], u'อื่นๆ')
             other_df['data_format_other'].replace('True', '', regex=True, inplace=True)
 
             license_id_choices = ['License not specified', 'Creative Commons Attributions','Creative Commons Attribution Share-Alike','Creative Commons Non-Commercial (Any)','Open Data Common','GNU Free Documentation License']
             other_df['license_id_other'] = other_df['license_id'].isin(license_id_choices)
-            other_df['license_id_other'] = other_df.license_id_other.astype(str)
-            other_df['license_id_other'] = np.where(other_df['license_id_other'] == 'True', 'True', other_df['license_id'])
-            other_df['license_id'] = np.where(other_df['license_id_other'] == 'True', other_df['license_id'], 'อื่นๆ')
+            other_df['license_id_other'] = np.where(other_df['license_id_other'], 'True', other_df['license_id'])
+            other_df['license_id'] = np.where(other_df['license_id_other'] == 'True', other_df['license_id'], u'อื่นๆ')
             other_df['license_id_other'].replace('True', '', regex=True, inplace=True)
             
-            data_support_choices = ['','ไม่มี', 'หน่วยงานของรัฐ', 'หน่วยงานเอกชน','หน่วยงาน/องค์กรระหว่างประเทศ','มูลนิธิ/สมาคม','สถาบันการศึกษา']
+            data_support_choices = ['',u'ไม่มี', u'หน่วยงานของรัฐ', u'หน่วยงานเอกชน',u'หน่วยงาน/องค์กรระหว่างประเทศ',u'มูลนิธิ/สมาคม',u'สถาบันการศึกษา']
             other_df['data_support_other'] = other_df['data_support'].isin(data_support_choices)
-            other_df['data_support_other'] = other_df.data_support_other.astype(str)
-            other_df['data_support_other'] = np.where(other_df['data_support_other'] == 'True', 'True', other_df['data_support'])
-            other_df['data_support'] = np.where(other_df['data_support_other'] == 'True', other_df['data_support'], 'อื่นๆ')
+            other_df['data_support_other'] = np.where(other_df['data_support_other'], 'True', other_df['data_support'])
+            other_df['data_support'] = np.where(other_df['data_support_other'] == 'True', other_df['data_support'], u'อื่นๆ')
             other_df['data_support_other'].replace('True', '', regex=True, inplace=True)
 
-            data_collect_choices = ['','ไม่มี','บุคคล', 'ครัวเรือน/ครอบครัว', 'บ้าน/ที่อยู่อาศัย','บริษัท/ห้างร้าน/สถานประกอบการ','อาคาร/สิ่งปลูกสร้าง','พื้นที่การเกษตร ประมง ป่าไม้','สัตว์และพันธุ์พืช','ขอบเขตเชิงภูมิศาสตร์หรือเชิงพื้นที่','แหล่งน้ำ เช่น แม่น้ำ อ่างเก็บน้ำ','เส้นทางการเดินทาง เช่น ถนน ทางรถไฟ','ไม่ทราบ']
+            data_collect_choices = ['',u'ไม่มี',u'บุคคล', u'ครัวเรือน/ครอบครัว', u'บ้าน/ที่อยู่อาศัย',u'บริษัท/ห้างร้าน/สถานประกอบการ',u'อาคาร/สิ่งปลูกสร้าง',u'พื้นที่การเกษตร ประมง ป่าไม้',u'สัตว์และพันธุ์พืช',u'ขอบเขตเชิงภูมิศาสตร์หรือเชิงพื้นที่',u'แหล่งน้ำ เช่น แม่น้ำ อ่างเก็บน้ำ',u'เส้นทางการเดินทาง เช่น ถนน ทางรถไฟ',u'ไม่ทราบ']
             other_df['data_collect_other'] = other_df['data_collect'].isin(data_collect_choices)
-            other_df['data_collect_other'] = other_df.data_collect_other.astype(str)
-            other_df['data_collect_other'] = np.where(other_df['data_collect_other'] == 'True', 'True', other_df['data_collect'])
-            other_df['data_collect'] = np.where(other_df['data_collect_other'] == 'True', other_df['data_collect'], 'อื่นๆ')
+            other_df['data_collect_other'] = np.where(other_df['data_collect_other'], 'True', other_df['data_collect'])
+            other_df['data_collect'] = np.where(other_df['data_collect_other'] == 'True', other_df['data_collect'], u'อื่นๆ')
             other_df['data_collect_other'].replace('True', '', regex=True, inplace=True)
 
-            data_language_choices = ['','ไทย', 'อังกฤษ', 'จีน','มลายู','พม่า','ลาว','เขมร','ญี่ปุ่น','เกาหลี','ฝรั่งเศส','เยอรมัน','อารบิก','ไม่ทราบ']
+            data_language_choices = ['',u'ไทย', u'อังกฤษ', u'จีน',u'มลายู',u'พม่า',u'ลาว',u'เขมร',u'ญี่ปุ่น',u'เกาหลี',u'ฝรั่งเศส',u'เยอรมัน',u'อารบิก',u'ไม่ทราบ']
             other_df['data_language_other'] = other_df['data_language'].isin(data_language_choices)
-            other_df['data_language_other'] = other_df.data_language_other.astype(str)
-            other_df['data_language_other'] = np.where(other_df['data_language_other'] == 'True', 'True', other_df['data_language'])
+            other_df['data_language_other'] = np.where(other_df['data_language_other'], 'True', other_df['data_language'])
             other_df['data_language'] = np.where(other_df['data_language_other'] == 'True', other_df['data_language'], u'อื่นๆ')
             other_df['data_language_other'].replace('True', '', regex=True, inplace=True)
 
@@ -779,8 +733,9 @@ class DatasetImportController(p.toolkit.BaseController):
         except Exception as err:
             log.info(err)
             other_df = pd.DataFrame(columns=['name','data_type_other','title','owner_org','maintainer','maintainer_email','tag_string','notes','objective','update_frequency_unit','update_frequency_interval','geo_coverage','data_source','data_format','data_category','license_id','accessible_condition','created_date','last_updated_date','url','data_support','data_collect','data_language','high_value_dataset','reference_data','data_type'])
-            other_df = other_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
             other_df.replace(np.nan, '', regex=True, inplace=True)
+            other_df = other_df.astype('unicode')
+            other_df = other_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
 
         portal = LocalCKAN()
 
@@ -813,15 +768,17 @@ class DatasetImportController(p.toolkit.BaseController):
                 log.info(log_str)
 
         try:
-            resource_df = pd.read_excel(data_dict['filename'], header=[3], sheet_name='Temp3_Resource_Other', dtype=str)
+            resource_df = pd.read_excel(data_dict['filename'], header=[3], sheet_name='Temp3_Resource_Other')
             resource_df.drop(0, inplace=True)
             resource_df.columns = ['dataset_name','resource_name','resource_url','description','resource_accessible_condition','resource_last_updated_date','format','resource_created_date','resource_data_collect']
-            resource_df = resource_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
             resource_df.replace(np.nan, '', regex=True, inplace=True)
+            resource_df = resource_df.astype('unicode')
+            resource_df = resource_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
         except:
             resource_df = pd.DataFrame(columns=['dataset_name','resource_name','resource_url','description','resource_accessible_condition','resource_last_updated_date','format','resource_created_date','resource_data_collect'])
-            resource_df = resource_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
             resource_df.replace(np.nan, '', regex=True, inplace=True)
+            resource_df = resource_df.astype('unicode')
+            resource_df = resource_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
 
         try:
             final_df = pd.merge(other_df,resource_df,how='left',left_on='dataset_name',right_on='dataset_name')
@@ -913,31 +870,31 @@ class DatasetImportController(p.toolkit.BaseController):
 
                 row_count = 0
 
-                record_df = pd.read_excel(filename, header=[3], sheet_name='Temp2_Meta_Record', dtype=str)
+                record_df = pd.read_excel(filename, header=[3], sheet_name='Temp2_Meta_Record')
                 if template_org != 'all':
                     row_count += record_df.iloc[:, 3].tolist().count(template_org)
                 else:
                     row_count += (len(record_df.index)-1)
                 
-                stat_df = pd.read_excel(filename, header=[3], sheet_name='Temp2_Meta_Stat', dtype=str)
+                stat_df = pd.read_excel(filename, header=[3], sheet_name='Temp2_Meta_Stat')
                 if template_org != 'all':
                     row_count += stat_df.iloc[:, 3].tolist().count(template_org)
                 else:
                     row_count += (len(stat_df.index)-1)
 
-                gis_df = pd.read_excel(filename, header=[3], sheet_name='Temp2_Meta_GIS', dtype=str)
+                gis_df = pd.read_excel(filename, header=[3], sheet_name='Temp2_Meta_GIS')
                 if template_org != 'all':
                     row_count += gis_df.iloc[:, 3].tolist().count(template_org)
                 else:
                     row_count += (len(gis_df.index)-1)
 
-                multi_df = pd.read_excel(filename, header=[3], sheet_name='Temp2_Meta_Multi', dtype=str)
+                multi_df = pd.read_excel(filename, header=[3], sheet_name='Temp2_Meta_Multi')
                 if template_org != 'all':
                     row_count += multi_df.iloc[:, 3].tolist().count(template_org)
                 else:
                     row_count += (len(multi_df.index)-1)
 
-                other_df = pd.read_excel(filename, header=[3], sheet_name='Temp2_Meta_Other', dtype=str)
+                other_df = pd.read_excel(filename, header=[3], sheet_name='Temp2_Meta_Other')
                 if template_org != 'all':
                     row_count += other_df.iloc[:, 3].tolist().count(template_org)
                 else:

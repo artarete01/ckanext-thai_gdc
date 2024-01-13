@@ -32,9 +32,8 @@
       licenses=licenses, entity_type=entity_type, object_type=object_type -%}
   {% endif %}
 {% elif request.endpoint == 'dataset.edit' %}
-    {% set pkg = h.thai_gdc_get_action('package_show', {'id':data.name}) %}
     {% set form_data_type = field.form_data_type %}
-    {% if pkg.data_type in form_data_type %}
+    {% if data.data_type in form_data_type %}
       {%- set form_snippet = field.form_snippet -%}
     
       {%- if not form_snippet -%}
@@ -49,10 +48,8 @@
         licenses=licenses, entity_type=entity_type, object_type=object_type -%}
     {% endif %}
 {% elif request.endpoint == 'resource.new' or request.endpoint == 'resource.edit'  %}
-  {% set pkg = h.thai_gdc_get_action('package_show', {'id':package_name}) %}
   {% set form_data_type = field.form_data_type %}
-
-  {% if pkg.data_type in form_data_type %}
+  {% if package_data_type in form_data_type %}
     {%- set form_snippet = field.form_snippet -%}
   
     {%- if not form_snippet -%}

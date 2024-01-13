@@ -3,11 +3,12 @@
 
 import re
 from itertools import count
-from ckan.model import (MAX_TAG_LENGTH, MIN_TAG_LENGTH, PACKAGE_NAME_MIN_LENGTH)
+from ckan.model import (PACKAGE_NAME_MIN_LENGTH)
 from ckan.model.core import State
 from six import string_types
 import ckan.lib.navl.dictization_functions as df
 from ckan.common import _
+import ckan.logic.validators as validators
 
 Invalid = df.Invalid
 missing = df.missing
@@ -15,24 +16,9 @@ missing = df.missing
 def tag_name_validator(value, context):
 
     tagname_match = re.compile('[ก-๙\w \-.]*', re.UNICODE)
-    if isinstance(value, str):
-        value = value.decode('utf8')
     if not tagname_match.match(value, re.U):
         raise Invalid(_('Tag "%s" must be alphanumeric '
                         'characters or symbols: -_.') % (value))
-    return value
-
-def tag_length_validator(value, context):
-    if isinstance(value, str):
-        value = value.decode('utf8')
-    if len(value) < MIN_TAG_LENGTH:
-        raise Invalid(
-            _('Tag "%s" length is less than minimum %s') % (value, MIN_TAG_LENGTH)
-        )
-    if len(value) > MAX_TAG_LENGTH:
-        raise Invalid(
-            _('Tag "%s" length is more than maximum %i') % (value, MAX_TAG_LENGTH)
-        )
     return value
 
 def tag_string_convert(key, data, errors, context):
@@ -57,7 +43,9 @@ def tag_string_convert(key, data, errors, context):
         data[('tags', num, 'name')] = tag
 
     for tag in tags:
-        tag_length_validator(tag, context)
+        if isinstance(tag, str):
+            tag = tag.decode('utf8')
+        validators.tag_length_validator(tag, context)
         tag_name_validator(tag, context)
     
 def package_name_validator(key, data, errors, context):

@@ -7,7 +7,7 @@ from ckan.common import _
 
 import ckan.authz as authz
 from ckan.lib.plugins import DefaultTranslation
-from ckan import logic
+import ckan.model as model
 
 from six import string_types
 
@@ -41,17 +41,12 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
         return facets_dict
 
     # IPackageController
-    def after_show(item, context, data_dict):
-        try:
-            if toolkit.c.action not in ['search','new','edit']:
-                resources = [resource_dict for resource_dict in data_dict['resources'] if not (resource_dict.get('resource_private','') == "True" and not authz.is_authorized('package_update', context, data_dict).get('success'))]
-                data_dict['resources'] = resources
-                data_dict['num_resources'] = len(data_dict['resources'])
-        except:
-            return
-        return
+    def after_show(self, context, data_dict):
+        resources = [resource_dict for resource_dict in data_dict['resources'] if not (resource_dict.get('resource_private','') == "True" and not authz.is_authorized('package_update', context, data_dict).get('success'))]
+        data_dict['resources'] = resources
+        data_dict['num_resources'] = len(data_dict['resources'])
 
-    def after_search(self, search_results, pkg_dict):
+    def after_search(self, search_results, search_params):
         try:
             if toolkit.c.action == 'action':
                 package_list = search_results['results']
@@ -64,14 +59,7 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
         return search_results
 
     def before_view(self, pkg_dict):
-        try:
-            context = {'ignore_auth': True}
-            pkg_dict = logic.get_action("package_show")(context, {
-                'include_tracking': True,
-                'id': pkg_dict['id']
-            })
-        except:
-            log.info('before_view error')
+        pkg_dict['tracking_summary'] = (model.TrackingSummary.get_for_package(pkg_dict['id']))
         return pkg_dict
 
     def _isEnglish(self, s):
@@ -144,10 +132,10 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             toolkit.add_ckan_admin_tab(config_, 'gdc_agency_admin_export', 'ส่งออกรายการชุดข้อมูล')
             toolkit.add_ckan_admin_tab(config_, 'gdc_agency_admin_popup', 'ป็อปอัพ')
         else:
-            toolkit.add_ckan_admin_tab(config_, 'banner_edit', 'แก้ไขแบนเนอร์', icon='wrench')
-            toolkit.add_ckan_admin_tab(config_, 'dataset_import', 'นำเข้ารายการชุดข้อมูล', icon='cloud-upload')
-            toolkit.add_ckan_admin_tab(config_, 'gdc_agency_admin_export', 'ส่งออกรายการชุดข้อมูล', icon='cloud-download')
-            toolkit.add_ckan_admin_tab(config_, 'gdc_agency_admin_popup', 'ป็อปอัพ', icon='window-maximize')
+            toolkit.add_ckan_admin_tab(config_, 'banner_edit', u'แก้ไขแบนเนอร์', icon='wrench')
+            toolkit.add_ckan_admin_tab(config_, 'dataset_import', u'นำเข้ารายการชุดข้อมูล', icon='cloud-upload')
+            toolkit.add_ckan_admin_tab(config_, 'gdc_agency_admin_export', u'ส่งออกรายการชุดข้อมูล', icon='cloud-download')
+            toolkit.add_ckan_admin_tab(config_, 'gdc_agency_admin_popup', u'ป็อปอัพ', icon='window-maximize')
 
         toolkit.add_template_directory(config_, 'templates')
         toolkit.add_public_directory(config_, 'public')
@@ -253,24 +241,18 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             action='user_active',
             controller='ckanext.thai_gdc.controllers.user:UserManageController',
         )
-        map.connect(
-            'dataset_gdcatalog_state',
-            '/dataset/gdcatalog-state/{package_id}',
-            action='gdcatalog_state',
-            controller='ckanext.thai_gdc.controllers.dataset:DatasetManageController',
-        )
-        map.connect(
-            'organizations_index',
-            '/organization/',
-            action='index',
-            controller='ckanext.thai_gdc.controllers.organization:OrganizationCustomController'
-        )
-        map.connect(
-            'organizations_index',
-            '/organization',
-            action='index',
-            controller='ckanext.thai_gdc.controllers.organization:OrganizationCustomController'
-        )
+        # map.connect(
+        #     'organizations_index',
+        #     '/organization/',
+        #     action='index',
+        #     controller='ckanext.thai_gdc.controllers.organization:OrganizationCustomController'
+        # )
+        # map.connect(
+        #     'organizations_index',
+        #     '/organization',
+        #     action='index',
+        #     controller='ckanext.thai_gdc.controllers.organization:OrganizationCustomController'
+        # )
         map.connect(
             'gdc_agency_admin_export',
             '/ckan-admin/dataset-export',
@@ -327,7 +309,6 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
     def get_validators(self):
         return {
             'tag_name_validator': thai_gdc_validator.tag_name_validator,
-            'tag_length_validator': thai_gdc_validator.tag_length_validator,
             'tag_string_convert': thai_gdc_validator.tag_string_convert,
             'package_name_validator': thai_gdc_validator.package_name_validator,
             'package_title_validator': thai_gdc_validator.package_title_validator,
@@ -366,7 +347,6 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             'thai_gdc_get_is_as_a_service': thai_gdc_h.get_is_as_a_service,
             'thai_gdc_get_gdcatalog_version_update': thai_gdc_h.get_gdcatalog_version_update,
             'thai_gdc_users_in_organization': thai_gdc_h.users_in_organization,
-            'thai_gdc_get_popular_datasets': thai_gdc_h.get_popular_datasets,
             'gdc_agency_get_suggest_view': thai_gdc_h.get_suggest_view,
             'gdc_agency_get_conf_group': thai_gdc_h.get_conf_group,
             'nso_get_last_modified_datasets': thai_gdc_h.get_last_modified_datasets,
