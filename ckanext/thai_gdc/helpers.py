@@ -387,7 +387,7 @@ def get_conf_group(conf_group):
 def get_last_modified_datasets(limit):
     try:
         package = model.Package
-        q = model.Session.query(package.name, package.title, package.type, package.metadata_modified.label('date_modified')).filter(package.state == 'active').order_by(package.metadata_modified.desc()).limit(limit)
+        q = model.Session.query(package.name, package.title, package.type, package.metadata_modified.label('date_modified')).filter(package.state == 'active').filter(package.private == False).order_by(package.metadata_modified.desc()).limit(limit)
         packages = q.all()
     except:
         return []
@@ -404,6 +404,6 @@ def get_popular_datasets(limit):
             'title': item['title'],
             'type': item['type'],
             'date_modified' : item['metadata_modified'],
-            'recent_view': tracking_summary['recent']})
+            'total_view': tracking_summary['total']})
 
     return package_list

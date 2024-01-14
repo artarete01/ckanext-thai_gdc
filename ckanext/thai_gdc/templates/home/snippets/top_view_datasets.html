@@ -5,7 +5,7 @@
       <div class="row">
         <div class="col-md-9 col-sm-9 col-xs-12" style="width: 100%;">
           <a href="{{ h.url_for('%s.read' % dataset.type, id=dataset.name) }}" class="textHeaderContentSearch">{{ dataset.title }}</a><br>
-          <span class="blockContentSearchDate"><i class="fa fa-eye" aria-hidden="true"></i> จำนวนการเข้าชม {{ dataset.recent_view }} ครั้ง</span>
+          <span class="blockContentSearchDate"><i class="fa fa-eye" aria-hidden="true"></i> จำนวนการเข้าชม {{ dataset.total_view }} ครั้ง</span>
           <hr class="dash"> 
         </div>
       </div>

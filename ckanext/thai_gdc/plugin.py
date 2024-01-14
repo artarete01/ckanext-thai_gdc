@@ -72,26 +72,29 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
 
     def before_search(self, search_params):
         import shlex
-        if 'q' in search_params:
-            q = search_params['q']
-            lelist = ["+","&&","||","!","(",")","{","}","[","]","^","~","*","?",":","/"]
-            contains_word = lambda s, l: any(map(lambda x: x in s, l))
-            if len(q) > 0 and len([e for e in lelist if e in q]) == 0:
-                q_list = shlex.split(search_params['q'])
-                q_list_result = []
-                for q_item in q_list:
-                    if contains_word(q, ['AND','OR','NOT']) and q_item not in ['AND','OR','NOT'] and not self._isEnglish(q_item):
-                        q_item = 'text:*'+q_item+'*'
-                    elif contains_word(q, ['AND','OR','NOT']) and q_item not in ['AND','OR','NOT'] and self._isEnglish(q_item):
-                        q_item = 'text:'+q_item
-                    elif not contains_word(q, ['AND','OR','NOT']):
-                        q_item = '*'+q_item+'*'
-                    q_list_result.append(q_item)
-                q = ' '.join(q_list_result)
-            search_params['q'] = q
-            if not contains_word(q, ['AND','OR','NOT']):
-                search_params['defType'] = 'edismax'
-                search_params['qf'] = 'name^4 title^4 tags^3 groups^2 organization^2 notes^2 maintainer^2 text'
+        try:
+            if 'q' in search_params:
+                q = search_params['q']
+                lelist = ["+","&&","||","!","(",")","{","}","[","]","^","~","*","?",":","/"]
+                contains_word = lambda s, l: any(map(lambda x: x in s, l))
+                if len(q) > 0 and len([e for e in lelist if e in q]) == 0:
+                    q_list = shlex.split(search_params['q'].encode('utf8'))
+                    q_list_result = []
+                    for q_item in q_list:
+                        if contains_word(q, ['AND','OR','NOT']) and q_item not in ['AND','OR','NOT'] and not self._isEnglish(q_item):
+                            q_item = 'text:*'+q_item+'*'
+                        elif contains_word(q, ['AND','OR','NOT']) and q_item not in ['AND','OR','NOT'] and self._isEnglish(q_item):
+                            q_item = 'text:'+q_item
+                        elif not contains_word(q, ['AND','OR','NOT']):
+                            q_item = '*'+q_item+'*'
+                        q_list_result.append(q_item)
+                    q = ' '.join(q_list_result)
+                search_params['q'] = q
+                if not contains_word(q, ['AND','OR','NOT']):
+                    search_params['defType'] = 'edismax'
+                    search_params['qf'] = 'name^4 title^4 tags^3 groups^2 organization^2 notes^2 maintainer^2 text'
+        except:
+            return search_params
         return search_params
 
     def _unicode_string_convert(self, value):
