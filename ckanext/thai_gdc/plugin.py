@@ -71,14 +71,13 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
             return True
 
     def before_search(self, search_params):
-        import shlex
         try:
             if 'q' in search_params:
                 q = search_params['q']
                 lelist = ["+","&&","||","!","(",")","{","}","[","]","^","~","*","?",":","/"]
                 contains_word = lambda s, l: any(map(lambda x: x in s, l))
                 if len(q) > 0 and len([e for e in lelist if e in q]) == 0:
-                    q_list = shlex.split(search_params['q'].encode('utf8'))
+                    q_list = q.split()
                     q_list_result = []
                     for q_item in q_list:
                         if contains_word(q, ['AND','OR','NOT']) and q_item not in ['AND','OR','NOT'] and not self._isEnglish(q_item):
