@@ -179,6 +179,8 @@ class Thai_GDCPlugin(plugins.SingletonPlugin, DefaultTranslation, toolkit.Defaul
         config_['thai_gdc.gdcatalog_apiregister_url'] = config_.get('thai_gdc.gdcatalog_apiregister_url', 'https://apiregister.gdcatalog.go.th')
         config_['ckan.datastore.sqlsearch.enabled'] = config_.get('ckan.datastore.sqlsearch.enabled', 'false')
         config_['ckan.datastore.search.rows_max'] = config_.get('ckan.datastore.search.rows_max', '10000')
+        config_['ckan.upload.admin.mimetypes'] = config_.get('ckan.upload.admin.mimetypes', 'image/png image/gif image/jpeg image/vnd.microsoft.icon application/zip')
+        config_['ckan.upload.admin.types'] = config_.get('ckan.upload.admin.types', 'image application')
 
     def update_config_schema(self, schema):
         ignore_missing = toolkit.get_validator('ignore_missing')
